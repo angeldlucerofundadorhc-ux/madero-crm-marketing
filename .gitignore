@@ -10,6 +10,7 @@ $RECYCLE.BIN/
 tmp/
 temp/
 .system_generated/
+*.zip
 
 # Editor / IDE
 .idea/
