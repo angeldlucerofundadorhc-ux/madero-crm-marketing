@@ -150,6 +150,7 @@ window.MaderoApp = (function () {
     // Dock Badges
     setTxt('dock-lbl-conduccion', `Conducción (${sum.totalPrioridades})`);
     setTxt('dock-lbl-proveedores', `Proveedores (${sum.provDesviosCount})`);
+    setTxt('dock-lbl-fotos', `Fotografías (${sum.fotosUnidadesTotales || 36})`);
     setTxt('dock-lbl-direccion', `Dirección (${sum.decisionesTotalCount})`);
   }
 
@@ -222,6 +223,8 @@ window.MaderoApp = (function () {
       html = window.MaderoConduccion.renderEquipoModule();
     } else if (activeModuleId === 'm9-proveedores') {
       html = window.MaderoProveedores.renderModule();
+    } else if (activeModuleId === 'm3-fotos') {
+      html = window.MaderoFotografias.renderModule();
     } else {
       const modObj = window.MaderoData.MODULOS_SISTEMA.find(m => m.id === activeModuleId);
       html = window.MaderoUI.renderUpcomingModuleBlueprint(modObj);

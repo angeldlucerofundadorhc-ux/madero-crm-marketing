@@ -209,6 +209,61 @@ window.MaderoStore = (function () {
       };
     });
 
+
+    // Fotografías y Digitalización (Módulo 3 - Paso 3)
+    const fotosUnidades = s.fotografia_unidades || [];
+    const fotosMeta = s.fotografia_semanal_meta || {};
+    const fotosEvolucion = fotosMeta.evolucion || {};
+    const universoControladoTotal = fotosMeta.universo_controlado_total || 163;
+    const conFotoLucyTotal = fotosMeta.con_foto_lucy_total || 97;
+    const sinFotoLucyTotal = fotosMeta.sin_foto_lucy_total || 66;
+    const coberturaGeneralLucyPct = universoControladoTotal > 0
+      ? Math.round((conFotoLucyTotal / universoControladoTotal) * 1000) / 10
+      : 0;
+
+    const fotosListosParaFotografiar = fotosUnidades.filter(u => u.estado_proceso === 'LISTO_PARA_FOTOGRAFIAR');
+    const fotosPendientesCoordinacion = fotosUnidades.filter(u =>
+      u.estado_proceso === 'PENDIENTE_COORDINACION' ||
+      (Number(u.cantidad_fotos_actual) === 0 && u.estado_proceso !== 'AL_DIA' && u.estado_proceso !== 'LISTO_PARA_FOTOGRAFIAR')
+    );
+    const fotosPendientesCarga = fotosUnidades.filter(u =>
+      Number(u.cantidad_fotos_actual) > 0 &&
+      (!u.cargado_drive || !u.cargado_lucy || !u.cargado_web || !u.cargado_redes)
+    );
+    const fotosCoberturaIncompleta = fotosUnidades.filter(u =>
+      Number(u.cantidad_fotos_actual) > 0 &&
+      Number(u.cantidad_fotos_actual) < (Number(u.estandar_fotos_minimo) || 8)
+    );
+    const fotosCalidadObservada = fotosUnidades.filter(u =>
+      u.calidad_estado === 'OBSERVADA' || u.estado_proceso === 'CALIDAD_OBSERVADA'
+    );
+    const fotosInconsistenciasCanales = fotosUnidades.filter(u => Boolean(u.inconsistencia_detectada));
+    const fotosAlDia = fotosUnidades.filter(u =>
+      u.estado_proceso === 'AL_DIA' &&
+      !u.inconsistencia_detectada &&
+      u.cargado_drive && u.cargado_lucy && u.cargado_web && u.cargado_redes &&
+      Number(u.cantidad_fotos_actual) >= (Number(u.estandar_fotos_minimo) || 8)
+    );
+
+    // Desglose por sucursales
+    const catalogoSucursales = (window.MaderoData && window.MaderoData.SUCURSALES_MADERO) || [];
+    const desgloseSucursales = catalogoSucursales.map(suc => {
+      const enMuestra = fotosUnidades.filter(u => {
+        if (suc.es_taller) return u.es_taller || (u.sucursal && (u.sucursal.toLowerCase().includes('taller') || u.sucursal === 'Talleres Externos / Movimiento'));
+        return u.sucursal === suc.nombre;
+      });
+      const conFotoMuestra = enMuestra.filter(u => Number(u.cantidad_fotos_actual) >= (Number(u.estandar_fotos_minimo) || 8) && u.cargado_lucy).length;
+      const sinFotoMuestra = enMuestra.length - conFotoMuestra;
+      const pctOficial = suc.total_stock > 0 ? Math.round((suc.con_foto / suc.total_stock) * 100) : 0;
+      return {
+        ...suc,
+        muestra_total: enMuestra.length,
+        muestra_con_foto: conFotoMuestra,
+        muestra_sin_foto: sinFotoMuestra,
+        pct_oficial: pctOficial
+      };
+    });
+
     const frentesRojo = gob.filter(g => g.semaforo === 'ROJO').length;
     const frentesAmbar = gob.filter(g => g.semaforo === 'AMBAR').length;
     const frentesVerde = gob.filter(g => g.semaforo === 'VERDE').length;
@@ -253,6 +308,29 @@ window.MaderoStore = (function () {
       decisionesConsolidadas,
       decisionesTotalCount: decisionesConsolidadas.length,
 
+
+      // Módulo 3: Fotografías y Digitalización (Sección 6)
+      fotosUnidadesTotales: fotosUnidades.length,
+      universoControladoTotal,
+      conFotoLucyTotal,
+      sinFotoLucyTotal,
+      coberturaGeneralLucyPct,
+      fotosListosParaFotografiarCount: fotosListosParaFotografiar.length,
+      fotosListosParaFotografiar,
+      fotosPendientesCoordinacionCount: fotosPendientesCoordinacion.length,
+      fotosPendientesCoordinacion,
+      fotosPendientesCargaCount: fotosPendientesCarga.length,
+      fotosPendientesCarga,
+      fotosCoberturaIncompletaCount: fotosCoberturaIncompleta.length,
+      fotosCoberturaIncompleta,
+      fotosCalidadObservadaCount: fotosCalidadObservada.length,
+      fotosCalidadObservada,
+      fotosInconsistenciasCanalesCount: fotosInconsistenciasCanales.length,
+      fotosInconsistenciasCanales,
+      fotosAlDiaCount: fotosAlDia.length,
+      desgloseSucursales,
+      fotosEvolucion,
+      fotosMeta,
       // Gobernanza
       frentesRojo,
       frentesAmbar,
@@ -445,6 +523,217 @@ window.MaderoStore = (function () {
   }
 
   // ------------------------------------------------------------------------
+  // MÓDULO 3: FOTOGRAFÍAS, DIGITALIZACIÓN Y SINCRONIZACIÓN (Paso 3)
+  // ------------------------------------------------------------------------
+  function upsertFotografiaUnidad(unidad) {
+    const list = getState().fotografia_unidades;
+    if (!unidad.id) {
+      unidad.id = nextId('FOT', list);
+    }
+    // Auto-detección inteligente del estado si no viene forzado
+    if (!unidad.estado_proceso) {
+      if (unidad.inconsistencia_detectada) {
+        unidad.estado_proceso = 'AL_DIA'; // o inconsistencia
+      } else if (unidad.calidad_estado === 'OBSERVADA') {
+        unidad.estado_proceso = 'CALIDAD_OBSERVADA';
+      } else if (Number(unidad.cantidad_fotos_actual) === 0) {
+        unidad.estado_proceso = unidad.causa_demora ? 'PENDIENTE_COORDINACION' : 'LISTO_PARA_FOTOGRAFIAR';
+      } else if (Number(unidad.cantidad_fotos_actual) < (Number(unidad.estandar_fotos_minimo) || 8)) {
+        unidad.estado_proceso = 'COBERTURA_INCOMPLETA';
+      } else if (!unidad.cargado_drive || !unidad.cargado_lucy || !unidad.cargado_web || !unidad.cargado_redes) {
+        unidad.estado_proceso = 'FOTOGRAFIADO_PENDIENTE_CARGA';
+      } else {
+        unidad.estado_proceso = 'AL_DIA';
+      }
+    }
+    const idx = list.findIndex(u => u.id === unidad.id);
+    if (idx !== -1) {
+      list[idx] = Object.assign({}, list[idx], unidad);
+    } else {
+      list.unshift(unidad);
+    }
+    persist(true);
+    return unidad;
+  }
+
+  function deleteFotografiaUnidad(id) {
+    const list = getState().fotografia_unidades;
+    const idx = list.findIndex(u => u.id === id);
+    if (idx !== -1) {
+      list.splice(idx, 1);
+      persist(true);
+      return true;
+    }
+    return false;
+  }
+
+  function toggleFotografiaCanal(id, canal) {
+    const list = getState().fotografia_unidades;
+    const item = list.find(u => u.id === id);
+    if (item) {
+      const key = 'cargado_' + canal.toLowerCase();
+      if (key in item) {
+        item[key] = !item[key];
+        // Recalcular estado de carga
+        if (Number(item.cantidad_fotos_actual) >= (Number(item.estandar_fotos_minimo) || 8)) {
+          if (item.cargado_drive && item.cargado_lucy && item.cargado_web && item.cargado_redes) {
+            if (item.calidad_estado !== 'OBSERVADA') {
+              item.estado_proceso = 'AL_DIA';
+            }
+          } else {
+            item.estado_proceso = 'FOTOGRAFIADO_PENDIENTE_CARGA';
+          }
+        }
+        persist(true);
+        return item;
+      }
+    }
+    return null;
+  }
+
+  function updateFotografiaMeta(patch) {
+    const meta = getState().fotografia_semanal_meta;
+    if (meta) {
+      Object.assign(meta, patch);
+      persist(true);
+      return meta;
+    }
+    return null;
+  }
+
+  function importarLucySnapshot(items) {
+    if (!Array.isArray(items) || items.length === 0) return 0;
+    const list = getState().fotografia_unidades;
+    let importados = 0;
+    items.forEach(raw => {
+      if (!raw.patente) return;
+      const normPat = raw.patente.toUpperCase().trim();
+      const existing = list.find(u => u.patente.toUpperCase().trim() === normPat);
+      if (existing) {
+        Object.assign(existing, {
+          marca_modelo: raw.marca_modelo || existing.marca_modelo,
+          anio: raw.anio || existing.anio,
+          color: raw.color || existing.color,
+          km: raw.km !== undefined ? raw.km : existing.km,
+          precio_revista: raw.precio_revista || existing.precio_revista,
+          sucursal: raw.sucursal || existing.sucursal,
+          es_taller: raw.es_taller !== undefined ? raw.es_taller : existing.es_taller,
+          cantidad_fotos_actual: raw.cantidad_fotos_actual !== undefined ? raw.cantidad_fotos_actual : existing.cantidad_fotos_actual,
+          cargado_lucy: raw.cargado_lucy !== undefined ? raw.cargado_lucy : existing.cargado_lucy
+        });
+      } else {
+        const newUnit = {
+          id: nextId('FOT', list),
+          patente: normPat,
+          marca_modelo: raw.marca_modelo || 'Vehículo importado Lucy',
+          anio: Number(raw.anio) || 2022,
+          color: raw.color || 'Consultar',
+          km: Number(raw.km) || 0,
+          precio_revista: Number(raw.precio_revista) || 0,
+          sucursal: raw.sucursal || 'Sin asignar / Salón no especificado',
+          es_taller: Boolean(raw.es_taller),
+          dias_en_stock: Number(raw.dias_en_stock) || 1,
+          estado_proceso: Number(raw.cantidad_fotos_actual || 0) > 0 ? 'FOTOGRAFIADO_PENDIENTE_CARGA' : 'LISTO_PARA_FOTOGRAFIAR',
+          causa_demora: raw.causa_demora || '',
+          proxima_accion: raw.proxima_accion || 'Auditar sesión fotográfica en salón.',
+          cargado_drive: Boolean(raw.cargado_drive),
+          cargado_lucy: Boolean(raw.cargado_lucy),
+          cargado_web: Boolean(raw.cargado_web),
+          cargado_redes: Boolean(raw.cargado_redes),
+          cantidad_fotos_actual: Number(raw.cantidad_fotos_actual) || 0,
+          estandar_fotos_minimo: 8,
+          fotos_faltantes_detalle: raw.fotos_faltantes_detalle || '',
+          calidad_estado: raw.calidad_estado || 'PENDIENTE_REVISION',
+          motivo_calidad: raw.motivo_calidad || '',
+          origen_observacion: raw.origen_observacion || 'Sin observación',
+          responsable_correccion: raw.responsable_correccion || '',
+          fecha_nueva_revision: raw.fecha_nueva_revision || '',
+          inconsistencia_detectada: Boolean(raw.inconsistencia_detectada),
+          detalle_inconsistencia: raw.detalle_inconsistencia || '',
+          canales_inconsistentes: Array.isArray(raw.canales_inconsistentes) ? raw.canales_inconsistentes : [],
+          fecha_ultima_sesion: raw.fecha_ultima_sesion || '',
+          drive_folder_url: raw.drive_folder_url || '',
+          lucy_url: raw.lucy_url || ('https://madero.lucydms.com/stock/' + normPat.replace(/-/g, '')),
+          web_url: raw.web_url || '',
+          notas: raw.notas || 'Importado desde Lucy DMS.'
+        };
+        list.push(newUnit);
+      }
+      importados++;
+    });
+    persist(true);
+    return importados;
+  }
+
+  function exportFotografiaCSV() {
+    const list = getState().fotografia_unidades || [];
+    const headers = [
+      'ID',
+      'Patente',
+      'Marca y Modelo',
+      'Año',
+      'Color',
+      'Km',
+      'Precio Revista',
+      'Sucursal / Ubicación',
+      'Es Taller',
+      'Días en Stock',
+      'Estado Proceso',
+      'Causa Demora',
+      'Próxima Acción',
+      'Drive',
+      'Lucy DMS',
+      'Web Oficial',
+      'Redes',
+      'Fotos Actuales',
+      'Estándar Mínimo',
+      'Fotos Faltantes',
+      'Calidad Estado',
+      'Motivo Calidad',
+      'Origen Observación',
+      'Responsable Corrección',
+      'Fecha Nueva Revisión',
+      'Inconsistencia Detectada',
+      'Detalle Inconsistencia',
+      'Fecha Última Sesión',
+      'Notas'
+    ];
+    const rows = list.map(u => [
+      u.id,
+      u.patente,
+      u.marca_modelo,
+      u.anio,
+      u.color,
+      u.km,
+      u.precio_revista,
+      u.sucursal,
+      u.es_taller ? 'SÍ' : 'NO',
+      u.dias_en_stock,
+      u.estado_proceso,
+      u.causa_demora,
+      u.proxima_accion,
+      u.cargado_drive ? 'SÍ' : 'NO',
+      u.cargado_lucy ? 'SÍ' : 'NO',
+      u.cargado_web ? 'SÍ' : 'NO',
+      u.cargado_redes ? 'SÍ' : 'NO',
+      u.cantidad_fotos_actual,
+      u.estandar_fotos_minimo,
+      u.fotos_faltantes_detalle,
+      u.calidad_estado,
+      u.motivo_calidad,
+      u.origen_observacion,
+      u.responsable_correccion,
+      u.fecha_nueva_revision,
+      u.inconsistencia_detectada ? 'SÍ' : 'NO',
+      u.detalle_inconsistencia,
+      u.fecha_ultima_sesion,
+      u.notas
+    ]);
+    const dateStr = (getState().meta.fecha_corte || 'reporte').replace(/[^0-9-]/g, '');
+    exportCSV(`madero_reporte_fotografia_secc6_${dateStr}.csv`, headers, rows);
+  }
+
+  // ------------------------------------------------------------------------
   // IMPORTACIÓN / EXPORTACIÓN / BACKUP SEGURO
   // ------------------------------------------------------------------------
   function exportCSV(filename, headers, rows) {
@@ -519,6 +808,13 @@ window.MaderoStore = (function () {
     getHorasAbsorbidasCompromiso,
     isPendienteMinuta,
     isVencidoSinActualizar,
+    // Módulo 3 (Paso 3)
+    upsertFotografiaUnidad,
+    deleteFotografiaUnidad,
+    toggleFotografiaCanal,
+    updateFotografiaMeta,
+    importarLucySnapshot,
+    exportFotografiaCSV,
     exportCSV,
     exportJSONBackup,
     importJSONBackup,
