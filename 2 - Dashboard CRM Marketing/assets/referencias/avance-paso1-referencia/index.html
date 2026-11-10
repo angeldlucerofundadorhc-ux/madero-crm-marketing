@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Madero Automotores · Control Integral de Marketing</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Apple Glassmorphism System Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="p-3 sm:p-6 lg:p-8 pb-32 sm:pb-28">
+
+  <!-- TOAST DE CONFIRMACIÓN -->
+  <div id="global-toast" class="hidden"></div>
+
+  <!-- TOP APP BAR (HEADER MAESTRO) -->
+  <header class="max-w-7xl mx-auto mb-5 sm:mb-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3.5 glass-card p-4 sm:px-6 no-print">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-stone-900 text-white flex items-center justify-center font-bold text-base sm:text-lg shadow-sm shrink-0">
+        M
+      </div>
+      <div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <h1 class="text-sm sm:text-lg font-extrabold tracking-tight text-stone-900 leading-tight">Madero Automotores</h1>
+          <span class="badge-pill bg-stone-200/85 text-stone-800 text-[10px] font-bold">Control Integral Marketing</span>
+          <span class="badge-pill badge-emerald text-[10px] font-mono">Paso 1 · Base Activa</span>
+        </div>
+        <p class="text-[11px] sm:text-xs text-stone-500 mt-0.5">
+          Conducción: <strong id="hdr-lider" class="text-stone-800">Ángelo Lucero</strong> · <span id="hdr-semana">Semana 45</span> · Corte: <span id="hdr-corte" class="font-mono font-semibold text-stone-700">06/11/2026</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto justify-between lg:justify-end pt-2.5 lg:pt-0 border-t lg:border-t-0 border-stone-200/70">
+      <!-- Switcher Oficial de Dos Niveles (Sección 3 del Documento) -->
+      <div class="flex items-center gap-1 bg-stone-200/75 p-1 rounded-2xl">
+        <button type="button" id="btn-nivel-operativo" onclick="MaderoApp.setNivel('operativo')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition tab-btn-active">
+          Nivel 1 · Control Operativo
+        </button>
+        <button type="button" id="btn-nivel-gerencial" onclick="MaderoApp.setNivel('gerencial')" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-stone-600 hover:text-stone-900 transition">
+          Nivel 2 · Informe Dirección
+        </button>
+      </div>
+
+      <button type="button" onclick="MaderoUI.openDataCenterModal()" class="px-3 py-1.5 rounded-xl bg-white text-stone-800 border border-stone-300 text-xs font-semibold hover:bg-stone-50 transition shadow-xs flex items-center gap-1.5 shrink-0">
+        <svg class="w-3.5 h-3.5 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        <span>Corte &amp; Respaldo</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="max-w-7xl mx-auto space-y-5 sm:space-y-6">
+
+    <!-- 4 PILARES OPERATIVOS DE CONDUCCIÓN (KPIs Vivos Clicables) -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 no-print">
+
+      <!-- Card 1: Agenda, Compromisos y Desvíos -->
+      <div class="glass-card glass-card-interactive p-4 sm:p-5 cursor-pointer hover:border-blue-300" onclick="MaderoApp.jumpToAgendaDesvios()">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-blue-900 uppercase tracking-wider flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-blue-600"></span> Agenda &amp; Compromisos
+          </span>
+          <span id="kpi-pri-badge" class="badge-pill badge-blue">8 frentes</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="kpi-pri-count" class="text-2xl sm:text-3xl font-extrabold text-stone-900 font-mono">8</span>
+          <span class="text-xs text-blue-800 font-semibold">Objetivos en seguimiento</span>
+        </div>
+        <p id="kpi-pri-desc" class="text-xs text-stone-500 mt-1.5 leading-snug">Control de fechas y entregas.</p>
+        <div class="mt-2.5 pt-2.5 border-t border-stone-200/60 flex items-center justify-between text-[11px] text-stone-600 font-medium">
+          <span id="kpi-pri-closed">Cerrados c/ evidencia: 1</span>
+          <span class="text-blue-700 font-bold">Auditar desvíos →</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Decisiones Requeridas de Dirección -->
+      <div class="glass-card glass-card-interactive p-4 sm:p-5 cursor-pointer hover:border-amber-300" onclick="MaderoApp.jumpToDecisionesDireccion()">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-amber-500"></span> Escalado a Dirección
+          </span>
+          <span id="kpi-dir-badge" class="badge-pill badge-amber">3 esc.</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="kpi-dir-count" class="text-2xl sm:text-3xl font-extrabold text-stone-900 font-mono">3</span>
+          <span class="text-xs text-amber-800 font-semibold">Decisiones requeridas</span>
+        </div>
+        <p id="kpi-dir-desc" class="text-xs text-stone-500 mt-1.5 leading-snug">Con antecedente y recomendación.</p>
+        <div class="mt-2.5 pt-2.5 border-t border-stone-200/60 flex items-center justify-between text-[11px] text-stone-600 font-medium">
+          <span>Sección 1 y 9 · Criterio Líder</span>
+          <span class="text-amber-800 font-bold">Ver definiciones →</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Capacidad Equipo Interno y Continuidad -->
+      <div class="glass-card glass-card-interactive p-4 sm:p-5 cursor-pointer hover:border-emerald-300" onclick="MaderoApp.jumpToEquipoCapacidad()">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-emerald-900 uppercase tracking-wider flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Equipo Interno
+          </span>
+          <span id="kpi-eq-badge" class="badge-pill badge-emerald">26% carga</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="kpi-eq-count" class="text-2xl sm:text-3xl font-extrabold text-stone-900 font-mono">47h</span>
+          <span id="kpi-eq-sub" class="text-xs text-emerald-800 font-semibold">de 180h semanales</span>
+        </div>
+        <p id="kpi-eq-desc" class="text-xs text-stone-500 mt-1.5 leading-snug">Cobertura, backups y bloqueos.</p>
+        <div class="mt-2.5 pt-2.5 border-t border-stone-200/60 flex items-center justify-between text-[11px] text-stone-600 font-medium">
+          <span>Comodoro · Neuquén · Cordillera</span>
+          <span class="text-emerald-700 font-bold">Ver capacidad →</span>
+        </div>
+      </div>
+
+      <!-- Card 4: Trabajo Absorbido (No Sustitución Silenciosa) -->
+      <div class="glass-card glass-card-interactive p-4 sm:p-5 cursor-pointer hover:border-rose-300" onclick="MaderoApp.jumpToTrabajoAbsorbido()">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-rose-900 uppercase tracking-wider flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-rose-600"></span> Trabajo Absorbido
+          </span>
+          <span id="kpi-abs-badge" class="badge-pill badge-red font-semibold">2 casos</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="kpi-abs-count" class="text-2xl sm:text-3xl font-extrabold text-stone-900 font-mono">6.5h</span>
+          <span class="text-xs text-rose-800 font-semibold">No sustitución silenciosa</span>
+        </div>
+        <p id="kpi-abs-desc" class="text-xs text-stone-500 mt-1.5 leading-snug">Fallas externas resueltas y documentadas.</p>
+        <div class="mt-2.5 pt-2.5 border-t border-stone-200/60 flex items-center justify-between text-[11px] text-stone-600 font-medium">
+          <span>Sección 7 y 9 · Reclamo origen</span>
+          <span class="text-rose-700 font-bold">Ver evidencia →</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- MAPA ACCESO DIRECTO A LOS 12 MÓDULOS EXIGIDOS POR DIRECCIÓN (Sección 5) -->
+    <nav id="modules-12-strip" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 no-print">
+      <!-- Renderizado dinámico por MaderoApp.renderModuleStrip() -->
+    </nav>
+
+    <!-- VISTA DINÁMICA ACTIVA -->
+    <section id="app-view-container">
+      <!-- Renderizado dinámico por MaderoApp.renderActiveView() -->
+    </section>
+
+  </main>
+
+  <!-- VISIONOS FLOATING BOTTOM DOCK (6 Macro-Clusters alineados a los 6 Pasos) -->
+  <div class="fixed bottom-3 sm:bottom-5 left-0 right-0 sm:left-1/2 sm:-translate-x-1/2 sm:w-auto px-3 sm:px-0 z-40 flex justify-center pointer-events-none no-print">
+
+    <!-- Mobile Dock (< 640px) -->
+    <nav class="sm:hidden vision-dock w-full max-w-md p-1.5 rounded-2xl grid grid-cols-6 gap-1 text-[9px] font-semibold pointer-events-auto">
+      <button type="button" onclick="MaderoApp.navigateCluster('conduccion')" id="dock-mob-conduccion" class="py-1.5 px-0.5 rounded-xl text-stone-600 flex flex-col items-center justify-center gap-0.5 transition tab-btn-active">
+        <span>🧭</span>
+        <span class="truncate">Conducción</span>
+      </button>
+      <button type="button" onclick="MaderoApp.navigateCluster('proveedores')" id="dock-mob-proveedores" class="py-1.5 px-0.5 rounded-xl text-stone-600 flex flex-col items-center justify-center gap-0.5 transition">
+        <span>🤝</span>
+        <span class="truncate">REM/Prov</span>
+      </button>
+      <button type="button" onclick="MaderoApp.navigateCluster('fotos')" id="dock-mob-fotos" class="py-1.5 px-0.5 rounded-xl text-stone-600 flex flex-col items-center justify-center gap-0.5 transition">
+        <span>📸</span>
+        <span class="truncate">Fotos</span>
+      </button>
+      <button type="button" onclick="MaderoApp.navigateCluster('contenido-pauta')" id="dock-mob-contenido-pauta" class="py-1.5 px-0.5 rounded-xl text-stone-600 flex flex-col items-center justify-center gap-0.5 transition">
+        <span>📣</span>
+        <span class="truncate">Pauta/Red</span>
+      </button>
+      <button type="button" onclick="MaderoApp.navigateCluster('ecosistema')" id="dock-mob-ecosistema" class="py-1.5 px-0.5 rounded-xl text-stone-600 flex flex-col items-center justify-center gap-0.5 transition">
+        <span>🌐</span>
+        <span class="truncate">Web/Terr</span>
+      </button>
+      <button type="button" onclick="MaderoApp.navigateCluster('direccion')" id="dock-mob-direccion" class="py-1.5 px-0.5 rounded-xl text-stone-600 flex flex-col items-center justify-center gap-0.5 transition">
+        <span>🏛️</span>
+        <span class="truncate">Dirección</span>
+      </button>
+    </nav>
+
+    <!-- Desktop / Tablet Dock (>= 640px) -->
+    <nav class="hidden sm:flex vision-dock px-2.5 py-2 rounded-2xl items-center gap-1 text-xs font-semibold pointer-events-auto">
+      <button type="button" onclick="MaderoApp.navigateCluster('conduccion')" id="dock-btn-conduccion" class="px-3 py-1.5 rounded-xl text-stone-600 hover:text-stone-900 transition flex items-center gap-1.5 tab-btn-active">
+        <span>🧭</span>
+        <span id="dock-lbl-conduccion">Conducción (8)</span>
+      </button>
+      <button type="button" onclick="MaderoApp.navigateCluster('proveedores')" id="dock-btn-proveedores" class="px-3 py-1.5 rounded-xl text-stone-600 hover:text-stone-900 transition flex items-center gap-1.5">
+        <span>🤝</span>
+        <span>Proveedores &amp; REM</span>
+      </button>
+      <button type="button" onclick="MaderoApp.navigateCluster('fotos')" id="dock-btn-fotos" class="px-3 py-1.5 rounded-xl text-stone-600 hover:text-stone-900 transition flex items-center gap-1.5">
+        <span>📸</span>
+        <span>Fotos &amp; Stock</span>
+      </button>
+      <button type="button" onclick="MaderoApp.navigateCluster('contenido-pauta')" id="dock-btn-contenido-pauta" class="px-3 py-1.5 rounded-xl text-stone-600 hover:text-stone-900 transition flex items-center gap-1.5">
+        <span>📣</span>
+        <span>Contenido &amp; Pauta</span>
+      </button>
+      <button type="button" onclick="MaderoApp.navigateCluster('ecosistema')" id="dock-btn-ecosistema" class="px-3 py-1.5 rounded-xl text-stone-600 hover:text-stone-900 transition flex items-center gap-1.5">
+        <span>🌐</span>
+        <span>Google, Web &amp; Territorio</span>
+      </button>
+      <button type="button" onclick="MaderoApp.navigateCluster('direccion')" id="dock-btn-direccion" class="px-3 py-1.5 rounded-xl text-stone-600 hover:text-stone-900 transition flex items-center gap-1.5">
+        <span>🏛️</span>
+        <span id="dock-lbl-direccion">Dirección (3)</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- MODAL ROOT -->
+  <div id="global-modal-root" class="hidden no-print"></div>
+
+  <!-- SCRIPTS MODULARES (Orden determinístico · Funciona tanto en file:// como en Vercel / HTTP) -->
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/modules/conduccion.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
