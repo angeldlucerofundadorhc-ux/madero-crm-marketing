@@ -78,9 +78,19 @@ window.MaderoUI = (function () {
   // ------------------------------------------------------------------------
   // SISTEMA DE MODALES GLASSMORPHIC
   // ------------------------------------------------------------------------
-  function openModal({ title, subtitle = '', maxWidth = 'max-w-2xl', bodyHtml = '', footerHtml = '' }) {
+  function openModal(arg1, arg2 = '', arg3 = 'max-w-2xl') {
     const root = document.getElementById('global-modal-root');
     if (!root) return;
+
+    const opts = typeof arg1 === 'object' && arg1 !== null
+      ? arg1
+      : { title: arg1, subtitle: '', maxWidth: arg3 || 'max-w-2xl', bodyHtml: arg2, footerHtml: '' };
+
+    const title = opts.title || '';
+    const subtitle = opts.subtitle || '';
+    const maxWidth = opts.maxWidth || 'max-w-2xl';
+    const bodyHtml = opts.bodyHtml || '';
+    const footerHtml = opts.footerHtml || '';
 
     root.innerHTML = `
       <div class="fixed inset-0 bg-stone-900/45 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto" onclick="if(event.target === this) MaderoUI.closeModal()">

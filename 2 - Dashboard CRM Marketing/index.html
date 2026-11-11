@@ -13,6 +13,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+  <!-- RemixIcon (Iconografía para Fotografías y Controles) -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+
   <!-- Apple Glassmorphism System Styles -->
   <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -22,7 +25,7 @@
   <div id="global-toast" class="hidden"></div>
 
   <!-- TOP APP BAR (HEADER MAESTRO) -->
-  <header class="max-w-7xl mx-auto mb-5 sm:mb-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3.5 glass-card p-4 sm:px-6 no-print">
+  <header class="max-w-[1440px] mx-auto mb-5 sm:mb-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3.5 glass-card p-4 sm:px-6 no-print">
     <div class="flex items-center gap-3">
       <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-stone-900 text-white flex items-center justify-center font-bold text-base sm:text-lg shadow-sm shrink-0">
         M
@@ -31,7 +34,7 @@
         <div class="flex items-center gap-2 flex-wrap">
           <h1 class="text-sm sm:text-lg font-extrabold tracking-tight text-stone-900 leading-tight">Madero Automotores</h1>
           <span class="badge-pill bg-stone-200/85 text-stone-800 text-[10px] font-bold">Control Integral Marketing</span>
-          <span class="badge-pill badge-emerald text-[10px] font-mono">Paso 2 · Proveedores Activo</span>
+          <span class="badge-pill badge-emerald text-[10px] font-mono">12 Módulos + Informe Dirección</span>
         </div>
         <p class="text-[11px] sm:text-xs text-stone-500 mt-0.5">
           Conducción: <strong id="hdr-lider" class="text-stone-800">Ángelo Lucero</strong> · <span id="hdr-semana">Semana 45</span> · Corte: <span id="hdr-corte" class="font-mono font-semibold text-stone-700">06/11/2026</span>
@@ -58,7 +61,7 @@
   </header>
 
   <!-- CONTENEDOR PRINCIPAL -->
-  <main class="max-w-7xl mx-auto space-y-5 sm:space-y-6">
+  <main class="max-w-[1440px] mx-auto space-y-5 sm:space-y-6">
 
     <!-- 4 PILARES OPERATIVOS DE CONDUCCIÓN (KPIs Vivos Clicables) -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 no-print">
@@ -185,7 +188,7 @@
     </nav>
 
     <!-- Desktop / Tablet Dock (>= 640px) -->
-    <nav class="hidden sm:flex vision-dock px-2.5 py-2 rounded-2xl items-center gap-1 text-xs font-semibold pointer-events-auto">
+    <nav class="hidden sm:flex flex-wrap justify-center max-w-[96vw] vision-dock px-2.5 py-2 rounded-2xl items-center gap-1 text-xs font-semibold pointer-events-auto">
       <button type="button" onclick="MaderoApp.navigateCluster('conduccion')" id="dock-btn-conduccion" class="px-3 py-1.5 rounded-xl text-stone-600 hover:text-stone-900 transition flex items-center gap-1.5 tab-btn-active">
         <span>🧭</span>
         <span id="dock-lbl-conduccion">Conducción (8)</span>
