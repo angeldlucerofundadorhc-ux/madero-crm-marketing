@@ -151,6 +151,7 @@ window.MaderoApp = (function () {
     setTxt('dock-lbl-conduccion', `Conducción (${sum.totalPrioridades})`);
     setTxt('dock-lbl-proveedores', `Proveedores (${sum.provDesviosCount})`);
     setTxt('dock-lbl-fotos', `Fotografías (${sum.fotosUnidadesTotales || 36})`);
+    setTxt('dock-lbl-contenido-pauta', `Contenido & Pauta (${(sum.contTotal || 0) + (sum.campTotal || 0)})`);
     setTxt('dock-lbl-direccion', `Dirección (${sum.decisionesTotalCount})`);
   }
 
@@ -214,7 +215,9 @@ window.MaderoApp = (function () {
 
     let html = '';
     if (activeNivel === 'gerencial') {
-      html = window.MaderoConduccion.renderResumenGerencialPreview();
+      html = window.MaderoInformeDireccion
+        ? window.MaderoInformeDireccion.renderExecutiveReport()
+        : window.MaderoConduccion.renderResumenGerencialPreview();
     } else if (activeModuleId === 'gob-frentes') {
       html = window.MaderoConduccion.renderGobernanzaSection();
     } else if (activeModuleId === 'm1-agenda') {
@@ -225,6 +228,22 @@ window.MaderoApp = (function () {
       html = window.MaderoProveedores.renderModule();
     } else if (activeModuleId === 'm3-fotos') {
       html = window.MaderoFotografias.renderModule();
+    } else if (activeModuleId === 'm4-contenido') {
+      html = window.MaderoContenidoPauta.renderContenidoModule();
+    } else if (activeModuleId === 'm5-redes') {
+      html = window.MaderoContenidoPauta.renderRedesModule();
+    } else if (activeModuleId === 'm6-campanas') {
+      html = window.MaderoContenidoPauta.renderCampanasModule();
+    } else if (activeModuleId === 'm7-google') {
+      html = window.MaderoEcosistemaTerritorio.renderGoogleModule();
+    } else if (activeModuleId === 'm8-web') {
+      html = window.MaderoEcosistemaTerritorio.renderWebModule();
+    } else if (activeModuleId === 'm10-eventos') {
+      html = window.MaderoEcosistemaTerritorio.renderEventosModule();
+    } else if (activeModuleId === 'm11-merch') {
+      html = window.MaderoEcosistemaTerritorio.renderMerchModule();
+    } else if (activeModuleId === 'm12-ventas') {
+      html = window.MaderoEcosistemaTerritorio.renderVentasModule();
     } else {
       const modObj = window.MaderoData.MODULOS_SISTEMA.find(m => m.id === activeModuleId);
       html = window.MaderoUI.renderUpcomingModuleBlueprint(modObj);

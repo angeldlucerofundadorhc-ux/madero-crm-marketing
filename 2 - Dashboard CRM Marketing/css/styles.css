@@ -235,17 +235,33 @@ body {
 
 /* Print layout preparation for Dirección Weekly Report */
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
   body {
     background: #ffffff !important;
     padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
   .no-print {
     display: none !important;
   }
-  .glass-card, .glass-card-dark {
+  .glass-card {
+    background: #ffffff !important;
     box-shadow: none !important;
     backdrop-filter: none !important;
     border: 1px solid #d6d3d1 !important;
+    break-inside: avoid;
+  }
+  .glass-card-dark {
+    background: #1c1917 !important;
+    color: #fafaf9 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    border: 1px solid #1c1917 !important;
+    break-inside: avoid;
   }
 }
 

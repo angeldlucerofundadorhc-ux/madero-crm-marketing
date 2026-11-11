@@ -184,6 +184,66 @@ window.MaderoData = (function () {
   ];
 
   // ------------------------------------------------------------------------
+  // 3C. CATÁLOGOS DE CONTENIDO, REDES Y CAMPAÑAS PAGAS (Paso 4 · Secc. 4 y 5.4-5.6)
+  // ------------------------------------------------------------------------
+  const ETAPAS_CONTENIDO = {
+    PLANIFICADO: { id: 'PLANIFICADO', orden: 1, label: '1. Planificado', shortLabel: 'Planificado', badge: 'badge-stone', dot: 'bg-stone-500' },
+    PRODUCIDO: { id: 'PRODUCIDO', orden: 2, label: '2. Producido', shortLabel: 'Producido', badge: 'badge-blue', dot: 'bg-blue-500' },
+    ENVIADO: { id: 'ENVIADO', orden: 3, label: '3. Enviado a revisión', shortLabel: 'Enviado', badge: 'badge-sky', dot: 'bg-sky-500' },
+    OBSERVADO: { id: 'OBSERVADO', orden: 4, label: '4. Observado por Madero', shortLabel: 'Observado Madero', badge: 'badge-amber', dot: 'bg-amber-500' },
+    APROBADO: { id: 'APROBADO', orden: 5, label: '5. Aprobado', shortLabel: 'Aprobado', badge: 'badge-emerald', dot: 'bg-emerald-500' },
+    PUBLICADO: { id: 'PUBLICADO', orden: 6, label: '6. Publicado c/ evidencia', shortLabel: 'Publicado', badge: 'badge-emerald', dot: 'bg-emerald-600' }
+  };
+
+  const FORMATOS_CONTENIDO = [
+    'Reel / Short Vertical',
+    'Carrusel Educativo / Stock',
+    'Story Secuencia',
+    'Video YouTube (Horizontal)',
+    'Gráfica Feed / Placa Comercial',
+    'Spot Institucional / Evento'
+  ];
+
+  const CALIDAD_LEADS = {
+    ALTA: { id: 'ALTA', label: 'Alta · Calificados con intención real', shortLabel: 'Alta (Calificados)', badge: 'badge-emerald', dot: 'bg-emerald-500' },
+    MEDIA: { id: 'MEDIA', label: 'Media · Volumen mixto / requiere filtrado', shortLabel: 'Media (Mixto)', badge: 'badge-amber', dot: 'bg-amber-500' },
+    BAJA_OBSERVADA: { id: 'BAJA_OBSERVADA', label: 'Baja / Observada por Ventas', shortLabel: 'Baja (Observada Ventas)', badge: 'badge-red', dot: 'bg-rose-600' }
+  };
+
+  const DECISIONES_CAMPANA = {
+    ESCALAR_PRESUPUESTO: { id: 'ESCALAR_PRESUPUESTO', label: 'Escalar presupuesto (Alta conversión)', badge: 'badge-emerald' },
+    MANTENER_OPTIMIZAR: { id: 'MANTENER_OPTIMIZAR', label: 'Mantener y optimizar creativos', badge: 'badge-blue' },
+    CORREGIR_SEGMENTACION: { id: 'CORREGIR_SEGMENTACION', label: 'Exigir a REM ajuste de segmentación / radio', badge: 'badge-amber' },
+    AJUSTAR_FORMULARIO: { id: 'AJUSTAR_FORMULARIO', label: 'Agregar filtro calificador en formulario', badge: 'badge-orange' },
+    REEMPLAZAR_CREATIVOS: { id: 'REEMPLAZAR_CREATIVOS', label: 'Reemplazar piezas por fatiga o desvío', badge: 'badge-purple' },
+    PAUSAR_CAMPANA: { id: 'PAUSAR_CAMPANA', label: 'Pausar / Reasignar inversión', badge: 'badge-red' }
+  };
+
+  // ------------------------------------------------------------------------
+  // 3D. CATÁLOGOS DE GOOGLE, WEB, EVENTOS, MERCH Y VENTAS (Paso 5 · Secc. 5.7-5.12)
+  // ------------------------------------------------------------------------
+  const PROPIEDAD_GOOGLE = {
+    PROPIETARIO_MADERO: { id: 'PROPIETARIO_MADERO', label: 'Propiedad Institucional Madero (OK)', shortLabel: 'Propiedad Madero OK', badge: 'badge-emerald', dot: 'bg-emerald-500' },
+    ACCESO_PARCIAL: { id: 'ACCESO_PARCIAL', label: 'Acceso Parcial (Sin rol Propietario)', shortLabel: 'Acceso Parcial', badge: 'badge-amber', dot: 'bg-amber-500' },
+    PENDIENTE_TRANSFERENCIA: { id: 'PENDIENTE_TRANSFERENCIA', label: 'Pendiente Transferencia / Acceso (Riesgo)', shortLabel: 'Pend. Acceso / Propiedad', badge: 'badge-red', dot: 'bg-rose-600' }
+  };
+
+  const ETAPAS_WEB = {
+    SOLICITADO: { id: 'SOLICITADO', orden: 1, label: '1. Solicitado / Ticket', shortLabel: 'Solicitado', badge: 'badge-stone', dot: 'bg-stone-500' },
+    EN_DESARROLLO: { id: 'EN_DESARROLLO', orden: 2, label: '2. En Desarrollo', shortLabel: 'En Desarrollo', badge: 'badge-blue', dot: 'bg-blue-500' },
+    EN_PRUEBA_STAGING: { id: 'EN_PRUEBA_STAGING', orden: 3, label: '3. En Prueba / Staging', shortLabel: 'En Staging / QA', badge: 'badge-sky', dot: 'bg-sky-500' },
+    OBSERVADO_QA: { id: 'OBSERVADO_QA', orden: 4, label: '4. Observado QA Madero', shortLabel: 'Observado QA', badge: 'badge-amber', dot: 'bg-amber-500' },
+    VALIDADO_PRODUCCION: { id: 'VALIDADO_PRODUCCION', orden: 5, label: '5. Validado en Producción', shortLabel: 'En Producción OK', badge: 'badge-emerald', dot: 'bg-emerald-600' }
+  };
+
+  const TIPOS_FEEDBACK_VENTAS = {
+    STOCK_PRIORITARIO: { id: 'STOCK_PRIORITARIO', label: 'Stock Prioritario (+180d / Empuje Comercial)', shortLabel: 'Stock Prioritario', badge: 'badge-amber' },
+    CALIDAD_LEADS: { id: 'CALIDAD_LEADS', label: 'Devolución sobre Calidad de Leads', shortLabel: 'Calidad de Leads', badge: 'badge-blue' },
+    PROBLEMA_PUBLICACION: { id: 'PROBLEMA_PUBLICACION', label: 'Desvío / Error detectado en Publicación', shortLabel: 'Desvío Publicación', badge: 'badge-red' },
+    PEDIDO_COMERCIAL: { id: 'PEDIDO_COMERCIAL', label: 'Necesidad / Material Comercial de Salón', shortLabel: 'Pedido Comercial', badge: 'badge-purple' }
+  };
+
+  // ------------------------------------------------------------------------
   // 4. MAPA OFICIAL DE LOS 12 MÓDULOS EXIGIDOS POR DIRECCIÓN (Sección 5)
   // ------------------------------------------------------------------------
   const MODULOS_SISTEMA = [
@@ -228,7 +288,7 @@ window.MaderoData = (function () {
       id: 'm4-contenido',
       cluster: 'contenido-pauta',
       paso: 4,
-      activoEnPasoActual: false,
+      activoEnPasoActual: true,
       nombre: 'Contenido',
       corto: '4. Contenido',
       alcanceDireccion: 'Planificado, producido, enviado, observado, aprobado, publicado, enlace y resultado.',
@@ -240,7 +300,7 @@ window.MaderoData = (function () {
       id: 'm5-redes',
       cluster: 'contenido-pauta',
       paso: 4,
-      activoEnPasoActual: false,
+      activoEnPasoActual: true,
       nombre: 'Redes sociales',
       corto: '5. Redes Sociales',
       alcanceDireccion: 'Instagram, Facebook, TikTok y YouTube con frecuencia, audiencia, desempeño, contenido por plaza y conclusión.',
@@ -252,7 +312,7 @@ window.MaderoData = (function () {
       id: 'm6-campanas',
       cluster: 'contenido-pauta',
       paso: 4,
-      activoEnPasoActual: false,
+      activoEnPasoActual: true,
       nombre: 'Campañas pagas',
       corto: '6. Campañas Pagas',
       alcanceDireccion: 'Objetivo, presupuesto, creativos, fechas, ubicaciones, resultado, calidad de lead y recomendación.',
@@ -264,7 +324,7 @@ window.MaderoData = (function () {
       id: 'm7-google',
       cluster: 'ecosistema',
       paso: 5,
-      activoEnPasoActual: false,
+      activoEnPasoActual: true,
       nombre: 'Google',
       corto: '7. Google',
       alcanceDireccion: 'Business Profile, Workspace, Analytics, Tag Manager, Search Console, Ads, accesos y entregables.',
@@ -276,7 +336,7 @@ window.MaderoData = (function () {
       id: 'm8-web',
       cluster: 'ecosistema',
       paso: 5,
-      activoEnPasoActual: false,
+      activoEnPasoActual: true,
       nombre: 'Web',
       corto: '8. Web',
       alcanceDireccion: 'Cambios solicitados, etapa, prueba, observaciones, responsable, fecha y validación.',
@@ -300,7 +360,7 @@ window.MaderoData = (function () {
       id: 'm10-eventos',
       cluster: 'ecosistema',
       paso: 5,
-      activoEnPasoActual: false,
+      activoEnPasoActual: true,
       nombre: 'Eventos y presencia regional',
       corto: '10. Eventos',
       alcanceDireccion: 'Calendario futuro, ciudad, objetivo, presupuesto, responsables, difusión y resultado.',
@@ -312,7 +372,7 @@ window.MaderoData = (function () {
       id: 'm11-merch',
       cluster: 'ecosistema',
       paso: 5,
-      activoEnPasoActual: false,
+      activoEnPasoActual: true,
       nombre: 'Merchandising',
       corto: '11. Merchandising',
       alcanceDireccion: 'Inventario, destino, costo, reposición, utilización y necesidades futuras.',
@@ -324,7 +384,7 @@ window.MaderoData = (function () {
       id: 'm12-ventas',
       cluster: 'ecosistema',
       paso: 5,
-      activoEnPasoActual: false,
+      activoEnPasoActual: true,
       nombre: 'Relación con Ventas',
       corto: '12. Ventas',
       alcanceDireccion: 'Necesidades comerciales, devoluciones sobre leads, stock prioritario y problemas detectados.',
@@ -352,7 +412,7 @@ window.MaderoData = (function () {
   // 5. LÍNEA DE BASE INICIAL (Fiel al corte post-devolución 28/10/2026)
   // ------------------------------------------------------------------------
   const INITIAL_STATE = {
-    schema_version: '1.3.0-paso3',
+    schema_version: '2.0.0-completo',
     updated_at: '2026-11-06T14:30:00-03:00',
 
     meta: {
@@ -2438,7 +2498,931 @@ window.MaderoData = (function () {
         web_url: 'https://maderoautomotores.com/autos/ford-ecosport-af489qq',
         notas: 'Reclamado en seguimiento de desarrollo web a L. Christian.'
       }
-    ]
+    ],
+
+    // ======================================================================
+    // PASO 4 · MÓDULO 4: CONTENIDO Y PIEZAS AUDIOVISUALES (Sección 4 y 5.4)
+    // Circuito Editorial: PLANIFICADO -> PRODUCIDO -> ENVIADO -> OBSERVADO / APROBADO -> PUBLICADO
+    // ======================================================================
+    contenido_piezas: [
+      {
+        id: 'CNT-01',
+        titulo: 'Reel Comparativo Pickups Stock Inmediato (Hilux SRX vs Amarok V6)',
+        formato: 'Reel / Short Vertical',
+        canal_destino: 'Instagram / TikTok',
+        plaza: 'Comodoro · Av. Polonia 546 (Salón Principal)',
+        actor_id: 'REM',
+        responsable_nombre: 'REM (Edición) / Mkt Interno (Crudos)',
+        etapa_contenido: 'OBSERVADO',
+        estado: 'OBSERVADO_MADERO',
+        fecha_acordada: '2026-11-04',
+        fecha_publicacion_real: '',
+        observacion_madero: 'Observado por Ángelo (04/11): El zócalo final muestra una tasa de financiación vencida de septiembre y omite la dirección de Av. Polonia 546. Se solicitó re-renderizado respetando manual de marca Madero (Minuta REM 04/11 Punto 2).',
+        enlace_pieza: 'https://drive.google.com/drive/folders/madero-contenido-cnt01-pickups',
+        resultado_metricas: 'Retenido hasta corrección de placa legal y dirección de sucursal.',
+        trabajo_absorbido: false,
+        trabajo_absorbido_detalle: ''
+      },
+      {
+        id: 'CNT-02',
+        titulo: 'Carrusel 6 SUVs Seleccionadas con Garantía Verificada CAM',
+        formato: 'Carrusel Educativo / Stock',
+        canal_destino: 'Instagram / Facebook',
+        plaza: 'Comodoro · CAM (Monseñor D\'Andrea 1967)',
+        actor_id: 'REM',
+        responsable_nombre: 'REM (Diseño) → Corregido por Mkt Interno',
+        etapa_contenido: 'PUBLICADO',
+        estado: 'CERRADO_EVIDENCIA',
+        fecha_acordada: '2026-11-02',
+        fecha_publicacion_real: '2026-11-03',
+        observacion_madero: 'REM entregó las placas con tipografía deformada y kilometraje erróneo en 2 unidades. Para no frenar la pauta de fin de semana, Diseño Interno rehízo las 6 láminas y se asentó reclamo formal en PRV-02.',
+        enlace_pieza: 'https://drive.google.com/drive/folders/madero-contenido-cnt02-suvs-cam',
+        resultado_metricas: 'Publicado 03/11 · 18.400 cuentas alcanzadas · 342 guardados · 19 consultas directas a WhatsApp salón.',
+        trabajo_absorbido: true,
+        trabajo_absorbido_detalle: '2.5 hs absorbidas por Diseño Interno rehaciendo las 6 placas por error tipográfico y de ficha técnica de REM.'
+      },
+      {
+        id: 'CNT-03',
+        titulo: 'Tour Recorrido Stock Madero Neuquén — Ingresos de la Semana',
+        formato: 'Reel / Short Vertical',
+        canal_destino: 'Instagram / TikTok / YouTube Shorts',
+        plaza: 'Neuquén · Madero Neuquén',
+        actor_id: 'MKT_INTERNO',
+        responsable_nombre: 'Equipo Audiovisual Interno + Referente Neuquén',
+        etapa_contenido: 'PUBLICADO',
+        estado: 'CERRADO_EVIDENCIA',
+        fecha_acordada: '2026-11-03',
+        fecha_publicacion_real: '2026-11-03',
+        observacion_madero: 'Aprobado conforme al estándar visual Madero. Excelente iluminación y locución destacando ubicación y permuta inmediata en Neuquén.',
+        enlace_pieza: 'https://drive.google.com/drive/folders/madero-contenido-cnt03-tour-nqn',
+        resultado_metricas: 'Publicado 03/11 · 29.800 reproducciones combinadas (IG + TikTok) · 24 mensajes directos calificados en plaza Neuquén.',
+        trabajo_absorbido: false,
+        trabajo_absorbido_detalle: ''
+      },
+      {
+        id: 'CNT-04',
+        titulo: 'Video Review Completo: Ford Ranger V6 Limited Plus (10 min 4K)',
+        formato: 'Video YouTube (Horizontal)',
+        canal_destino: 'YouTube',
+        plaza: 'Comodoro · Av. Polonia 546 (Salón Principal)',
+        actor_id: 'MKT_INTERNO',
+        responsable_nombre: 'Producción Audiovisual Interna',
+        etapa_contenido: 'APROBADO',
+        estado: 'CERRADO_EVIDENCIA',
+        fecha_acordada: '2026-11-06',
+        fecha_publicacion_real: '2026-11-06',
+        observacion_madero: 'Aprobado por Ángelo. Incluye capítulos, enlace directo a ficha web y miniatura de alto contraste validada.',
+        enlace_pieza: 'https://youtube.com/@maderoautomotores/videos',
+        resultado_metricas: 'Estreno programado viernes 06/11 19:00 hs · Miniatura y SEO de YouTube configurados.',
+        trabajo_absorbido: false,
+        trabajo_absorbido_detalle: ''
+      },
+      {
+        id: 'CNT-05',
+        titulo: 'Piezas Pauta Financiación Tasa Preferencial Noviembre (Set 4 Formatos)',
+        formato: 'Gráfica Feed / Placa Comercial',
+        canal_destino: 'Meta Ads / Instagram / Facebook',
+        plaza: 'Todas las plazas (Transversal)',
+        actor_id: 'REM',
+        responsable_nombre: 'REM (Agencia Externa)',
+        etapa_contenido: 'ENVIADO',
+        estado: 'ENTREGADO_REVISION',
+        fecha_acordada: '2026-11-06',
+        fecha_publicacion_real: '',
+        observacion_madero: 'Entregado hoy 06/11 por REM. En revisión por Ángelo y Gerencia Comercial para validar el CFT legal antes de activar en Meta Ads.',
+        enlace_pieza: 'https://drive.google.com/drive/folders/madero-contenido-cnt05-pauta-financiacion',
+        resultado_metricas: 'En bandeja de control de calidad previo a pauta.',
+        trabajo_absorbido: false,
+        trabajo_absorbido_detalle: ''
+      },
+      {
+        id: 'CNT-06',
+        titulo: 'Reel Proceso de Alistamiento y Check de 90 Puntos en CAM D\'Andrea',
+        formato: 'Reel / Short Vertical',
+        canal_destino: 'Instagram / TikTok / Facebook',
+        plaza: 'Comodoro · CAM (Monseñor D\'Andrea 1967)',
+        actor_id: 'MKT_INTERNO',
+        responsable_nombre: 'Audiovisual Interno',
+        etapa_contenido: 'PRODUCIDO',
+        estado: 'EN_ELABORACION',
+        fecha_acordada: '2026-11-07',
+        fecha_publicacion_real: '',
+        observacion_madero: 'Tomas grabadas en boxes de Monseñor D\'Andrea 1967. En etapa de montaje de subtítulos dinámicos y corrección de color.',
+        enlace_pieza: 'https://drive.google.com/drive/folders/madero-contenido-cnt06-cam-proceso',
+        resultado_metricas: 'Concluye edición el 07/11.',
+        trabajo_absorbido: false,
+        trabajo_absorbido_detalle: ''
+      },
+      {
+        id: 'CNT-07',
+        titulo: 'Secuencia Stories Destacados: Unidades Oportunidad Av. Alem 828',
+        formato: 'Story Secuencia',
+        canal_destino: 'Instagram / Facebook Stories',
+        plaza: 'Comodoro · Av. Alem 828',
+        actor_id: 'MKT_INTERNO',
+        responsable_nombre: 'Community Manager Interno',
+        etapa_contenido: 'PUBLICADO',
+        estado: 'CERRADO_EVIDENCIA',
+        fecha_acordada: '2026-11-04',
+        fecha_publicacion_real: '2026-11-04',
+        observacion_madero: 'Aprobado. Set de 5 historias con sticker de contacto directo al equipo de ventas de Alem 828.',
+        enlace_pieza: 'https://drive.google.com/drive/folders/madero-contenido-cnt07-stories-alem',
+        resultado_metricas: '4.120 vistas únicas en 24 hs · 38 clics en link de WhatsApp Alem.',
+        trabajo_absorbido: false,
+        trabajo_absorbido_detalle: ''
+      },
+      {
+        id: 'CNT-08',
+        titulo: 'Reel Especial Stock Tracción 4x4 para Cordillera (Esquel y Comarca)',
+        formato: 'Reel / Short Vertical',
+        canal_destino: 'Instagram / Facebook / TikTok',
+        plaza: 'Cordillera · Cordillera Venta',
+        actor_id: 'REM',
+        responsable_nombre: 'REM (Edición sobre material enviado por Madero)',
+        etapa_contenido: 'PLANIFICADO',
+        estado: 'ATRASADO',
+        fecha_acordada: '2026-11-05',
+        fecha_publicacion_real: '',
+        observacion_madero: 'Crudos enviados a REM el 31/10. Fecha comprometida vencida el 05/11 sin entrega de primer corte. Reclamado formalmente por Ángelo con intimación de entrega 07/11.',
+        enlace_pieza: 'https://drive.google.com/drive/folders/madero-contenido-cnt08-cordillera-4x4',
+        resultado_metricas: 'Atrasado por REM (1 día de mora sobre calendario).',
+        trabajo_absorbido: false,
+        trabajo_absorbido_detalle: ''
+      },
+      {
+        id: 'CNT-09',
+        titulo: 'Testimonio Entregas Reales de la Semana — Clientes Comodoro y Neuquén',
+        formato: 'Carrusel Educativo / Stock',
+        canal_destino: 'Instagram / Facebook',
+        plaza: 'Todas las plazas (Transversal)',
+        actor_id: 'OTRO_PRESTADOR',
+        responsable_nombre: 'Fotógrafo Freelance Neuquén + Diseño Interno',
+        etapa_contenido: 'APROBADO',
+        estado: 'ENTREGADO_REVISION',
+        fecha_acordada: '2026-11-07',
+        fecha_publicacion_real: '',
+        observacion_madero: 'Fotografías verificadas con consentimiento de clientes y patentes difuminadas por seguridad.',
+        enlace_pieza: 'https://drive.google.com/drive/folders/madero-contenido-cnt09-entregas',
+        resultado_metricas: 'Listo para salida dominical 08/11.',
+        trabajo_absorbido: false,
+        trabajo_absorbido_detalle: ''
+      }
+    ],
+
+    // ======================================================================
+    // PASO 4 · MÓDULO 5: REDES SOCIALES MULTICANAL (Sección 5.5)
+    // Los 4 canales obligatorios: Instagram, Facebook, TikTok y YouTube
+    // ======================================================================
+    redes_sociales: [
+      {
+        id: 'RED-IG',
+        canal: 'Instagram',
+        handle: '@maderoautomotores',
+        actor_id: 'MKT_INTERNO',
+        responsable_gestion: 'Mkt Interno (Calendario y Comunidad) + REM (Piezas pauta)',
+        estado_canal: 'EN_META',
+        frecuencia_plan_semanal: 12,
+        frecuencia_real_semanal: 11,
+        seguidores_actual: 48650,
+        variacion_audiencia: '+420 (+0.9% sem.)',
+        alcance_periodo: 142800,
+        interacciones: 6840,
+        tasa_engagement: '4.8%',
+        desglose_plazas: {
+          comodoro_pct: 55,
+          neuquen_pct: 30,
+          cordillera_pct: 15,
+          comodoro_piezas: 6,
+          neuquen_piezas: 3,
+          cordillera_piezas: 2
+        },
+        formato_destacado: 'Reels comparativos de Pickups en salón y Carruseles de ingresos verificados CAM.',
+        observacion_calidad: 'Se corrigió la saturación de placas estáticas de REM priorizando video real en sucursal.',
+        conclusion_lider: 'Canal principal de conversión orgánica. Comodoro y Neuquén mantienen tracción sólida; debemos incrementar 1 Reel semanal específico para Cordillera donde la audiencia responde mejor a unidades 4x4.',
+        proxima_accion: 'Fijar en historias destacadas el stock actualizado por plaza (Comodoro / Neuquén / Cordillera) todos los lunes.',
+        evidencia_url: 'https://instagram.com/maderoautomotores'
+      },
+      {
+        id: 'RED-FB',
+        canal: 'Facebook',
+        handle: 'Madero Automotores Oficial',
+        actor_id: 'MKT_INTERNO',
+        responsable_gestion: 'Mkt Interno + REM (Sincronización catálogo)',
+        estado_canal: 'SEGUIMIENTO',
+        frecuencia_plan_semanal: 10,
+        frecuencia_real_semanal: 9,
+        seguidores_actual: 63200,
+        variacion_audiencia: '+185 (+0.3% sem.)',
+        alcance_periodo: 98400,
+        interacciones: 4120,
+        tasa_engagement: '4.2%',
+        desglose_plazas: {
+          comodoro_pct: 60,
+          neuquen_pct: 25,
+          cordillera_pct: 15,
+          comodoro_piezas: 5,
+          neuquen_piezas: 2,
+          cordillera_piezas: 2
+        },
+        formato_destacado: 'Álbumes de unidades ingresadas con ficha completa y precio transparente.',
+        observacion_calidad: 'Detectamos 3 publicaciones replicadas desde IG por REM con enlaces no clicables en el texto; se exigió adaptar el copy nativo para Facebook.',
+        conclusion_lider: 'Sigue siendo el canal de mayor volumen de consulta directa en segmento +40 años (especialmente Comodoro y Esquel/Cordillera). No debe tratarse como un espejo automático de Instagram.',
+        proxima_accion: 'Auditar los viernes que todas las unidades dadas de baja o reservadas en Lucy DMS se marquen como VENDIDO/RESERVADO en álbumes de Facebook.',
+        evidencia_url: 'https://facebook.com/maderoautomotores'
+      },
+      {
+        id: 'RED-TK',
+        canal: 'TikTok',
+        handle: '@maderoautomotores.ok',
+        actor_id: 'MKT_INTERNO',
+        responsable_gestion: 'Equipo Audiovisual Interno',
+        estado_canal: 'EN_META',
+        frecuencia_plan_semanal: 5,
+        frecuencia_real_semanal: 5,
+        seguidores_actual: 19400,
+        variacion_audiencia: '+890 (+4.8% sem.)',
+        alcance_periodo: 186500,
+        interacciones: 11250,
+        tasa_engagement: '6.0%',
+        desglose_plazas: {
+          comodoro_pct: 50,
+          neuquen_pct: 35,
+          cordillera_pct: 15,
+          comodoro_piezas: 3,
+          neuquen_piezas: 2,
+          cordillera_piezas: 0
+        },
+        formato_destacado: 'Tours rápidos de precio/cuota en Neuquén y proceso real de taller/alistamiento en CAM D\'Andrea.',
+        observacion_calidad: 'Excelente retención en los primeros 3 segundos cuando aparece el asesor o vehículo en marcha.',
+        conclusion_lider: 'Canal de mayor crecimiento porcentual y costo cero de adquisición de alcance. Neuquén tracciona muy fuerte; falta incorporar al menos 1 video semanal grabado en Cordillera.',
+        proxima_accion: 'Coordinar con referente de Cordillera grabación vertical quincenal de 3 unidades destacadas.',
+        evidencia_url: 'https://tiktok.com/@maderoautomotores.ok'
+      },
+      {
+        id: 'RED-YT',
+        canal: 'YouTube',
+        handle: 'Madero Automotores TV',
+        actor_id: 'MKT_INTERNO',
+        responsable_gestion: 'Mkt Interno (Producción) + REM (Optimización canal)',
+        estado_canal: 'BAJO_META',
+        frecuencia_plan_semanal: 3,
+        frecuencia_real_semanal: 1,
+        seguidores_actual: 4820,
+        variacion_audiencia: '+65 (+1.4% sem.)',
+        alcance_periodo: 21300,
+        interacciones: 940,
+        tasa_engagement: '4.4%',
+        desglose_plazas: {
+          comodoro_pct: 70,
+          neuquen_pct: 20,
+          cordillera_pct: 10,
+          comodoro_piezas: 1,
+          neuquen_piezas: 0,
+          cordillera_piezas: 0
+        },
+        formato_destacado: 'Reviews profundos 4K de Pickups y SUVs tope de gama + Shorts derivados.',
+        observacion_calidad: 'REM adeuda la optimización de listas de reproducción y plantillas de miniaturas comprometidas en minuta del 15/10.',
+        conclusion_lider: 'Bajo frecuencia meta (1 de 3 semanales) porque el equipo audiovisual interno priorizó cubrir el pasivo fotográfico de Lucy DMS. Aun así, el lead que llega desde YouTube viene con altísima decisión de compra.',
+        proxima_accion: 'Publicar 1 review largo los viernes y 2 YouTube Shorts martes/jueves reutilizando los cortes verticales de salón.',
+        evidencia_url: 'https://youtube.com/@maderoautomotores'
+      }
+    ],
+
+    // ======================================================================
+    // PASO 4 · MÓDULO 6: CAMPAÑAS PAGAS Y PAUTA DIGITAL (Sección 4 y 5.6)
+    // Separación Sección 4: REM en ejecución técnica; Madero en prioridades, presupuesto y validaciones
+    // ======================================================================
+    campanas_pagas: [
+      {
+        id: 'CMP-01',
+        nombre: 'Meta Ads · Pickups Trabajo & Flota (Hilux / Amarok / Ranger)',
+        plataforma: 'Meta Ads',
+        actor_id: 'REM',
+        responsable_tecnico: 'REM (Tráfico) · Validado por Ángelo Lucero',
+        validacion_madero: 'APROBADA',
+        estado: 'CERRADO_EVIDENCIA',
+        objetivo: 'Generación de Leads Calificados WhatsApp / Formulario con filtro de entrega o permuta',
+        plazas_ubicaciones: 'Comodoro · Av. Polonia 546 (Salón Principal)',
+        presupuesto_asignado: 950000,
+        presupuesto_ejecutado: 890000,
+        vigencia_desde: '2026-10-15',
+        vigencia_hasta: '2026-11-15',
+        creativos_validados_detalle: '3 Reels comparativos + 2 Carruseles con precio de contado y anticipo real validados por Madero.',
+        creativos_url: 'https://drive.google.com/drive/folders/madero-pauta-cmp01-pickups',
+        leads_generados: 164,
+        cpl: 5427,
+        calidad_lead_estado: 'ALTA',
+        devolucion_ventas_leads: 'Supervisión Ventas Polonia informa que el 68% de los contactos posee usado para entregar o capital de anticipo real. 4 reservas concretadas.',
+        recomendacion_lider: 'Mejor campaña activa del mes. Recomiendo escalar +20% el presupuesto asignado para la segunda quincena de noviembre manteniendo el filtro de capital de anticipo.',
+        accion_decision: 'ESCALAR_PRESUPUESTO'
+      },
+      {
+        id: 'CMP-02',
+        nombre: 'Meta Ads · Financiación Usados Seleccionados Neuquén',
+        plataforma: 'Meta Ads',
+        actor_id: 'REM',
+        responsable_tecnico: 'REM (Tráfico) · Observado por Ángelo Lucero',
+        validacion_madero: 'OBSERVADA',
+        estado: 'OBSERVADO_MADERO',
+        objetivo: 'Mensajes a WhatsApp Salón Madero Neuquén para gama media y SUVs',
+        plazas_ubicaciones: 'Neuquén · Madero Neuquén',
+        presupuesto_asignado: 750000,
+        presupuesto_ejecutado: 610000,
+        vigencia_desde: '2026-10-20',
+        vigencia_hasta: '2026-11-20',
+        creativos_validados_detalle: 'Set de 4 placas de cuota fija observado: REM omitió aclarar "Con anticipo mínimo del 40%" en el copy principal.',
+        creativos_url: 'https://drive.google.com/drive/folders/madero-pauta-cmp02-nqn',
+        leads_generados: 215,
+        cpl: 2837,
+        calidad_lead_estado: 'BAJA_OBSERVADA',
+        devolucion_ventas_leads: 'Reclamo formal de Ventas Neuquén: alto volumen de leads pero el 75% pide financiación 100% sin entrega o consulta desde localidades a +400 km sin intención de viajar.',
+        recomendacion_lider: 'El CPL bajo es engañoso porque desgasta a los vendedores con contactos no calificables. Se ordenó a REM (Minuta 04/11) acotar radio geográfico a 60 km de Neuquén Capital y agregar pregunta filtro obligatoria de anticipo.',
+        accion_decision: 'CORREGIR_SEGMENTACION'
+      },
+      {
+        id: 'CMP-03',
+        nombre: 'Google Ads · Búsqueda Intención Directa "Concesionaria Usados Comodoro / Neuquén"',
+        plataforma: 'Google Ads',
+        actor_id: 'REM',
+        responsable_tecnico: 'REM (Search) · Supervisado por Madero',
+        validacion_madero: 'APROBADA',
+        estado: 'EN_ELABORACION',
+        objetivo: 'Tráfico de alta intención de compra hacia catálogo web y llamada directa a sucursal',
+        plazas_ubicaciones: 'Todas las plazas (Transversal)',
+        presupuesto_asignado: 820000,
+        presupuesto_ejecutado: 645000,
+        vigencia_desde: '2026-10-01',
+        vigencia_hasta: '2026-11-30',
+        creativos_validados_detalle: 'Anuncios responsivos de búsqueda (RSA) con extensiones de ubicación para Polonia 546, Alem 828 y Madero Neuquén.',
+        creativos_url: 'https://drive.google.com/drive/folders/madero-pauta-cmp03-google-search',
+        leads_generados: 92,
+        cpl: 7011,
+        calidad_lead_estado: 'ALTA',
+        devolucion_ventas_leads: 'Contactos muy puntuales que preguntan por unidades específicas vistas en la web. Se requiere que la web no muestre unidades ya reservadas.',
+        recomendacion_lider: 'Mantener inversión y negativizar términos de búsqueda de repuestos/talleres que consumieron un 8% del presupuesto según auditoría de términos.',
+        accion_decision: 'MANTENER_OPTIMIZAR'
+      },
+      {
+        id: 'CMP-04',
+        nombre: 'Meta Ads · Oportunidades y Toma de Usados Av. Alem 828 & CAM D\'Andrea',
+        plataforma: 'Meta Ads',
+        actor_id: 'REM',
+        responsable_tecnico: 'REM (Tráfico)',
+        validacion_madero: 'APROBADA',
+        estado: 'EN_ELABORACION',
+        objetivo: 'Captación de vehículos en parte de pago y rotación de stock intermedio en Comodoro',
+        plazas_ubicaciones: 'Comodoro · Av. Alem 828',
+        presupuesto_asignado: 580000,
+        presupuesto_ejecutado: 430000,
+        vigencia_desde: '2026-10-25',
+        vigencia_hasta: '2026-11-25',
+        creativos_validados_detalle: 'Carrusel de 6 unidades oportunidades + Reel de tasación en el acto en Alem 828.',
+        creativos_url: 'https://drive.google.com/drive/folders/madero-pauta-cmp04-alem-cam',
+        leads_generados: 108,
+        cpl: 3981,
+        calidad_lead_estado: 'MEDIA',
+        devolucion_ventas_leads: 'Equipo de Alem reporta buen caudal de consultas por permuta, aunque un 35% ofrece modelos inferiores a 2012 fuera de política de toma.',
+        recomendacion_lider: 'Mantener campaña activa e incorporar en el formulario nativo el desplegable "Año de tu vehículo a entregar (2015 en adelante)" para depurar la bandeja comercial.',
+        accion_decision: 'AJUSTAR_FORMULARIO'
+      },
+      {
+        id: 'CMP-05',
+        nombre: 'Meta Ads · Especial Tracción 4x4 & SUVs Cordillera (Esquel y Comarca)',
+        plataforma: 'Meta Ads',
+        actor_id: 'REM',
+        responsable_tecnico: 'REM (Tráfico)',
+        validacion_madero: 'EN_REVISION',
+        estado: 'ATRASADO',
+        objetivo: 'Posicionamiento territorial y generación de entrevistas en Cordillera Venta',
+        plazas_ubicaciones: 'Cordillera · Cordillera Venta',
+        presupuesto_asignado: 450000,
+        presupuesto_ejecutado: 190000,
+        vigencia_desde: '2026-11-01',
+        vigencia_hasta: '2026-11-30',
+        creativos_validados_detalle: 'Pendiente renovación de video principal (CNT-08 atrasado por REM). Actualmente corriendo solo con 2 gráficas estáticas.',
+        creativos_url: 'https://drive.google.com/drive/folders/madero-pauta-cmp05-cordillera',
+        leads_generados: 28,
+        cpl: 6786,
+        calidad_lead_estado: 'MEDIA',
+        devolucion_ventas_leads: 'Cordillera Venta solicita mayor presencia de video con unidades doble cabina y SUVs diésel disponibles para entrega.',
+        recomendacion_lider: 'Sub-ejecución presupuestaria por demora de REM en entregar el Reel 4x4 (CNT-08). No incrementar pauta hasta que REM suba los nuevos creativos en video este jueves.',
+        accion_decision: 'REEMPLAZAR_CREATIVOS'
+      },
+      {
+        id: 'CMP-06',
+        nombre: 'Google Ads · Display & YouTube In-Stream Institucional Patagonia',
+        plataforma: 'Google Ads',
+        actor_id: 'REM',
+        responsable_tecnico: 'REM (Google Ads)',
+        validacion_madero: 'PAUSADA_POR_MADERO',
+        estado: 'OBSERVADO_MADERO',
+        objetivo: 'Reconocimiento de marca regional',
+        plazas_ubicaciones: 'Todas las plazas (Transversal)',
+        presupuesto_asignado: 350000,
+        presupuesto_ejecutado: 210000,
+        vigencia_desde: '2026-10-10',
+        vigencia_hasta: '2026-11-10',
+        creativos_validados_detalle: 'Spot institucional de 15 segundos.',
+        creativos_url: 'https://drive.google.com/drive/folders/madero-pauta-cmp06-display',
+        leads_generados: 11,
+        cpl: 19091,
+        calidad_lead_estado: 'BAJA_OBSERVADA',
+        devolucion_ventas_leads: 'Sin impacto trazable en consultas de salón; clics accidentales desde aplicaciones móviles en red Display.',
+        recomendacion_lider: 'Pausada por decisión de Ángelo tras auditar ubicaciones (exceso de impresiones en apps de juegos infantiles). Reasignar los $140.000 remanentes a la campaña CMP-01 de Pickups.',
+        accion_decision: 'PAUSAR_CAMPANA'
+      }
+    ],
+
+    // ======================================================================
+    // PASO 5 · MÓDULO 7: ECOSISTEMA GOOGLE (Sección 4, 5.7 y 12)
+    // Business Profile, Workspace, Analytics 4, Tag Manager, Search Console, Google Ads
+    // ======================================================================
+    google_activos: [
+      {
+        id: 'GGL-01',
+        herramienta: 'Business Profile',
+        sucursal_cuenta: 'Comodoro · Av. Polonia 546 (Salón Principal)',
+        propiedad_madero: 'PROPIETARIO_MADERO',
+        acceso_pendiente_detalle: 'Propiedad principal asegurada en cuenta institucional Madero.',
+        actor_id: 'MKT_INTERNO',
+        responsable_nombre: 'Ángelo Lucero + Community Manager',
+        estado: 'CERRADO_EVIDENCIA',
+        entregable: 'Ficha verificada, horarios actualizados, catálogo de fotos fachada/salón y respuesta a reseñas <24 hs.',
+        evidencia: 'https://business.google.com/locations/polonia-546',
+        observacion: 'Calificación actual 4.6★ (218 reseñas). Todas las reseñas de octubre/noviembre respondidas con criterio institucional.',
+        proximo_paso: 'Mantener carga semanal de 5 fotos nuevas de salón y entregas.'
+      },
+      {
+        id: 'GGL-02',
+        herramienta: 'Business Profile',
+        sucursal_cuenta: 'Comodoro · Av. Alem 828',
+        propiedad_madero: 'PROPIETARIO_MADERO',
+        acceso_pendiente_detalle: 'Propiedad principal asegurada en cuenta institucional Madero.',
+        actor_id: 'MKT_INTERNO',
+        responsable_nombre: 'Marketing Interno',
+        estado: 'CERRADO_EVIDENCIA',
+        entregable: 'Actualización de teléfono directo WhatsApp Comercial Alem y geolocalización exacta.',
+        evidencia: 'https://business.google.com/locations/alem-828',
+        observacion: 'Corregido el pin de mapa que antes derivaba a media cuadra del ingreso de salón.',
+        proximo_paso: 'Solicitar a asesores de Alem invitar a clientes con entrega semanal a dejar reseña.'
+      },
+      {
+        id: 'GGL-03',
+        herramienta: 'Business Profile',
+        sucursal_cuenta: 'Comodoro · CAM (Monseñor D\'Andrea 1967)',
+        propiedad_madero: 'ACCESO_PARCIAL',
+        acceso_pendiente_detalle: 'Falta código postal/video de verificación de Google para unificar duplicado histórico creado por terceros.',
+        actor_id: 'MKT_INTERNO',
+        responsable_nombre: 'Ángelo Lucero + Administración Madero',
+        estado: 'PENDIENTE_INFO_MADERO',
+        entregable: 'Unificación de ficha "CAM Centro de Alistamiento Madero" bajo dominio oficial.',
+        evidencia: 'https://drive.google.com/drive/folders/madero-pedido-accesos-google',
+        observacion: 'Se grabó video de fachada y taller en Monseñor D\'Andrea 1967; pendiente validación de soporte Google.',
+        proximo_paso: 'Completar llamada de verificación con soporte Google Business el martes 10/11.'
+      },
+      {
+        id: 'GGL-04',
+        herramienta: 'Business Profile',
+        sucursal_cuenta: 'Neuquén · Madero Neuquén',
+        propiedad_madero: 'PENDIENTE_TRANSFERENCIA',
+        acceso_pendiente_detalle: 'REM figura como Propietario Principal desde la apertura de cuenta; Madero solo figura como Administrador.',
+        actor_id: 'REM',
+        responsable_nombre: 'REM (Agencia) → Reclamado en Pedido de Accesos Google',
+        estado: 'ATRASADO',
+        entregable: 'Transferencia de Propiedad Principal (Owner) a marketing@maderoautomotores.com.',
+        evidencia: 'https://drive.google.com/drive/folders/madero-pedido-accesos-google',
+        observacion: 'Reclamado en Minuta REM 15/10 y reiterado el 02/11. Ningún proveedor externo debe retener la propiedad raíz de una sucursal de Madero.',
+        proximo_paso: 'Intimar transferencia inmediata en reunión semanal con REM; escalado a Dirección en PRV-03.'
+      },
+      {
+        id: 'GGL-05',
+        herramienta: 'Analytics 4',
+        sucursal_cuenta: 'Propiedad Web Oficial (GA4 - maderoautomotores.com)',
+        propiedad_madero: 'ACCESO_PARCIAL',
+        acceso_pendiente_detalle: 'Madero tiene rol Editor, pero falta permiso de Administrador de Cuenta para auditar vinculación con BigQuery y Google Ads.',
+        actor_id: 'REM',
+        responsable_nombre: 'REM + L. Christian (Web)',
+        estado: 'OBSERVADO_MADERO',
+        entregable: 'Configuración de eventos de conversión reales (clic en WhatsApp por sucursal y envío de formulario de tasación).',
+        evidencia: 'https://analytics.google.com/',
+        observacion: 'Observado por Ángelo: GA4 estaba contabilizando como conversión cada scroll al 50% de página, inflando artificialmente las conversiones reportadas por REM.',
+        proximo_paso: 'Depurar eventos en GTM junto a L. Christian y dejar solo conversiones comerciales reales.'
+      },
+      {
+        id: 'GGL-06',
+        herramienta: 'Tag Manager',
+        sucursal_cuenta: 'Contenedor Web GTM-MADERO01',
+        propiedad_madero: 'PENDIENTE_TRANSFERENCIA',
+        acceso_pendiente_detalle: 'Contenedor alojado en cuenta de agencia REM sin permiso de publicación para Madero ni L. Christian.',
+        actor_id: 'REM',
+        responsable_nombre: 'REM (Agencia Externa)',
+        estado: 'ATRASADO',
+        entregable: 'Cesión de administración total del contenedor GTM y auditoría de píxeles activos.',
+        evidencia: 'https://drive.google.com/drive/folders/madero-pedido-accesos-google',
+        observacion: 'Bloquea a L. Christian cuando necesita medir nuevos botones de WhatsApp por sucursal en la web.',
+        proximo_paso: 'Otorgar permiso de Publicación y Administración a Madero antes del 09/11.'
+      },
+      {
+        id: 'GGL-07',
+        herramienta: 'Search Console',
+        sucursal_cuenta: 'Dominio maderoautomotores.com',
+        propiedad_madero: 'PROPIETARIO_MADERO',
+        acceso_pendiente_detalle: 'Verificado por DNS en poder de Madero / L. Christian.',
+        actor_id: 'CHRISTIAN_WEB',
+        responsable_nombre: 'L. Christian (Web) + Ángelo Lucero',
+        estado: 'EN_ELABORACION',
+        entregable: 'Corrección de 14 URLs de vehículos ya vendidos que devolvían error 404 en Google.',
+        evidencia: 'https://search.google.com/search-console',
+        observacion: 'Se definió redirección automática al catálogo de la categoría equivalente cuando una unidad se vende.',
+        proximo_paso: 'Validar cobertura de sitemap.xml actualizado tras despliegue web del viernes.'
+      },
+      {
+        id: 'GGL-08',
+        herramienta: 'Google Ads',
+        sucursal_cuenta: 'Cuenta Publicitaria ID 492-881-1024',
+        propiedad_madero: 'PROPIETARIO_MADERO',
+        acceso_pendiente_detalle: 'Facturación y propiedad de Madero; REM opera desde su MCC de agencia.',
+        actor_id: 'REM',
+        responsable_nombre: 'REM (Tráfico) · Auditado por Ángelo Lucero',
+        estado: 'OBSERVADO_MADERO',
+        entregable: 'Informe de términos de búsqueda negativos y desglose de inversión por plaza.',
+        evidencia: 'https://ads.google.com/',
+        observacion: 'Se detectó consumo en red Display en apps móviles sin retorno comercial (Campaña CMP-06 pausada por orden de Ángelo).',
+        proximo_paso: 'Concentrar el 100% de la pauta de Google Ads en Red de Búsqueda de alta intención comercial.'
+      },
+      {
+        id: 'GGL-09',
+        herramienta: 'Workspace',
+        sucursal_cuenta: 'Cuentas Corporativas @maderoautomotores.com y Drive Maestro',
+        propiedad_madero: 'PROPIETARIO_MADERO',
+        acceso_pendiente_detalle: 'Administración interna de Madero.',
+        actor_id: 'MKT_INTERNO',
+        responsable_nombre: 'Ángelo Lucero + Administración',
+        estado: 'CERRADO_EVIDENCIA',
+        entregable: 'Estructura estandarizada de Drive por sucursal/patente, carpeta de Minutas REM y Respaldos JSON del CRM.',
+        evidencia: 'https://drive.google.com/drive/folders/madero-marketing-maestro',
+        observacion: 'Permisos ordenados para garantizar continuidad documental del equipo interno.',
+        proximo_paso: 'Mantener auditoría mensual de permisos de carpetas compartidas con proveedores.'
+      }
+    ],
+
+    // ======================================================================
+    // PASO 5 · MÓDULO 8: PLATAFORMA WEB Y STAGING (Sección 4 y 5.8)
+    // Seguimiento con L. Christian y otros: Solicitado -> Desarrollo -> Staging -> Observado QA -> Producción
+    // ======================================================================
+    web_cambios: [
+      {
+        id: 'WEB-01',
+        cambio_solicitado: 'Sincronización automática de estado RESERVADO / VENDIDO desde Lucy DMS y ocultamiento de unidades dadas de baja',
+        tipo: 'Integración / Stock',
+        actor_id: 'CHRISTIAN_WEB',
+        responsable: 'L. Christian (Desarrollo Web)',
+        etapa_web: 'EN_PRUEBA_STAGING',
+        estado: 'ENTREGADO_REVISION',
+        url_prueba: 'https://staging.maderoautomotores.com/catalogo-sync',
+        observaciones_madero: 'En entorno de prueba funciona correctamente la baja de vendidos, pero falta mostrar el badge ámbar "RESERVADO" cuando la unidad sigue en salón con seña.',
+        fecha_acordada: '2026-11-08',
+        validacion_final: 'Pendiente ajuste visual de etiqueta RESERVADO para pasar a Producción.'
+      },
+      {
+        id: 'WEB-02',
+        cambio_solicitado: 'Reemplazo de galería de fotos viejas en Ford EcoSport (AF-489-QQ) y optimización de compresión WebP',
+        tipo: 'Corrección Visual / Catálogo',
+        actor_id: 'CHRISTIAN_WEB',
+        responsable: 'L. Christian (Desarrollo Web)',
+        etapa_web: 'OBSERVADO_QA',
+        estado: 'OBSERVADO_MADERO',
+        url_prueba: 'https://maderoautomotores.com/autos/ford-ecosport-af489qq',
+        observaciones_madero: 'Observado en auditoría cruzada de Fotografías (FOT-036): el caché del servidor seguía sirviendo las 3 fotos preliminares viejas en lugar del set de 10 fotos nuevas de estudio.',
+        fecha_acordada: '2026-11-07',
+        validacion_final: 'Purgar caché de CDN y verificar visualización en móvil y desktop.'
+      },
+      {
+        id: 'WEB-03',
+        cambio_solicitado: 'Enrutador inteligente de botón WhatsApp por sucursal según ubicación de la unidad (Polonia, Alem, CAM, Neuquén, Cordillera)',
+        tipo: 'Conversión Comercial',
+        actor_id: 'CHRISTIAN_WEB',
+        responsable: 'L. Christian (Desarrollo Web)',
+        etapa_web: 'VALIDADO_PRODUCCION',
+        estado: 'CERRADO_EVIDENCIA',
+        url_prueba: 'https://maderoautomotores.com/autos',
+        observaciones_madero: 'Probado y validado por Ángelo junto a referentes de Ventas. Cada ficha envía en el mensaje automático la patente, marca/modelo y deriva al número exacto de la sucursal donde está físico el vehículo.',
+        fecha_acordada: '2026-11-02',
+        validacion_final: 'Validado en Producción el 02/11 con evidencia de ruteo correcto.'
+      },
+      {
+        id: 'WEB-04',
+        cambio_solicitado: 'Landing Page específica "Entregá tu Usado / Tasación en el Acto" con filtro de año (>2015) y kilometraje',
+        tipo: 'Landing Campaña Paga',
+        actor_id: 'CHRISTIAN_WEB',
+        responsable: 'L. Christian (Web) + Diseño Interno',
+        etapa_web: 'EN_DESARROLLO',
+        estado: 'EN_ELABORACION',
+        url_prueba: 'https://staging.maderoautomotores.com/tasacion-usados',
+        observaciones_madero: 'Requerido para mejorar la calidad de leads de las campañas CMP-02 (Neuquén) y CMP-04 (Alem) y evitar consultas de vehículos fuera de política comercial.',
+        fecha_acordada: '2026-11-11',
+        validacion_final: 'En maquetación de formulario condicional.'
+      },
+      {
+        id: 'WEB-05',
+        cambio_solicitado: 'Corrección de visualización de kilometraje "0 km" en usados que vienen sin dato en Lucy DMS (mostrar "Consultar km en salón")',
+        tipo: 'Regla de Negocio / Datos',
+        actor_id: 'CHRISTIAN_WEB',
+        responsable: 'L. Christian (Desarrollo Web)',
+        etapa_web: 'VALIDADO_PRODUCCION',
+        estado: 'CERRADO_EVIDENCIA',
+        url_prueba: 'https://maderoautomotores.com/autos/toyota-hilux-ag102kl',
+        observaciones_madero: 'Evita reclamos de clientes cuando una unidad 2022/2023 tiene "0 km" cargado por defecto en el sistema de gestión.',
+        fecha_acordada: '2026-11-04',
+        validacion_final: 'Validado en producción 04/11. Regla activa para todo vehículo con año < 2026 y km = 0.'
+      },
+      {
+        id: 'WEB-06',
+        cambio_solicitado: 'Instalación de eventos limpios de conversión GA4 / Meta Pixel en botones de llamada y formulario',
+        tipo: 'Analítica y Tracking',
+        actor_id: 'REM',
+        responsable: 'REM (Tracking) + L. Christian (Implementación)',
+        etapa_web: 'SOLICITADO',
+        estado: 'PENDIENTE_INFO_MADERO',
+        url_prueba: 'https://maderoautomotores.com',
+        observaciones_madero: 'Depende de que REM libere los permisos de administrador del contenedor Google Tag Manager (GGL-06).',
+        fecha_acordada: '2026-11-12',
+        validacion_final: 'Bloqueado por acceso GTM pendiente de REM.'
+      }
+    ],
+
+    // ======================================================================
+    // PASO 5 · MÓDULO 10: EVENTOS Y PRESENCIA REGIONAL (Sección 4 y 5.10)
+    // Calendario futuro y ejecutado, ciudad/plaza, objetivo, presupuesto, difusión y resultado
+    // ======================================================================
+    eventos_regionales: [
+      {
+        id: 'EVT-01',
+        evento: 'Exhibición Especial Pickups & SUVs 4x4 — Fin de Semana Largo Comodoro (Av. Polonia 546)',
+        ciudad_plaza: 'Comodoro · Av. Polonia 546 (Salón Principal)',
+        fecha_inicio: '2026-11-14',
+        fecha_fin: '2026-11-15',
+        objetivo: 'Generar tráfico presencial calificado en salón principal, test drive de gama alta y cierre de operaciones con toma de usado en el acto.',
+        presupuesto_estimado: 680000,
+        presupuesto_real: 620000,
+        actor_id: 'MKT_INTERNO',
+        responsables: 'Ángelo Lucero + Equipo Interno + Gerencia Ventas Polonia',
+        difusion_plan: 'Pauta geolocalizada 7 días antes, invitación personalizada por WhatsApp a cartera activa, cobertura en vivo en IG/TikTok y gráfica de salón.',
+        estado: 'EN_ELABORACION',
+        resultado_medido: 'Banderas flybanner, carpa institucional, catering y 12 unidades seleccionadas ya confirmadas con Alistamiento CAM.',
+        conclusion_lider: 'Todo el material POP y el stock protagonista están asegurados una semana antes para evitar improvisaciones de último momento.',
+        evidencia_url: 'https://drive.google.com/drive/folders/madero-evento-polonia-nov'
+      },
+      {
+        id: 'EVT-02',
+        evento: 'Activación Presencia de Marca & Stand Móvil — Paseo de la Costa Neuquén',
+        ciudad_plaza: 'Neuquén · Madero Neuquén',
+        fecha_inicio: '2026-11-21',
+        fecha_fin: '2026-11-22',
+        objetivo: 'Consolidar reconocimiento de marca de Madero Automotores en plaza Neuquén y captar leads presenciales con código QR de tasación inmediata.',
+        presupuesto_estimado: 920000,
+        presupuesto_real: 450000,
+        actor_id: 'MKT_INTERNO',
+        responsables: 'Ángelo Lucero + Referente Comercial Neuquén + Promoción',
+        difusion_plan: 'Reels de convocatoria en Neuquén, pauta radial local y cobertura audiovisual durante ambas jornadas.',
+        estado: 'PENDIENTE_INFO_MADERO',
+        resultado_medido: 'Permiso municipal gestionado; pendiente aprobación final de Dirección para el canon de espacio y traslado de 3 unidades desde salón Neuquén.',
+        conclusion_lider: 'Requiere validación presupuestaria de Dirección antes del martes 10/11 para congelar tarifa de proveedores locales.',
+        evidencia_url: 'https://drive.google.com/drive/folders/madero-evento-neuquen-costa'
+      },
+      {
+        id: 'EVT-03',
+        evento: 'Encuentro Regional Clientes & Productores — Cordillera Venta (Esquel / Trevelin)',
+        ciudad_plaza: 'Cordillera · Cordillera Venta',
+        fecha_inicio: '2026-11-28',
+        fecha_fin: '2026-11-29',
+        objetivo: 'Afianzar vínculo comercial en la Comarca Andina presentando línea de utilitarios y pickups doble cabina listas para trabajo rural y turístico.',
+        presupuesto_estimado: 540000,
+        presupuesto_real: 0,
+        actor_id: 'MKT_INTERNO',
+        responsables: 'Marketing Interno + Equipo Cordillera Venta',
+        difusion_plan: 'Campaña Meta Ads segmentada en Esquel/Trevelin/El Bolsón + prensa radial regional.',
+        estado: 'PENDIENTE_INICIO',
+        resultado_medido: 'En etapa de armado de listado de invitados y selección de 6 unidades 4x4.',
+        conclusion_lider: 'Clave para equilibrar la presencia territorial en Cordillera durante el cierre de noviembre.',
+        evidencia_url: 'https://drive.google.com/drive/folders/madero-evento-cordillera'
+      },
+      {
+        id: 'EVT-04',
+        evento: 'Jornada Puertas Abiertas "Liquidación Stock Seleccionado" — Av. Alem 828',
+        ciudad_plaza: 'Comodoro · Av. Alem 828',
+        fecha_inicio: '2026-10-24',
+        fecha_fin: '2026-10-25',
+        objetivo: 'Acelerar rotación de unidades de gama media con más de 90 días en stock en sucursal Alem.',
+        presupuesto_estimado: 410000,
+        presupuesto_real: 395000,
+        actor_id: 'MKT_INTERNO',
+        responsables: 'Ángelo Lucero + Equipo Ventas Alem 828',
+        difusion_plan: 'Stories secuenciales, difusión en Facebook Marketplace/Álbumes y gráfica en vidriera.',
+        estado: 'CERRADO_EVIDENCIA',
+        resultado_medido: '38 visitas presenciales registradas en planilla de salón · 14 tasaciones realizadas · 3 unidades señadas durante el fin de semana.',
+        conclusion_lider: 'Excelente retorno sobre inversión ($395k invertidos para 3 cierres directos). Se documentó el formato para repetir el último sábado de cada mes.',
+        evidencia_url: 'https://drive.google.com/drive/folders/madero-evento-alem-oct'
+      }
+    ],
+
+    // ======================================================================
+    // PASO 5 · MÓDULO 11: MERCHANDISING E INVENTARIO POP (Sección 4 y 5.11)
+    // Inventario, sucursal/destino, costo, punto de reposición, utilización y necesidad futura
+    // ======================================================================
+    merchandising_stock: [
+      {
+        id: 'MER-01',
+        articulo: 'Kit Entrega Cliente Premium (Caja grabada, llavero cuero/metal Madero y porta-documentos)',
+        categoria: 'Presentes de Entrega',
+        sucursal_ubicacion: 'Comodoro · Av. Polonia 546 (Salón Principal)',
+        stock_actual: 18,
+        stock_minimo_reposicion: 25,
+        costo_unitario: 18500,
+        destino_principal: 'Entrega de unidades en Av. Polonia 546 y Av. Alem 828',
+        utilizacion_periodo: '32 kits entregados en las últimas 3 semanas.',
+        necesidad_futura: 'URGENTE: Reponer 80 unidades para cubrir cierres de noviembre y diciembre.',
+        responsable_control: 'Marketing Interno + Administración Polonia'
+      },
+      {
+        id: 'MER-02',
+        articulo: 'Portapatentes Acrílico / Inyectado Oficial "Madero Automotores"',
+        categoria: 'Identificación Vehicular',
+        sucursal_ubicacion: 'Comodoro · CAM (Monseñor D\'Andrea 1967)',
+        stock_actual: 145,
+        stock_minimo_reposicion: 80,
+        costo_unitario: 4200,
+        destino_principal: 'Colocación obligatoria en CAM Alistamiento previo a sesión de fotos y entrega',
+        utilizacion_periodo: '54 pares colocados en octubre/noviembre.',
+        necesidad_futura: 'Stock saludable para 60 días. Próxima compra programada en diciembre.',
+        responsable_control: 'Coordinador CAM D\'Andrea + Marketing Interno'
+      },
+      {
+        id: 'MER-03',
+        articulo: 'Placas Cubre-Patentes de Salón para Fotografía y Exhibición ("MADERO")',
+        categoria: 'Exhibición y Fotografía',
+        sucursal_ubicacion: 'Neuquén · Madero Neuquén',
+        stock_actual: 4,
+        stock_minimo_reposicion: 10,
+        costo_unitario: 9800,
+        destino_principal: 'Sesiones fotográficas de stock y unidades en salón Madero Neuquén',
+        utilizacion_periodo: '6 placas deterioradas por uso intensivo en playón.',
+        necesidad_futura: 'Enviar 12 placas nuevas por encomienda a Neuquén esta semana para sostener estándar de fotos.',
+        responsable_control: 'Equipo Fotografía / Referente Neuquén'
+      },
+      {
+        id: 'MER-04',
+        articulo: 'Mates Térmicos Grabados Láser con Bombilla Acero (Logo Madero)',
+        categoria: 'Presentes de Entrega / VIP',
+        sucursal_ubicacion: 'Comodoro · Av. Polonia 546 (Salón Principal)',
+        stock_actual: 9,
+        stock_minimo_reposicion: 15,
+        costo_unitario: 24000,
+        destino_principal: 'Regalo de fidelización en entregas de Pickups y SUVs gama alta',
+        utilizacion_periodo: '21 unidades entregadas en operaciones destacadas (con foto de cliente en redes).',
+        necesidad_futura: 'Solicitar presupuesto comparativo por 50 unidades a 2 proveedores de merchandising.',
+        responsable_control: 'Ángelo Lucero'
+      },
+      {
+        id: 'MER-05',
+        articulo: 'Banderas Flybanner 3.5m Doble Costura + Bases Rellenables Exterior',
+        categoria: 'Material POP Eventos y Fachada',
+        sucursal_ubicacion: 'Comodoro · Av. Alem 828',
+        stock_actual: 6,
+        stock_minimo_reposicion: 4,
+        costo_unitario: 68000,
+        destino_principal: 'Frente de salones Comodoro y eventos regionales de fin de semana',
+        utilizacion_periodo: 'En uso continuo en Polonia y Alem.',
+        necesidad_futura: 'Confeccionar 4 velas de repuesto reforzadas para viento patagónico antes del evento EVT-01.',
+        responsable_control: 'Marketing Interno'
+      },
+      {
+        id: 'MER-06',
+        articulo: 'Chombas y Camperas Softshell Institucionales Equipo Comercial & Alistamiento',
+        categoria: 'Indumentaria Corporativa',
+        sucursal_ubicacion: 'Todas las plazas (Transversal)',
+        stock_actual: 12,
+        stock_minimo_reposicion: 10,
+        costo_unitario: 45000,
+        destino_principal: 'Asesores comerciales ( presencia uniforme en Reels/Videos y atención en salón)',
+        utilizacion_periodo: 'Entregadas a nuevos ingresos de Neuquén y CAM.',
+        necesidad_futura: 'Relevar talles de verano para pedido de diciembre.',
+        responsable_control: 'Marketing Interno + RRHH'
+      },
+      {
+        id: 'MER-07',
+        articulo: 'Kit Entrega Cliente y Carpetas Institucionales — Plaza Cordillera',
+        categoria: 'Presentes de Entrega',
+        sucursal_ubicacion: 'Cordillera · Cordillera Venta',
+        stock_actual: 3,
+        stock_minimo_reposicion: 8,
+        costo_unitario: 18500,
+        destino_principal: 'Operaciones cerradas en Cordillera Venta',
+        utilizacion_periodo: '7 entregas realizadas en el bimestre.',
+        necesidad_futura: 'CRÍTICO: Despachar 10 kits desde Comodoro junto con material del evento EVT-03.',
+        responsable_control: 'Marketing Interno'
+      }
+    ],
+
+    // ======================================================================
+    // PASO 5 · MÓDULO 12: RELACIÓN CON VENTAS Y STOCK PRIORITARIO (Sección 5.12)
+    // Necesidades comerciales, devoluciones sobre leads, stock prioritario y desvíos
+    // ======================================================================
+    ventas_feedback: [
+      {
+        id: 'VTA-01',
+        fecha: '2026-11-04',
+        sucursal_plaza: 'Comodoro · Av. Polonia 546 (Salón Principal)',
+        referente_ventas: 'Gerencia Ventas Polonia',
+        tipo: 'STOCK_PRIORITARIO',
+        unidades_involucradas: 'AE-901-BC (VW Amarok V6 Extreme 2021 · 194 días) y AD-442-LP (Ford Ranger Ltd 2020 · 182 días)',
+        descripcion: 'Dos unidades de alto valor inmovilizadas hace más de 180 días en stock. Ventas solicita acción focalizada de rotación inmediata tras ajuste de precio de revista.',
+        accion_marketing: 'Se realizó nueva sesión de video vertical en primer plano destacando el nuevo precio bonificado y se activó pauta específica en CMP-01.',
+        actor_id: 'MKT_INTERNO',
+        responsable: 'Ángelo Lucero + Audiovisual Interno',
+        estado: 'EN_ELABORACION',
+        cierre_verificado: false
+      },
+      {
+        id: 'VTA-02',
+        fecha: '2026-11-03',
+        sucursal_plaza: 'Neuquén · Madero Neuquén',
+        referente_ventas: 'Coordinador Comercial Neuquén',
+        tipo: 'CALIDAD_LEADS',
+        unidades_involucradas: 'Línea SUVs y Gama Media (Campaña Meta Ads CMP-02)',
+        descripcion: 'Los vendedores reportan que el 75% de los leads ingresados por la campaña de financiación de REM consultan sin anticipo ni vehículo para entregar, o desde localidades muy distantes.',
+        accion_marketing: 'Ángelo auditó la campaña CMP-02, observó formalmente a REM en minuta del 04/11 y ordenó limitar el radio a 60 km de Neuquén agregando filtro obligatorio de anticipo.',
+        actor_id: 'REM',
+        responsable: 'REM (Ajuste técnico) · Controla Ángelo Lucero',
+        estado: 'OBSERVADO_MADERO',
+        cierre_verificado: false
+      },
+      {
+        id: 'VTA-03',
+        fecha: '2026-11-05',
+        sucursal_plaza: 'Comodoro · Av. Alem 828',
+        referente_ventas: 'Supervisor Salón Alem 828',
+        tipo: 'PROBLEMA_PUBLICACION',
+        unidades_involucradas: 'AE-721-ZX (Honda HR-V EXL 2021) y AF-310-MN (Toyota Corolla XEI 2022)',
+        descripcion: 'Clientes se presentaron en salón Alem preguntando por la Honda HR-V que ya había sido señada hace 48 hs pero seguía figurando como "Disponible" en la web y en un álbum de Facebook.',
+        accion_marketing: 'Se actualizó de inmediato el estado en redes y se vinculó con el ticket WEB-01 asignado a L. Christian para automatizar la etiqueta RESERVADO desde Lucy DMS.',
+        actor_id: 'CHRISTIAN_WEB',
+        responsable: 'L. Christian (Web) + Community Manager Interno',
+        estado: 'ENTREGADO_REVISION',
+        cierre_verificado: false
+      },
+      {
+        id: 'VTA-04',
+        fecha: '2026-11-02',
+        sucursal_plaza: 'Comodoro · CAM (Monseñor D\'Andrea 1967)',
+        referente_ventas: 'Coordinación Ventas / CAM',
+        tipo: 'STOCK_PRIORITARIO',
+        unidades_involucradas: '14 unidades recién alistadas en Monseñor D\'Andrea 1967 pendientes de publicación',
+        descripcion: 'Ventas necesita que las unidades que terminan alistamiento mecánico y estético los lunes y miércoles estén publicadas con fotos en menos de 48 hs para que los vendedores las ofrezcan por WhatsApp.',
+        accion_marketing: 'Se instauró ventana fija de fotografía en CAM martes y jueves 10:00 hs con carga directa en Drive y Lucy DMS en el mismo día.',
+        actor_id: 'MKT_INTERNO',
+        responsable: 'Equipo Fotografía Interno',
+        estado: 'CERRADO_EVIDENCIA',
+        cierre_verificado: true
+      },
+      {
+        id: 'VTA-05',
+        fecha: '2026-11-05',
+        sucursal_plaza: 'Cordillera · Cordillera Venta',
+        referente_ventas: 'Referente Comercial Cordillera',
+        tipo: 'PEDIDO_COMERCIAL',
+        unidades_involucradas: 'Stock Tracción 4x4 y Utilitarios Cordillera',
+        descripcion: 'Solicitan catálogo PDF descargable actualizado semanalmente con las unidades disponibles en Esquel/Cordillera y kits de entrega de clientes (MER-07 en stock crítico).',
+        accion_marketing: 'Diseño Interno armó plantilla rápida de catálogo semanal para WhatsApp y se programó envío de 10 kits de entrega desde Comodoro.',
+        actor_id: 'MKT_INTERNO',
+        responsable: 'Diseño Interno + Logística Marketing',
+        estado: 'EN_ELABORACION',
+        cierre_verificado: false
+      }
+    ],
+
+    // ======================================================================
+    // PASO 6 · NIVEL 2: NOTAS EJECUTIVAS DEL INFORME SEMANAL A DIRECCIÓN (Sección 10)
+    // Los 8 bloques obligatorios con la lectura y conclusión propia de Ángelo Lucero
+    // ======================================================================
+    informe_semanal_notas: {
+      bloque_1_resumen_general:
+        'En esta semana dejamos operativo el sistema único de Control Integral de Marketing exigido por Dirección el 28/10. Los 12 módulos ya registran responsables, fechas, evidencia y criterio de calidad. El foco estuvo en ordenar el pasivo fotográfico de stock en Lucy DMS (Av. Polonia al 100%, concentrando esfuerzos en CAM D\'Andrea y Neuquén) y en exigir a REM la corrección inmediata de campañas con baja calidad de lead y la devolución de propiedad de activos Google.',
+      bloque_2_marketing_interno:
+        'El equipo interno opera al 26%–35% de carga planificada formal más las horas de trabajo absorbido documentadas. Se establecieron backups de continuidad para todas las funciones críticas, se fijaron días de sesión fotográfica en CAM Monseñor D\'Andrea y se blindó la organización previa del evento de exhibición en Av. Polonia (EVT-01).',
+      bloque_3_proveedores_rem:
+        'Se terminó con las observaciones informales: toda desviación de REM o L. Christian quedó asentada en el circuito de 9 estados y vinculada a su minuta sin suavizar el contenido. REM mantiene atrasos en entregas de video para Cordillera (CNT-08) y en la transferencia de propiedad de Google Business Neuquén y Tag Manager.',
+      bloque_4_canales_campanas:
+        'Instagram y TikTok lideran el crecimiento orgánico y la tracción en Comodoro y Neuquén; YouTube requiere recuperar su ritmo de 3 piezas semanales. En pauta paga, la campaña de Pickups (CMP-01) entrega leads de alta conversión (4 reservas), mientras que en Neuquén (CMP-02) exigimos a REM acotar segmentación y filtrar por anticipo.',
+      bloque_5_calidad:
+        'Criterio único de aceptación aplicado: ninguna pieza sale a publicación ni se da por cerrada con un proveedor si presenta errores de precio, kilometraje, tasa financiera vencida o falta de identificación de sucursal. Esta semana se observaron 3 entregables de REM y 1 de Web antes de que afecten la operación comercial.',
+      bloque_6_dependencias_madero:
+        'Para destrabar los frentes pendientes necesitamos: (1) que Administración/Dirección acompañe el reclamo formal de propiedad raíz de Google Business Neuquén y GTM ante REM, (2) que CAM D\'Andrea libere las unidades lavadas en la franja de martes y jueves, y (3) aprobación presupuestaria para la activación en Neuquén (EVT-02) y reposición de Kits de Entrega (MER-01).',
+      bloque_7_trabajo_absorbido:
+        'Cumpliendo la regla de "No sustitución silenciosa", cada vez que Marketing Interno debió rehacer placas o carruseles por errores tipográficos o de ficha técnica de REM (ej. CNT-02 / PRV-02), el trabajo se ejecutó para no frenar a Ventas pero quedó contabilizado en horas e imputado al legajo de auditoría del proveedor.',
+      bloque_8_prioridades_decisiones:
+        'Prioridades de la próxima semana: (1) Reducir en un 40% las unidades sin foto en CAM D\'Andrea y Neuquén; (2) Poner en producción con L. Christian la sincronización automática de RESERVADO/VENDIDO en la web (WEB-01); (3) Auditar el resultado del nuevo filtro de leads en Neuquén. Se elevan a Dirección las decisiones contractuales y presupuestarias detalladas al pie.'
+    }
   };
 
   return {
@@ -2450,6 +3434,13 @@ window.MaderoData = (function () {
     POSICIONES_MADERO,
     POSICIONES_REQUIEREN_MINUTA,
     PASOS_FORMALIZACION,
+    ETAPAS_CONTENIDO,
+    FORMATOS_CONTENIDO,
+    CALIDAD_LEADS,
+    DECISIONES_CAMPANA,
+    PROPIEDAD_GOOGLE,
+    ETAPAS_WEB,
+    TIPOS_FEEDBACK_VENTAS,
     MODULOS_SISTEMA,
     SUCURSALES_MADERO,
     INITIAL_STATE
