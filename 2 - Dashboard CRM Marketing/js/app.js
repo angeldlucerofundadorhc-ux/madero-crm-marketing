@@ -167,10 +167,11 @@ window.MaderoApp = (function () {
 
     const gobActive = activeModuleId === 'gob-frentes';
     let html = `
-      <button type="button" onclick="MaderoApp.navigateModule('gob-frentes')" class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 transition shrink-0 ${gobActive ? 'subtab-btn-active' : 'bg-white/75 hover:bg-white text-stone-700 border border-stone-200/90'}">
+      <button type="button" onclick="MaderoApp.navigateModule('gob-frentes')" class="apple-module-pill whitespace-nowrap flex items-center gap-1.5 shrink-0 ${gobActive ? 'subtab-btn-active' : ''}">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
         <span>Secc. 4 · Separación Responsabilidades (7)</span>
       </button>
+      <span class="hidden sm:inline-block w-px h-4 bg-stone-300/80 mx-0.5 select-none" aria-hidden="true"></span>
     `;
 
     window.MaderoData.MODULOS_SISTEMA.forEach(m => {
@@ -178,7 +179,7 @@ window.MaderoApp = (function () {
       const dotClass = m.activoEnPasoActual ? 'bg-emerald-500' : 'bg-stone-400';
       const stepTag = m.activoEnPasoActual ? '' : `<span class="text-[9px] font-mono opacity-75">P${m.paso}</span>`;
       html += `
-        <button type="button" onclick="MaderoApp.navigateModule('${m.id}')" class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 transition shrink-0 ${isAct ? 'subtab-btn-active' : 'bg-white/75 hover:bg-white text-stone-700 border border-stone-200/90'}">
+        <button type="button" onclick="MaderoApp.navigateModule('${m.id}')" class="apple-module-pill whitespace-nowrap flex items-center gap-1.5 shrink-0 ${isAct ? 'subtab-btn-active' : ''}">
           <span class="w-1.5 h-1.5 rounded-full ${dotClass}"></span>
           <span>${window.MaderoUI.esc(m.corto)}</span>
           ${stepTag}
