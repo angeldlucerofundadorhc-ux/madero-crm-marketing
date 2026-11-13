@@ -34,6 +34,17 @@ window.MaderoStore = (function () {
       }
     });
 
+    // Migrar capacidad semanal heredada (180h sintéticas -> 47.5h reales Lun-Vie 9:30 a 19:00)
+    if (Array.isArray(merged.equipo_miembros)) {
+      const legacyCapTotal = merged.equipo_miembros.reduce(
+        (acc, m) => acc + (Number(m.horas_capacidad_semanal) || 0),
+        0
+      );
+      if (legacyCapTotal > 60) {
+        merged.equipo_miembros = deepClone(base.equipo_miembros);
+      }
+    }
+
     // Sincronizar banderas de módulos activos en gobernanza si corresponde
     return merged;
   }

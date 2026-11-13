@@ -861,7 +861,7 @@ window.MaderoConduccion = (function () {
                 <span class="badge-pill badge-emerald">Operativo · Paso 1</span>
               </div>
               <h2 class="text-base sm:text-lg font-extrabold text-stone-900 tracking-tight">Equipo Interno: Capacidad, Cobertura, Reemplazos y Calidad</h2>
-              <p class="text-xs text-stone-500 mt-0.5">Supervisión de carga semanal, continuidad documental ante ausencias, bloqueos en sucursales y registro explícito de trabajo absorbido.</p>
+              <p class="text-xs text-stone-500 mt-0.5">Supervisión de carga semanal (base jornada Lun a Vie · 9:30 a 19:00 = 47.5h semanales), continuidad documental ante ausencias y trabajo absorbido.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
               <button type="button" onclick="MaderoConduccion.openMiembroModal(null)" class="px-3 py-1.5 rounded-xl bg-white border border-stone-300 text-stone-800 text-xs font-semibold hover:bg-stone-50">
@@ -881,7 +881,7 @@ window.MaderoConduccion = (function () {
             <div class="p-3.5 rounded-2xl bg-white/75 border border-stone-200/80">
               <span class="text-[10px] font-bold uppercase tracking-wider text-stone-500 block">Ocupación Planificada</span>
               <span class="font-mono text-xl font-extrabold text-stone-900">${summary.horasAsignadas} / ${summary.capacidadTotalHs} hs</span>
-              <span class="text-[11px] text-emerald-700 font-semibold block mt-0.5">${summary.ocupacionPct}% de capacidad semanal</span>
+              <span class="text-[11px] text-emerald-700 font-semibold block mt-0.5">${summary.ocupacionPct}% de capacidad semanal (Lun–Vie 9:30–19:00)</span>
             </div>
             <div class="p-3.5 rounded-2xl bg-white/75 border border-stone-200/80">
               <span class="text-[10px] font-bold uppercase tracking-wider text-stone-500 block">Continuidad / Reemplazos</span>

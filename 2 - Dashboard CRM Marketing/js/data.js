@@ -674,13 +674,14 @@ window.MaderoData = (function () {
     ],
 
     // MÓDULO 2A: EQUIPO INTERNO — CAPACIDAD, COBERTURA Y CONTINUIDAD (Sección 2 y 5.2)
+    // Capacidad total semanal real: Lun a Vie 9:30 a 19:00 (9.5h/día × 5 días = 47.5h semanales)
     equipo_miembros: [
       {
         id: 'MEM-01',
-        nombre: 'Ángelo Lucero',
-        rol: 'Líder de Marketing · Conducción, Calidad y Proveedores',
+        nombre: 'Ángelo Lucero · Conducción & Proveedores',
+        rol: 'Líder de Marketing · Jornada Lun a Vie 9:30 a 19:00 (47,5h sem. totales)',
         plaza_base: 'Comodoro · Av. Alem 828 (Cobertura Transversal)',
-        horas_capacidad_semanal: 45,
+        horas_capacidad_semanal: 3,
         reemplazo_designado: 'Dirección / Referente Operativo Comodoro (según frente)',
         estado_continuidad: 'DOCUMENTADO', // DOCUMENTADO | EN_PROCESO | RIESGO_SIN_BACKUP
         detalle_continuidad: 'Tablero centralizado, minutas REM y criterios de aceptación formalizados por escrito.',
@@ -692,7 +693,7 @@ window.MaderoData = (function () {
         nombre: 'Célula Fotografía & Detailing Visual · Comodoro',
         rol: 'Captura Fotográfica y Video de Unidades en Salón / CAM',
         plaza_base: 'Polonia 546 · Alem 828 · CAM D\'Andrea 1967 · Colón',
-        horas_capacidad_semanal: 40,
+        horas_capacidad_semanal: 15,
         reemplazo_designado: 'Cobertura cruzada Ángelo Lucero / Operador Audiovisual',
         estado_continuidad: 'DOCUMENTADO',
         detalle_continuidad: 'Guía de 8 tomas obligatorias (frente 3/4, lateral, trasera, tablero, plazas, motor, baúl).',
@@ -704,7 +705,7 @@ window.MaderoData = (function () {
         nombre: 'Gestión de Plataformas & Stock Digital',
         rol: 'Carga en Drive, Lucy DMS, Web Oficial y Auditoría de Fichas',
         plaza_base: 'Todas las plazas (Transversal)',
-        horas_capacidad_semanal: 35,
+        horas_capacidad_semanal: 10,
         reemplazo_designado: 'Ángelo Lucero + Soporte Admin Comercial',
         estado_continuidad: 'EN_PROCESO',
         detalle_continuidad: 'En redacción instructivo paso a paso de nomenclatura de carpetas Drive -> Lucy -> Web.',
@@ -716,7 +717,7 @@ window.MaderoData = (function () {
         nombre: 'Referente Operativo · Plaza Neuquén & Cordillera',
         rol: 'Captura Local de Stock, Reels de Salón y Vínculo con Ventas NQN',
         plaza_base: 'Neuquén · Madero Neuquén',
-        horas_capacidad_semanal: 30,
+        horas_capacidad_semanal: 3.5,
         reemplazo_designado: 'Asesor designado Sucursal Neuquén (para fotos urgentes de ingreso)',
         estado_continuidad: 'EN_PROCESO',
         detalle_continuidad: 'Requiere homologar iluminación interior de salón Neuquén con el estándar de Av. Polonia.',
@@ -728,7 +729,7 @@ window.MaderoData = (function () {
         nombre: 'Coordinación Contenido Orgánico, Eventos & Merchandising',
         rol: 'Activaciones Regionales, TikTok / Reels en Vivo y Control POP',
         plaza_base: 'Comodoro + Articulación Regional',
-        horas_capacidad_semanal: 30,
+        horas_capacidad_semanal: 16,
         reemplazo_designado: 'Articulación Carlos Rodríguez (TikTok/Eventos) + Ángelo Lucero',
         estado_continuidad: 'DOCUMENTADO',
         detalle_continuidad: 'Planillas de acreditación, inventario de merchandising y checklist de eventos operativos.',
