@@ -1195,7 +1195,19 @@ window.MaderoFotografias = (function () {
   }
 
   function openObservacionDetail(motivo) {
-    alert('Observación de Calidad:\n\n' + motivo);
+    window.MaderoUI.openModal({
+      title: 'Observación de Calidad Fotográfica',
+      subtitle: 'Revisión de cobertura y estándar visual',
+      maxWidth: 'max-w-lg',
+      bodyHtml: `
+        <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-stone-800 text-xs leading-relaxed">
+          ${esc(motivo || 'Sin detalle registrado para esta observación.')}
+        </div>
+      `,
+      footerHtml: `
+        <button type="button" onclick="MaderoUI.closeModal()" class="px-4 py-2 rounded-xl text-xs font-bold bg-stone-900 text-white hover:bg-stone-800 transition">Entendido</button>
+      `
+    });
   }
 
   function openInconsistenciaDetail(id) {

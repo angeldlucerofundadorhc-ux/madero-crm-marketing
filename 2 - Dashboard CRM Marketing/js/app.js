@@ -153,6 +153,40 @@ window.MaderoApp = (function () {
     setTxt('dock-lbl-fotos', `Fotografías (${sum.fotosUnidadesTotales || 36})`);
     setTxt('dock-lbl-contenido-pauta', `Contenido & Pauta (${(sum.contTotal || 0) + (sum.campTotal || 0)})`);
     setTxt('dock-lbl-direccion', `Dirección (${sum.decisionesTotalCount})`);
+
+    // Spatial Bento Hero Widgets (SVG Dial, Arc, Showroom Camera, 7-Frentes)
+    const cobPct = Number(sum.coberturaGeneralLucyPct || 0);
+    setTxt('bento-media-sub', `${sum.provDesviosCount || 0} desvíos prov. · ${(sum.contTotal || 0) + (sum.campTotal || 0)} piezas/camp.`);
+    setTxt('bento-cam-pct', `${cobPct}%`);
+    setTxt('bento-cam-stats', `${sum.fotosAlDiaCount || 0}/${sum.fotosUnidadesTotales || 36}`);
+    setTxt('bento-dial-max', `${sum.capacidadTotalHs || 0}h`);
+    setTxt('bento-lucy-sub', `Corte: ${window.MaderoUI.formatDateDisplay(meta.fecha_corte)} · ${cobPct}% fotos`);
+
+    const dialRing = document.getElementById('bento-dial-ring');
+    if (dialRing) {
+      const occ = Math.min(100, Math.max(0, Number(sum.ocupacionPct || 0)));
+      dialRing.setAttribute('stroke-dashoffset', String(Math.round(289 - (289 * occ) / 100)));
+    }
+
+    const arcPath = document.getElementById('bento-arc-path');
+    const arcThumb = document.getElementById('bento-arc-thumb');
+    if (arcPath || arcThumb) {
+      const ratio = sum.totalPrioridades > 0
+        ? Math.min(1, Math.max(0.12, (sum.priDesviosCount + sum.decisionesTotalCount) / Math.max(1, sum.totalPrioridades)))
+        : 0.25;
+      if (arcPath) arcPath.setAttribute('stroke-dashoffset', String(Math.round(151 * (1 - ratio))));
+      if (arcThumb) {
+        const theta = (-Math.PI / 2) + ratio * Math.PI;
+        arcThumb.setAttribute('cx', (15 + 48 * Math.cos(theta)).toFixed(1));
+        arcThumb.setAttribute('cy', (64 + 48 * Math.sin(theta)).toFixed(1));
+      }
+    }
+
+    const gobList = (window.MaderoStore.getState().gobernanza_frentes || []);
+    if (gobList.length > 0) {
+      const okFrentes = gobList.filter(f => (f.semaforo || 'VERDE') === 'VERDE').length;
+      setTxt('bento-frentes-pct', `${okFrentes}/${gobList.length}`);
+    }
   }
 
   function renderModuleStrip() {
@@ -167,24 +201,31 @@ window.MaderoApp = (function () {
 
     const gobActive = activeModuleId === 'gob-frentes';
     let html = `
-      <button type="button" onclick="MaderoApp.navigateModule('gob-frentes')" class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 transition shrink-0 ${gobActive ? 'subtab-btn-active' : 'bg-white/75 hover:bg-white text-stone-700 border border-stone-200/90'}">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-        <span>Secc. 4 · Separación Responsabilidades (7)</span>
+      <button type="button" onclick="MaderoApp.navigateModule('gob-frentes')" class="spatial-pill px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 shrink-0 ${gobActive ? 'spatial-pill-active' : ''}">
+        <span class="w-1.5 h-1.5 rounded-full ${gobActive ? 'bg-white' : 'bg-emerald-400'}"></span>
+        <span>7 Frentes</span>
       </button>
     `;
 
     window.MaderoData.MODULOS_SISTEMA.forEach(m => {
       const isAct = activeModuleId === m.id;
-      const dotClass = m.activoEnPasoActual ? 'bg-emerald-500' : 'bg-stone-400';
+      const dotClass = isAct ? 'bg-white' : (m.activoEnPasoActual ? 'bg-emerald-400' : 'bg-stone-400');
       const stepTag = m.activoEnPasoActual ? '' : `<span class="text-[9px] font-mono opacity-75">P${m.paso}</span>`;
       html += `
-        <button type="button" onclick="MaderoApp.navigateModule('${m.id}')" class="px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 transition shrink-0 ${isAct ? 'subtab-btn-active' : 'bg-white/75 hover:bg-white text-stone-700 border border-stone-200/90'}">
+        <button type="button" onclick="MaderoApp.navigateModule('${m.id}')" class="spatial-pill px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 shrink-0 ${isAct ? 'spatial-pill-active' : ''}">
           <span class="w-1.5 h-1.5 rounded-full ${dotClass}"></span>
           <span>${window.MaderoUI.esc(m.corto)}</span>
           ${stepTag}
         </button>
       `;
     });
+
+    html += `
+      <button type="button" onclick="MaderoApp.triggerQuickNew()" class="spatial-pill-new px-4 py-1.5 text-xs font-bold whitespace-nowrap flex items-center gap-1 shrink-0 ml-auto">
+        <i class="ri-add-line text-sm"></i>
+        <span>Nuevo</span>
+      </button>
+    `;
 
     strip.innerHTML = html;
   }
@@ -200,6 +241,12 @@ window.MaderoApp = (function () {
         if (c === currentCluster) btn.classList.add('tab-btn-active');
         else btn.classList.remove('tab-btn-active');
       });
+
+      const sideBtn = document.getElementById('side-btn-' + c);
+      if (sideBtn) {
+        if (c === currentCluster) sideBtn.classList.add('side-btn-active');
+        else sideBtn.classList.remove('side-btn-active');
+      }
     });
   }
 
@@ -317,6 +364,138 @@ window.MaderoApp = (function () {
     renderAll();
   });
 
+  function handleGlobalSearch(query) {
+    const q = String(query || '');
+    if (activeNivel === 'gerencial') {
+      if (!q.trim()) return;
+      activeNivel = 'operativo';
+      activeModuleId = 'm1-agenda';
+    }
+    switch (activeModuleId) {
+      case 'gob-frentes':
+        if (q.trim()) activeModuleId = 'm1-agenda';
+        if (window.MaderoConduccion?.setAgendaSearch) window.MaderoConduccion.setAgendaSearch(q);
+        break;
+      case 'm1-agenda':
+        if (window.MaderoConduccion?.setAgendaSearch) window.MaderoConduccion.setAgendaSearch(q);
+        break;
+      case 'm2-equipo':
+        if (window.MaderoConduccion?.setEquipoSearch) window.MaderoConduccion.setEquipoSearch(q);
+        break;
+      case 'm9-proveedores':
+        if (window.MaderoProveedores?.setFilter) window.MaderoProveedores.setFilter('search', q);
+        break;
+      case 'm3-fotos':
+        if (window.MaderoFotografias?.setSearch) window.MaderoFotografias.setSearch(q);
+        break;
+      case 'm4-contenido':
+      case 'm5-redes':
+        if (window.MaderoContenidoPauta?.setContenidoSearch) window.MaderoContenidoPauta.setContenidoSearch(q);
+        break;
+      case 'm6-campanas':
+        if (window.MaderoContenidoPauta?.setCampanasSearch) window.MaderoContenidoPauta.setCampanasSearch(q);
+        break;
+      case 'm7-google':
+        if (window.MaderoEcosistemaTerritorio?.setGoogleSearch) window.MaderoEcosistemaTerritorio.setGoogleSearch(q);
+        break;
+      case 'm8-web':
+        if (window.MaderoEcosistemaTerritorio?.setWebSearch) window.MaderoEcosistemaTerritorio.setWebSearch(q);
+        break;
+      case 'm10-eventos':
+        if (window.MaderoEcosistemaTerritorio?.setEventosSearch) window.MaderoEcosistemaTerritorio.setEventosSearch(q);
+        break;
+      case 'm11-merch':
+        if (window.MaderoEcosistemaTerritorio?.setMerchSearch) window.MaderoEcosistemaTerritorio.setMerchSearch(q);
+        break;
+      case 'm12-ventas':
+        if (window.MaderoEcosistemaTerritorio?.setVentasSearch) window.MaderoEcosistemaTerritorio.setVentasSearch(q);
+        break;
+      default:
+        break;
+    }
+    updateHeaderAndKPIs();
+    updateDockActiveState();
+    renderModuleStrip();
+  }
+
+  function triggerQuickNew() {
+    if (activeNivel === 'gerencial') {
+      if (window.MaderoInformeDireccion?.openNotasInformeModal) {
+        window.MaderoInformeDireccion.openNotasInformeModal();
+      }
+      return;
+    }
+    switch (activeModuleId) {
+      case 'gob-frentes':
+      case 'm1-agenda':
+        window.MaderoConduccion?.openPrioridadModal(null);
+        break;
+      case 'm2-equipo':
+        window.MaderoConduccion?.openTareaEquipoModal(null);
+        break;
+      case 'm9-proveedores':
+        window.MaderoProveedores?.openCompromisoModal();
+        break;
+      case 'm3-fotos':
+        window.MaderoFotografias?.openCreateModal();
+        break;
+      case 'm4-contenido':
+        window.MaderoContenidoPauta?.openPiezaModal(null);
+        break;
+      case 'm5-redes':
+        window.MaderoContenidoPauta?.openRedModal(null);
+        break;
+      case 'm6-campanas':
+        window.MaderoContenidoPauta?.openCampanaModal(null);
+        break;
+      case 'm7-google':
+        window.MaderoEcosistemaTerritorio?.openGoogleModal(null);
+        break;
+      case 'm8-web':
+        window.MaderoEcosistemaTerritorio?.openWebModal(null);
+        break;
+      case 'm10-eventos':
+        window.MaderoEcosistemaTerritorio?.openEventoModal(null);
+        break;
+      case 'm11-merch':
+        window.MaderoEcosistemaTerritorio?.openMerchModal(null);
+        break;
+      case 'm12-ventas':
+        window.MaderoEcosistemaTerritorio?.openVentaModal(null);
+        break;
+      default:
+        window.MaderoConduccion?.openPrioridadModal(null);
+        break;
+    }
+  }
+
+  function toggleBentoHero() {
+    const hero = document.getElementById('spatial-bento-hero');
+    const btn = document.getElementById('btn-toggle-bento');
+    if (!hero) return;
+    const isHidden = hero.classList.toggle('hidden');
+    if (btn) {
+      btn.innerHTML = isHidden
+        ? '<i class="ri-eye-off-line text-xs"></i> Mostrar Bento'
+        : '<i class="ri-eye-line text-xs"></i> Ocultar Bento';
+    }
+  }
+
+  function toggleThemeMode() {
+    const isSpatial = document.body.classList.toggle('spatial-theme');
+    ['theme-toggle-icon', 'theme-toggle-icon-mob'].forEach(id => {
+      const icon = document.getElementById(id);
+      if (icon) {
+        icon.className = isSpatial
+          ? (id === 'theme-toggle-icon' ? 'ri-moon-clear-line text-base' : 'ri-moon-clear-line text-sm')
+          : (id === 'theme-toggle-icon' ? 'ri-sun-line text-base' : 'ri-sun-line text-sm');
+      }
+    });
+    if (window.MaderoUI?.showToast) {
+      window.MaderoUI.showToast(isSpatial ? 'Modo Spatial Frosted Glass activado' : 'Modo Claro Clásico activado');
+    }
+  }
+
   return {
     setNivel,
     navigateCluster,
@@ -329,7 +508,11 @@ window.MaderoApp = (function () {
     renderAll,
     saveMetaFromModal,
     handleImportJSON,
-    handleResetBaseline
+    handleResetBaseline,
+    handleGlobalSearch,
+    triggerQuickNew,
+    toggleBentoHero,
+    toggleThemeMode
   };
 })();
 

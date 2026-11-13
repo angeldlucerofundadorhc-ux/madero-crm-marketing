@@ -233,6 +233,483 @@ body {
   animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* ==========================================================================
+   VISIONOS SPATIAL FROSTED DARK GLASS THEME (@media screen only)
+   Preserves native @media print white A4 layout for Dirección reports.
+   ========================================================================== */
+@media screen {
+  body.spatial-theme {
+    color-scheme: dark;
+    color: rgba(248, 250, 252, 0.94);
+    background-color: #091316;
+    background-image:
+      radial-gradient(ellipse 68% 58% at 14% 16%, rgba(16, 110, 104, 0.48) 0%, transparent 64%),
+      radial-gradient(ellipse 56% 52% at 86% 14%, rgba(154, 102, 48, 0.36) 0%, transparent 62%),
+      radial-gradient(ellipse 65% 58% at 78% 88%, rgba(28, 72, 118, 0.38) 0%, transparent 65%),
+      radial-gradient(ellipse 55% 50% at 18% 84%, rgba(21, 88, 66, 0.34) 0%, transparent 60%),
+      linear-gradient(135deg, #0b181b 0%, #101e23 48%, #141920 100%);
+    background-attachment: fixed;
+  }
+
+  /* Main Spatial Frosted Glass Frame */
+  body.spatial-theme .spatial-shell {
+    position: relative;
+    background: linear-gradient(145deg, rgba(31, 46, 51, 0.64) 0%, rgba(19, 27, 33, 0.72) 55%, rgba(24, 30, 36, 0.68) 100%);
+    backdrop-filter: blur(42px) saturate(160%);
+    -webkit-backdrop-filter: blur(42px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 30px;
+    box-shadow:
+      0 32px 80px -20px rgba(0, 0, 0, 0.65),
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  /* Floating Vertical Left Side Dock */
+  body.spatial-theme .spatial-side-dock {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%);
+    backdrop-filter: blur(30px) saturate(170%);
+    -webkit-backdrop-filter: blur(30px) saturate(170%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    box-shadow:
+      0 20px 44px -10px rgba(0, 0, 0, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+
+  body.spatial-theme .spatial-side-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.65);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+  }
+
+  body.spatial-theme .spatial-side-btn:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.14);
+    transform: scale(1.06);
+  }
+
+  body.spatial-theme .spatial-side-btn.side-btn-active {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: #ffffff;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  /* Horizontal VisionOS Pills */
+  body.spatial-theme .spatial-pill {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: rgba(241, 245, 249, 0.85);
+    border-radius: 999px;
+    transition: all 0.18s ease;
+    backdrop-filter: blur(12px);
+  }
+
+  body.spatial-theme .spatial-pill:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.28);
+    color: #ffffff;
+  }
+
+  body.spatial-theme .spatial-pill-active {
+    background: linear-gradient(135deg, #2b6eff 0%, #1652e8 100%) !important;
+    border-color: rgba(147, 197, 253, 0.55) !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 22px -4px rgba(37, 99, 235, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  body.spatial-theme .spatial-pill-new {
+    background: linear-gradient(135deg, #2b6eff 0%, #1652e8 100%);
+    border: 1px solid rgba(147, 197, 253, 0.45);
+    color: #ffffff;
+    border-radius: 999px;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transition: all 0.18s ease;
+  }
+
+  body.spatial-theme .spatial-pill-new:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
+
+  /* Spatial Bento Cards */
+  body.spatial-theme .spatial-card {
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.035) 100%);
+    backdrop-filter: blur(22px) saturate(140%);
+    -webkit-backdrop-filter: blur(22px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 22px;
+    box-shadow:
+      0 14px 36px -12px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    transition: transform 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+  }
+
+  body.spatial-theme .spatial-card:hover {
+    border-color: rgba(255, 255, 255, 0.24);
+  }
+
+  body.spatial-theme .spatial-card-blue {
+    background: linear-gradient(135deg, rgba(30, 64, 128, 0.44) 0%, rgba(28, 43, 68, 0.52) 100%);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border: 1px solid rgba(96, 165, 250, 0.25);
+    border-radius: 22px;
+    box-shadow:
+      0 14px 36px -12px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(191, 219, 254, 0.2);
+  }
+
+  body.spatial-theme .spatial-card-dashed {
+    background: rgba(255, 255, 255, 0.035);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1.5px dashed rgba(255, 255, 255, 0.26);
+    border-radius: 22px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  /* Tactile Apple iOS-Style Switch */
+  body.spatial-theme .ios-switch {
+    position: relative;
+    width: 38px;
+    height: 21px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    transition: background 0.22s ease, border-color 0.22s ease;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  body.spatial-theme .ios-switch::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 15px;
+    height: 15px;
+    border-radius: 999px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  body.spatial-theme .ios-switch.is-on {
+    background: linear-gradient(135deg, #2b6eff 0%, #1d4ed8 100%);
+    border-color: rgba(147, 197, 253, 0.55);
+  }
+
+  body.spatial-theme .ios-switch.is-on::after {
+    transform: translateX(17px);
+  }
+
+  /* Dark Glass Adaptation of Existing Module Cards & Docks */
+  body.spatial-theme .glass-card {
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.04) 100%);
+    backdrop-filter: blur(22px) saturate(145%);
+    -webkit-backdrop-filter: blur(22px) saturate(145%);
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    box-shadow:
+      0 14px 36px -14px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  body.spatial-theme .glass-card-subtle {
+    background: rgba(255, 255, 255, 0.055);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.4);
+  }
+
+  body.spatial-theme .glass-card-dark {
+    background: linear-gradient(145deg, rgba(20, 34, 52, 0.85) 0%, rgba(12, 18, 28, 0.9) 100%);
+    border: 1px solid rgba(96, 165, 250, 0.25);
+    box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.65);
+  }
+
+  body.spatial-theme .vision-dock {
+    background: rgba(18, 26, 32, 0.82);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 18px 42px -10px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+
+  body.spatial-theme .tab-btn-active {
+    background: linear-gradient(135deg, #2b6eff 0%, #1652e8 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+  }
+
+  body.spatial-theme .subtab-btn-active {
+    background: linear-gradient(135deg, #2b6eff 0%, #1652e8 100%) !important;
+    color: #ffffff !important;
+    border-color: rgba(147, 197, 253, 0.5) !important;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  }
+
+  /* Automatic Dark Glass Override for Tailwind Surfaces Inside Modules */
+  body.spatial-theme .bg-white,
+  body.spatial-theme .bg-white\/95,
+  body.spatial-theme .bg-white\/90,
+  body.spatial-theme .bg-white\/85,
+  body.spatial-theme .bg-white\/80,
+  body.spatial-theme .bg-white\/75,
+  body.spatial-theme .bg-white\/70,
+  body.spatial-theme .bg-white\/60,
+  body.spatial-theme .bg-white\/50 {
+    background-color: rgba(255, 255, 255, 0.07) !important;
+  }
+
+  body.spatial-theme .bg-stone-50,
+  body.spatial-theme .bg-stone-50\/80,
+  body.spatial-theme .bg-stone-50\/70,
+  body.spatial-theme .bg-stone-50\/60 {
+    background-color: rgba(255, 255, 255, 0.045) !important;
+  }
+
+  body.spatial-theme .bg-stone-100,
+  body.spatial-theme .bg-stone-100\/80,
+  body.spatial-theme .bg-stone-200\/70,
+  body.spatial-theme .bg-stone-200 {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  body.spatial-theme .hover\:bg-white:hover,
+  body.spatial-theme .hover\:bg-stone-50:hover,
+  body.spatial-theme .hover\:bg-stone-100:hover,
+  body.spatial-theme .hover\:bg-stone-200:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+  }
+
+  /* Keep dark stone primary buttons crisp as Luminous Blue/Slate controls */
+  body.spatial-theme button.bg-stone-900,
+  body.spatial-theme .bg-stone-900:not(.fixed) {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    border-color: rgba(147, 197, 253, 0.45) !important;
+  }
+
+  body.spatial-theme button.bg-stone-900:hover,
+  body.spatial-theme .hover\:bg-stone-800:hover {
+    background-color: #1d4ed8 !important;
+  }
+
+  /* Soft Semantic Alert Backgrounds Adapted to Dark Glass */
+  body.spatial-theme .bg-amber-50,
+  body.spatial-theme .bg-amber-50\/80,
+  body.spatial-theme .bg-amber-50\/60 {
+    background-color: rgba(245, 158, 11, 0.12) !important;
+  }
+
+  body.spatial-theme .bg-emerald-50,
+  body.spatial-theme .bg-emerald-50\/80,
+  body.spatial-theme .bg-emerald-50\/60 {
+    background-color: rgba(16, 185, 129, 0.12) !important;
+  }
+
+  body.spatial-theme .bg-rose-50,
+  body.spatial-theme .bg-rose-50\/80,
+  body.spatial-theme .bg-red-50 {
+    background-color: rgba(244, 63, 94, 0.14) !important;
+  }
+
+  body.spatial-theme .bg-sky-50,
+  body.spatial-theme .bg-sky-50\/80,
+  body.spatial-theme .bg-blue-50,
+  body.spatial-theme .bg-blue-50\/80 {
+    background-color: rgba(56, 189, 248, 0.12) !important;
+  }
+
+  body.spatial-theme .bg-indigo-50,
+  body.spatial-theme .bg-violet-50 {
+    background-color: rgba(129, 140, 248, 0.13) !important;
+  }
+
+  /* Typography & Contrast Overrides */
+  body.spatial-theme .text-stone-900,
+  body.spatial-theme .text-stone-800 {
+    color: rgba(255, 255, 255, 0.95) !important;
+  }
+
+  body.spatial-theme .text-stone-700 {
+    color: rgba(226, 232, 240, 0.88) !important;
+  }
+
+  body.spatial-theme .text-stone-600 {
+    color: rgba(203, 213, 225, 0.78) !important;
+  }
+
+  body.spatial-theme .text-stone-500 {
+    color: rgba(148, 163, 184, 0.88) !important;
+  }
+
+  body.spatial-theme .text-stone-400 {
+    color: rgba(148, 163, 184, 0.7) !important;
+  }
+
+  body.spatial-theme .text-amber-900,
+  body.spatial-theme .text-amber-800,
+  body.spatial-theme .text-amber-700 {
+    color: #fcd34d !important;
+  }
+
+  body.spatial-theme .text-emerald-900,
+  body.spatial-theme .text-emerald-800,
+  body.spatial-theme .text-emerald-700 {
+    color: #6ee7b7 !important;
+  }
+
+  body.spatial-theme .text-rose-900,
+  body.spatial-theme .text-rose-800,
+  body.spatial-theme .text-rose-700,
+  body.spatial-theme .text-red-800,
+  body.spatial-theme .text-red-700 {
+    color: #fda4af !important;
+  }
+
+  body.spatial-theme .text-sky-900,
+  body.spatial-theme .text-sky-800,
+  body.spatial-theme .text-sky-700,
+  body.spatial-theme .text-blue-800,
+  body.spatial-theme .text-blue-700 {
+    color: #7dd3fc !important;
+  }
+
+  body.spatial-theme .text-indigo-800,
+  body.spatial-theme .text-violet-800 {
+    color: #c4b5fd !important;
+  }
+
+  /* Borders */
+  body.spatial-theme .border-stone-100,
+  body.spatial-theme .border-stone-200,
+  body.spatial-theme .border-stone-200\/70,
+  body.spatial-theme .border-stone-200\/80,
+  body.spatial-theme .border-stone-200\/90,
+  body.spatial-theme .border-stone-300 {
+    border-color: rgba(255, 255, 255, 0.13) !important;
+  }
+
+  body.spatial-theme .border-amber-200,
+  body.spatial-theme .border-amber-300 {
+    border-color: rgba(251, 191, 36, 0.35) !important;
+  }
+
+  body.spatial-theme .border-emerald-200,
+  body.spatial-theme .border-emerald-300 {
+    border-color: rgba(52, 211, 153, 0.35) !important;
+  }
+
+  body.spatial-theme .border-rose-200,
+  body.spatial-theme .border-rose-300 {
+    border-color: rgba(251, 113, 133, 0.38) !important;
+  }
+
+  body.spatial-theme .divide-stone-100 > :not([hidden]) ~ :not([hidden]),
+  body.spatial-theme .divide-stone-200 > :not([hidden]) ~ :not([hidden]) {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Inputs, Selects & Textareas */
+  body.spatial-theme .input-glass,
+  body.spatial-theme input[type="text"],
+  body.spatial-theme input[type="date"],
+  body.spatial-theme input[type="number"],
+  body.spatial-theme input[type="url"],
+  body.spatial-theme input[type="email"],
+  body.spatial-theme select,
+  body.spatial-theme textarea {
+    color-scheme: dark;
+    background: rgba(15, 23, 30, 0.65) !important;
+    border-color: rgba(255, 255, 255, 0.16) !important;
+    color: rgba(248, 250, 252, 0.95) !important;
+  }
+
+  body.spatial-theme .input-glass::placeholder,
+  body.spatial-theme input::placeholder,
+  body.spatial-theme textarea::placeholder {
+    color: rgba(148, 163, 184, 0.65) !important;
+  }
+
+  body.spatial-theme .input-glass:focus,
+  body.spatial-theme input:focus,
+  body.spatial-theme select:focus,
+  body.spatial-theme textarea:focus {
+    background: rgba(15, 23, 30, 0.85) !important;
+    border-color: rgba(96, 165, 250, 0.7) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.22) !important;
+  }
+
+  body.spatial-theme select option {
+    background-color: #0f172a;
+    color: #f8fafc;
+  }
+
+  /* Luminous Semantic Badges on Dark Glass */
+  body.spatial-theme .badge-pendiente {
+    background: rgba(148, 163, 184, 0.2);
+    color: #e2e8f0;
+    border-color: rgba(148, 163, 184, 0.35);
+  }
+  body.spatial-theme .badge-progreso {
+    background: rgba(56, 189, 248, 0.2);
+    color: #7dd3fc;
+    border-color: rgba(56, 189, 248, 0.42);
+  }
+  body.spatial-theme .badge-revision {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fcd34d;
+    border-color: rgba(251, 191, 36, 0.42);
+  }
+  body.spatial-theme .badge-aprobado {
+    background: rgba(16, 185, 129, 0.22);
+    color: #6ee7b7;
+    border-color: rgba(16, 185, 129, 0.45);
+  }
+  body.spatial-theme .badge-bloqueado {
+    background: rgba(244, 63, 94, 0.22);
+    color: #fda4af;
+    border-color: rgba(244, 63, 94, 0.45);
+  }
+  body.spatial-theme .badge-cancelado {
+    background: rgba(100, 116, 139, 0.2);
+    color: #cbd5e1;
+    border-color: rgba(100, 116, 139, 0.35);
+  }
+
+  /* Modal Dark Glass Panel */
+  body.spatial-theme #global-modal-root .glass-card {
+    background: linear-gradient(155deg, rgba(22, 33, 41, 0.94) 0%, rgba(14, 21, 27, 0.96) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  }
+
+  /* Custom subtle dark scrollbar */
+  body.spatial-theme ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  body.spatial-theme ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+  }
+  body.spatial-theme ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+  }
+  body.spatial-theme ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.32);
+  }
+}
+
 /* Print layout preparation for Dirección Weekly Report */
 @media print {
   @page {

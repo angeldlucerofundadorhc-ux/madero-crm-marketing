@@ -78,12 +78,30 @@ window.MaderoUI = (function () {
   // ------------------------------------------------------------------------
   // SISTEMA DE MODALES GLASSMORPHIC
   // ------------------------------------------------------------------------
-  function openModal({ title, subtitle = '', maxWidth = 'max-w-2xl', bodyHtml = '', footerHtml = '' }) {
+  function openModal(arg1, arg2, arg3) {
     const root = document.getElementById('global-modal-root');
     if (!root) return;
 
+    let title = '';
+    let subtitle = '';
+    let maxWidth = 'max-w-2xl';
+    let bodyHtml = '';
+    let footerHtml = '';
+
+    if (arg1 && typeof arg1 === 'object') {
+      title = arg1.title || '';
+      subtitle = arg1.subtitle || '';
+      maxWidth = arg1.maxWidth || 'max-w-2xl';
+      bodyHtml = arg1.bodyHtml || '';
+      footerHtml = arg1.footerHtml || '';
+    } else {
+      title = String(arg1 || '');
+      bodyHtml = String(arg2 || '');
+      if (typeof arg3 === 'string' && arg3.trim()) maxWidth = arg3;
+    }
+
     root.innerHTML = `
-      <div class="fixed inset-0 bg-stone-900/45 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto" onclick="if(event.target === this) MaderoUI.closeModal()">
+      <div class="fixed inset-0 bg-stone-900/55 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5 overflow-y-auto" onclick="if(event.target === this) MaderoUI.closeModal()">
         <div class="glass-card ${maxWidth} w-full bg-white/95 p-5 sm:p-6 my-auto modal-animate max-h-[92vh] flex flex-col">
           <div class="flex items-start justify-between gap-3 pb-3.5 mb-4 border-b border-stone-200/80 shrink-0">
             <div>
