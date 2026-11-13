@@ -4,10 +4,13 @@
    ========================================================================== */
 
 :root {
-  --bg-stone-1: rgba(245, 240, 235, 0.98);
-  --bg-stone-2: rgba(238, 231, 222, 0.94);
-  --bg-stone-3: rgba(230, 222, 212, 0.98);
-  --ink-primary: #1c1917;
+  --madero-dark: #0e0e0e;
+  --madero-cream: #f4f1ea;
+  --madero-accent: #de4800;
+  --bg-stone-1: #f4f1ea;
+  --bg-stone-2: rgba(244, 241, 234, 0.94);
+  --bg-stone-3: rgba(235, 229, 218, 0.98);
+  --ink-primary: #0e0e0e;
   --ink-secondary: #57534e;
 }
 
@@ -26,12 +29,12 @@ body {
 
 /* Apple Glassmorphism Surfaces */
 .glass-card {
-  background: rgba(255, 255, 255, 0.78);
+  background: rgba(244, 241, 234, 0.84);
   backdrop-filter: blur(28px) saturate(190%);
   -webkit-backdrop-filter: blur(28px) saturate(190%);
   border: 1px solid rgba(255, 255, 255, 0.88);
   border-radius: 1.25rem;
-  box-shadow: 0 10px 36px -10px rgba(45, 35, 25, 0.07), 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+  box-shadow: 0 10px 36px -10px rgba(14, 14, 14, 0.08), 0 1px 3px 0 rgba(0, 0, 0, 0.03);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -42,26 +45,26 @@ body {
 }
 
 .glass-card-interactive:hover {
-  box-shadow: 0 16px 44px -10px rgba(45, 35, 25, 0.12), 0 2px 6px 0 rgba(0, 0, 0, 0.03);
+  box-shadow: 0 16px 44px -10px rgba(14, 14, 14, 0.14), 0 2px 6px 0 rgba(0, 0, 0, 0.04);
   transform: translateY(-1px);
 }
 
 .glass-card-subtle {
-  background: rgba(255, 255, 255, 0.56);
+  background: rgba(244, 241, 234, 0.65);
   backdrop-filter: blur(18px) saturate(160%);
   -webkit-backdrop-filter: blur(18px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.78);
   border-radius: 1rem;
 }
 
 .glass-card-dark {
-  background: rgba(28, 25, 23, 0.93);
+  background: rgba(14, 14, 14, 0.94);
   backdrop-filter: blur(32px) saturate(190%);
   -webkit-backdrop-filter: blur(32px) saturate(190%);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(244, 241, 234, 0.14);
   border-radius: 1.25rem;
-  color: #fafaf9;
-  box-shadow: 0 16px 44px -12px rgba(0, 0, 0, 0.25);
+  color: #f4f1ea;
+  box-shadow: 0 16px 44px -12px rgba(0, 0, 0, 0.35);
 }
 
 @media (min-width: 640px) {
@@ -72,23 +75,23 @@ body {
 
 /* VisionOS Floating Dock */
 .vision-dock {
-  background: rgba(255, 255, 255, 0.91);
+  background: rgba(244, 241, 234, 0.92);
   backdrop-filter: blur(32px) saturate(200%);
   -webkit-backdrop-filter: blur(32px) saturate(200%);
   border: 1px solid rgba(255, 255, 255, 0.96);
-  box-shadow: 0 16px 40px -8px rgba(45, 35, 25, 0.22), 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 16px 40px -8px rgba(14, 14, 14, 0.24), 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .tab-btn-active {
-  background: #1c1917 !important;
-  color: #ffffff !important;
-  box-shadow: 0 4px 12px -2px rgba(28, 25, 23, 0.35);
+  background: #de4800 !important;
+  color: #f4f1ea !important;
+  box-shadow: 0 4px 12px -2px rgba(222, 72, 0, 0.38);
 }
 
 .subtab-btn-active {
-  background: #1c1917 !important;
-  color: #ffffff !important;
-  box-shadow: 0 2px 8px -1px rgba(28, 25, 23, 0.25);
+  background: #de4800 !important;
+  color: #f4f1ea !important;
+  box-shadow: 0 2px 8px -1px rgba(222, 72, 0, 0.3);
 }
 
 /* Apple Glass Segmented Module Tray (12 Operational Modules) */
@@ -273,47 +276,48 @@ body {
 }
 
 /* ==========================================================================
-   VISIONOS SPATIAL FROSTED DARK GLASS THEME (@media screen only)
+   MADERO BRAND SPATIAL FROSTED DARK GLASS THEME (@media screen only)
+   Regla 60% #0e0e0e (Obsidian Glass) · 30% #f4f1ea (Cream/Ivory) · 10% #de4800 (Terracotta)
    Preserves native @media print white A4 layout for Dirección reports.
    ========================================================================== */
 @media screen {
   body.spatial-theme {
     color-scheme: dark;
-    color: rgba(248, 250, 252, 0.94);
-    background-color: #091316;
+    color: rgba(244, 241, 234, 0.94);
+    background-color: #0e0e0e;
     background-image:
-      radial-gradient(ellipse 68% 58% at 14% 16%, rgba(16, 110, 104, 0.48) 0%, transparent 64%),
-      radial-gradient(ellipse 56% 52% at 86% 14%, rgba(154, 102, 48, 0.36) 0%, transparent 62%),
-      radial-gradient(ellipse 65% 58% at 78% 88%, rgba(28, 72, 118, 0.38) 0%, transparent 65%),
-      radial-gradient(ellipse 55% 50% at 18% 84%, rgba(21, 88, 66, 0.34) 0%, transparent 60%),
-      linear-gradient(135deg, #0b181b 0%, #101e23 48%, #141920 100%);
+      radial-gradient(ellipse 62% 54% at 12% 16%, rgba(222, 72, 0, 0.24) 0%, transparent 62%),
+      radial-gradient(ellipse 56% 50% at 86% 18%, rgba(244, 241, 234, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 64% 56% at 82% 86%, rgba(222, 72, 0, 0.16) 0%, transparent 64%),
+      radial-gradient(ellipse 52% 48% at 20% 84%, rgba(244, 241, 234, 0.06) 0%, transparent 60%),
+      linear-gradient(135deg, #0e0e0e 0%, #151311 48%, #0e0e0e 100%);
     background-attachment: fixed;
   }
 
-  /* Main Spatial Frosted Glass Frame */
+  /* Main Spatial Frosted Glass Frame (60% Obsidian Glass + 30% Cream Hairlines) */
   body.spatial-theme .spatial-shell {
     position: relative;
-    background: linear-gradient(145deg, rgba(31, 46, 51, 0.64) 0%, rgba(19, 27, 33, 0.72) 55%, rgba(24, 30, 36, 0.68) 100%);
-    backdrop-filter: blur(42px) saturate(160%);
-    -webkit-backdrop-filter: blur(42px) saturate(160%);
-    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: linear-gradient(145deg, rgba(26, 23, 21, 0.78) 0%, rgba(14, 14, 14, 0.88) 55%, rgba(20, 18, 16, 0.84) 100%);
+    backdrop-filter: blur(42px) saturate(145%);
+    -webkit-backdrop-filter: blur(42px) saturate(145%);
+    border: 1px solid rgba(244, 241, 234, 0.16);
     border-radius: 30px;
     box-shadow:
-      0 32px 80px -20px rgba(0, 0, 0, 0.65),
-      inset 0 1px 0 rgba(255, 255, 255, 0.22),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+      0 32px 80px -20px rgba(0, 0, 0, 0.75),
+      inset 0 1px 0 rgba(244, 241, 234, 0.2),
+      inset 0 -1px 0 rgba(244, 241, 234, 0.05);
   }
 
   /* Floating Vertical Left Side Dock */
   body.spatial-theme .spatial-side-dock {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%);
-    backdrop-filter: blur(30px) saturate(170%);
-    -webkit-backdrop-filter: blur(30px) saturate(170%);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: linear-gradient(180deg, rgba(244, 241, 234, 0.11) 0%, rgba(244, 241, 234, 0.05) 100%);
+    backdrop-filter: blur(30px) saturate(150%);
+    -webkit-backdrop-filter: blur(30px) saturate(150%);
+    border: 1px solid rgba(244, 241, 234, 0.18);
     border-radius: 999px;
     box-shadow:
-      0 20px 44px -10px rgba(0, 0, 0, 0.55),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      0 20px 44px -10px rgba(0, 0, 0, 0.65),
+      inset 0 1px 0 rgba(244, 241, 234, 0.22);
   }
 
   body.spatial-theme .spatial-side-btn {
@@ -323,105 +327,106 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(255, 255, 255, 0.65);
+    color: rgba(244, 241, 234, 0.65);
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
   }
 
   body.spatial-theme .spatial-side-btn:hover {
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.14);
+    color: #f4f1ea;
+    background: rgba(244, 241, 234, 0.14);
     transform: scale(1.06);
   }
 
   body.spatial-theme .spatial-side-btn.side-btn-active {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    color: #ffffff;
-    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    background: linear-gradient(135deg, #f0540a 0%, #de4800 65%, #b83b00 100%);
+    color: #f4f1ea;
+    box-shadow: 0 6px 20px rgba(222, 72, 0, 0.5), inset 0 1px 0 rgba(244, 241, 234, 0.35);
   }
 
   /* Horizontal VisionOS Pills */
   body.spatial-theme .spatial-pill {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    color: rgba(241, 245, 249, 0.85);
+    background: rgba(244, 241, 234, 0.085);
+    border: 1px solid rgba(244, 241, 234, 0.15);
+    color: rgba(244, 241, 234, 0.86);
     border-radius: 999px;
     transition: all 0.18s ease;
     backdrop-filter: blur(12px);
   }
 
   body.spatial-theme .spatial-pill:hover {
-    background: rgba(255, 255, 255, 0.18);
-    border-color: rgba(255, 255, 255, 0.28);
-    color: #ffffff;
+    background: rgba(244, 241, 234, 0.16);
+    border-color: rgba(244, 241, 234, 0.3);
+    color: #f4f1ea;
   }
 
   body.spatial-theme .spatial-pill-active {
-    background: linear-gradient(135deg, #2b6eff 0%, #1652e8 100%) !important;
-    border-color: rgba(147, 197, 253, 0.55) !important;
-    color: #ffffff !important;
-    box-shadow: 0 8px 22px -4px rgba(37, 99, 235, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    background: linear-gradient(135deg, #f0540a 0%, #de4800 65%, #b83b00 100%) !important;
+    border-color: rgba(244, 241, 234, 0.42) !important;
+    color: #f4f1ea !important;
+    box-shadow: 0 8px 22px -4px rgba(222, 72, 0, 0.52), inset 0 1px 0 rgba(244, 241, 234, 0.35);
   }
 
   body.spatial-theme .spatial-pill-new {
-    background: linear-gradient(135deg, #2b6eff 0%, #1652e8 100%);
-    border: 1px solid rgba(147, 197, 253, 0.45);
-    color: #ffffff;
+    background: linear-gradient(135deg, #f0540a 0%, #de4800 65%, #b83b00 100%);
+    border: 1px solid rgba(244, 241, 234, 0.38);
+    color: #f4f1ea;
     border-radius: 999px;
-    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    box-shadow: 0 6px 18px rgba(222, 72, 0, 0.45), inset 0 1px 0 rgba(244, 241, 234, 0.3);
     transition: all 0.18s ease;
   }
 
   body.spatial-theme .spatial-pill-new:hover {
-    filter: brightness(1.1);
+    filter: brightness(1.08);
     transform: translateY(-1px);
   }
 
-  /* Spatial Bento Cards */
+  /* Spatial Bento Cards (60% Obsidian Glass + 30% Cream Edge) */
   body.spatial-theme .spatial-card {
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.035) 100%);
-    backdrop-filter: blur(22px) saturate(140%);
-    -webkit-backdrop-filter: blur(22px) saturate(140%);
-    border: 1px solid rgba(255, 255, 255, 0.13);
+    background: linear-gradient(160deg, rgba(244, 241, 234, 0.075) 0%, rgba(14, 14, 14, 0.52) 100%);
+    backdrop-filter: blur(22px) saturate(130%);
+    -webkit-backdrop-filter: blur(22px) saturate(130%);
+    border: 1px solid rgba(244, 241, 234, 0.13);
     border-radius: 22px;
     box-shadow:
-      0 14px 36px -12px rgba(0, 0, 0, 0.45),
-      inset 0 1px 0 rgba(255, 255, 255, 0.16);
+      0 14px 36px -12px rgba(0, 0, 0, 0.52),
+      inset 0 1px 0 rgba(244, 241, 234, 0.15);
     transition: transform 0.22s ease, border-color 0.22s ease, background 0.22s ease;
   }
 
   body.spatial-theme .spatial-card:hover {
-    border-color: rgba(255, 255, 255, 0.24);
+    border-color: rgba(244, 241, 234, 0.26);
   }
 
+  /* Madero Focal Accent Card (10% Terracotta Highlight) */
   body.spatial-theme .spatial-card-blue {
-    background: linear-gradient(135deg, rgba(30, 64, 128, 0.44) 0%, rgba(28, 43, 68, 0.52) 100%);
+    background: linear-gradient(135deg, rgba(222, 72, 0, 0.26) 0%, rgba(28, 19, 15, 0.72) 100%);
     backdrop-filter: blur(22px);
     -webkit-backdrop-filter: blur(22px);
-    border: 1px solid rgba(96, 165, 250, 0.25);
+    border: 1px solid rgba(222, 72, 0, 0.42);
     border-radius: 22px;
     box-shadow:
-      0 14px 36px -12px rgba(0, 0, 0, 0.45),
-      inset 0 1px 0 rgba(191, 219, 254, 0.2);
+      0 14px 36px -12px rgba(0, 0, 0, 0.52),
+      inset 0 1px 0 rgba(244, 241, 234, 0.18);
   }
 
   body.spatial-theme .spatial-card-dashed {
-    background: rgba(255, 255, 255, 0.035);
+    background: rgba(244, 241, 234, 0.035);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
-    border: 1.5px dashed rgba(255, 255, 255, 0.26);
+    border: 1.5px dashed rgba(244, 241, 234, 0.28);
     border-radius: 22px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 0 rgba(244, 241, 234, 0.08);
   }
 
-  /* Tactile Apple iOS-Style Switch */
+  /* Tactile Apple iOS-Style Switch (Madero Terracotta #de4800 Active) */
   body.spatial-theme .ios-switch {
     position: relative;
     width: 38px;
     height: 21px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.18);
-    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(244, 241, 234, 0.18);
+    border: 1px solid rgba(244, 241, 234, 0.18);
     transition: background 0.22s ease, border-color 0.22s ease;
     cursor: pointer;
     flex-shrink: 0;
@@ -435,14 +440,14 @@ body {
     width: 15px;
     height: 15px;
     border-radius: 999px;
-    background: #ffffff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    background: #f4f1ea;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
     transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   body.spatial-theme .ios-switch.is-on {
-    background: linear-gradient(135deg, #2b6eff 0%, #1d4ed8 100%);
-    border-color: rgba(147, 197, 253, 0.55);
+    background: linear-gradient(135deg, #f0540a 0%, #de4800 100%);
+    border-color: rgba(244, 241, 234, 0.45);
   }
 
   body.spatial-theme .ios-switch.is-on::after {
@@ -451,51 +456,51 @@ body {
 
   /* Dark Glass Adaptation of Existing Module Cards & Docks */
   body.spatial-theme .glass-card {
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.04) 100%);
-    backdrop-filter: blur(22px) saturate(145%);
-    -webkit-backdrop-filter: blur(22px) saturate(145%);
-    border: 1px solid rgba(255, 255, 255, 0.13);
+    background: linear-gradient(160deg, rgba(244, 241, 234, 0.075) 0%, rgba(14, 14, 14, 0.56) 100%);
+    backdrop-filter: blur(22px) saturate(135%);
+    -webkit-backdrop-filter: blur(22px) saturate(135%);
+    border: 1px solid rgba(244, 241, 234, 0.13);
     box-shadow:
-      0 14px 36px -14px rgba(0, 0, 0, 0.5),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      0 14px 36px -14px rgba(0, 0, 0, 0.58),
+      inset 0 1px 0 rgba(244, 241, 234, 0.15);
   }
 
   body.spatial-theme .glass-card-subtle {
-    background: rgba(255, 255, 255, 0.055);
+    background: rgba(244, 241, 234, 0.045);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.11);
-    box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(244, 241, 234, 0.11);
+    box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.45);
   }
 
   body.spatial-theme .glass-card-dark {
-    background: linear-gradient(145deg, rgba(20, 34, 52, 0.85) 0%, rgba(12, 18, 28, 0.9) 100%);
-    border: 1px solid rgba(96, 165, 250, 0.25);
-    box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.65);
+    background: linear-gradient(145deg, rgba(32, 22, 18, 0.9) 0%, rgba(14, 14, 14, 0.94) 100%);
+    border: 1px solid rgba(222, 72, 0, 0.32);
+    box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.72);
   }
 
   body.spatial-theme .vision-dock {
-    background: rgba(18, 26, 32, 0.82);
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 18px 42px -10px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    background: rgba(14, 14, 14, 0.86);
+    backdrop-filter: blur(28px) saturate(160%);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    border: 1px solid rgba(244, 241, 234, 0.18);
+    box-shadow: 0 18px 42px -10px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(244, 241, 234, 0.16);
   }
 
   body.spatial-theme .tab-btn-active {
-    background: linear-gradient(135deg, #2b6eff 0%, #1652e8 100%) !important;
-    color: #ffffff !important;
-    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+    background: linear-gradient(135deg, #f0540a 0%, #de4800 65%, #b83b00 100%) !important;
+    color: #f4f1ea !important;
+    box-shadow: 0 6px 18px rgba(222, 72, 0, 0.48);
   }
 
   body.spatial-theme .subtab-btn-active {
-    background: linear-gradient(135deg, #2b6eff 0%, #1652e8 100%) !important;
-    color: #ffffff !important;
-    border-color: rgba(147, 197, 253, 0.5) !important;
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    background: linear-gradient(135deg, #f0540a 0%, #de4800 65%, #b83b00 100%) !important;
+    color: #f4f1ea !important;
+    border-color: rgba(244, 241, 234, 0.4) !important;
+    box-shadow: 0 4px 14px rgba(222, 72, 0, 0.4);
   }
 
-  /* Automatic Dark Glass Override for Tailwind Surfaces Inside Modules */
+  /* Automatic Obsidian & Warm Ivory Glass Override for Tailwind Surfaces Inside Modules */
   body.spatial-theme .bg-white,
   body.spatial-theme .bg-white\/95,
   body.spatial-theme .bg-white\/90,
@@ -505,44 +510,44 @@ body {
   body.spatial-theme .bg-white\/70,
   body.spatial-theme .bg-white\/60,
   body.spatial-theme .bg-white\/50 {
-    background-color: rgba(255, 255, 255, 0.07) !important;
+    background-color: rgba(244, 241, 234, 0.065) !important;
   }
 
   body.spatial-theme .bg-stone-50,
   body.spatial-theme .bg-stone-50\/80,
   body.spatial-theme .bg-stone-50\/70,
   body.spatial-theme .bg-stone-50\/60 {
-    background-color: rgba(255, 255, 255, 0.045) !important;
+    background-color: rgba(244, 241, 234, 0.04) !important;
   }
 
   body.spatial-theme .bg-stone-100,
   body.spatial-theme .bg-stone-100\/80,
   body.spatial-theme .bg-stone-200\/70,
   body.spatial-theme .bg-stone-200 {
-    background-color: rgba(255, 255, 255, 0.1) !important;
+    background-color: rgba(244, 241, 234, 0.095) !important;
   }
 
   body.spatial-theme .hover\:bg-white:hover,
   body.spatial-theme .hover\:bg-stone-50:hover,
   body.spatial-theme .hover\:bg-stone-100:hover,
   body.spatial-theme .hover\:bg-stone-200:hover {
-    background-color: rgba(255, 255, 255, 0.15) !important;
+    background-color: rgba(244, 241, 234, 0.14) !important;
   }
 
-  /* Keep dark stone primary buttons crisp as Luminous Blue/Slate controls */
+  /* Keep dark stone primary buttons crisp in Madero #de4800 Accent */
   body.spatial-theme button.bg-stone-900,
   body.spatial-theme .bg-stone-900:not(.fixed) {
-    background-color: #2563eb !important;
-    color: #ffffff !important;
-    border-color: rgba(147, 197, 253, 0.45) !important;
+    background-color: #de4800 !important;
+    color: #f4f1ea !important;
+    border-color: rgba(244, 241, 234, 0.32) !important;
   }
 
   body.spatial-theme button.bg-stone-900:hover,
   body.spatial-theme .hover\:bg-stone-800:hover {
-    background-color: #1d4ed8 !important;
+    background-color: #c23f00 !important;
   }
 
-  /* Soft Semantic Alert Backgrounds Adapted to Dark Glass */
+  /* Soft Semantic Alert Backgrounds Adapted to Obsidian Glass */
   body.spatial-theme .bg-amber-50,
   body.spatial-theme .bg-amber-50\/80,
   body.spatial-theme .bg-amber-50\/60 {
@@ -558,41 +563,41 @@ body {
   body.spatial-theme .bg-rose-50,
   body.spatial-theme .bg-rose-50\/80,
   body.spatial-theme .bg-red-50 {
-    background-color: rgba(244, 63, 94, 0.14) !important;
+    background-color: rgba(222, 72, 0, 0.16) !important;
   }
 
   body.spatial-theme .bg-sky-50,
   body.spatial-theme .bg-sky-50\/80,
   body.spatial-theme .bg-blue-50,
   body.spatial-theme .bg-blue-50\/80 {
-    background-color: rgba(56, 189, 248, 0.12) !important;
+    background-color: rgba(244, 241, 234, 0.08) !important;
   }
 
   body.spatial-theme .bg-indigo-50,
   body.spatial-theme .bg-violet-50 {
-    background-color: rgba(129, 140, 248, 0.13) !important;
+    background-color: rgba(222, 72, 0, 0.11) !important;
   }
 
-  /* Typography & Contrast Overrides */
+  /* 30% #f4f1ea Warm Ivory Typography & Contrast Overrides */
   body.spatial-theme .text-stone-900,
   body.spatial-theme .text-stone-800 {
-    color: rgba(255, 255, 255, 0.95) !important;
+    color: #f4f1ea !important;
   }
 
   body.spatial-theme .text-stone-700 {
-    color: rgba(226, 232, 240, 0.88) !important;
+    color: rgba(244, 241, 234, 0.86) !important;
   }
 
   body.spatial-theme .text-stone-600 {
-    color: rgba(203, 213, 225, 0.78) !important;
+    color: rgba(244, 241, 234, 0.72) !important;
   }
 
   body.spatial-theme .text-stone-500 {
-    color: rgba(148, 163, 184, 0.88) !important;
+    color: rgba(244, 241, 234, 0.56) !important;
   }
 
   body.spatial-theme .text-stone-400 {
-    color: rgba(148, 163, 184, 0.7) !important;
+    color: rgba(244, 241, 234, 0.42) !important;
   }
 
   body.spatial-theme .text-amber-900,
@@ -612,7 +617,7 @@ body {
   body.spatial-theme .text-rose-700,
   body.spatial-theme .text-red-800,
   body.spatial-theme .text-red-700 {
-    color: #fda4af !important;
+    color: #ff8a5c !important;
   }
 
   body.spatial-theme .text-sky-900,
@@ -620,22 +625,22 @@ body {
   body.spatial-theme .text-sky-700,
   body.spatial-theme .text-blue-800,
   body.spatial-theme .text-blue-700 {
-    color: #7dd3fc !important;
+    color: #f4f1ea !important;
   }
 
   body.spatial-theme .text-indigo-800,
   body.spatial-theme .text-violet-800 {
-    color: #c4b5fd !important;
+    color: #ff9c6e !important;
   }
 
-  /* Borders */
+  /* Warm Cream Hairline Borders */
   body.spatial-theme .border-stone-100,
   body.spatial-theme .border-stone-200,
   body.spatial-theme .border-stone-200\/70,
   body.spatial-theme .border-stone-200\/80,
   body.spatial-theme .border-stone-200\/90,
   body.spatial-theme .border-stone-300 {
-    border-color: rgba(255, 255, 255, 0.13) !important;
+    border-color: rgba(244, 241, 234, 0.13) !important;
   }
 
   body.spatial-theme .border-amber-200,
@@ -650,15 +655,15 @@ body {
 
   body.spatial-theme .border-rose-200,
   body.spatial-theme .border-rose-300 {
-    border-color: rgba(251, 113, 133, 0.38) !important;
+    border-color: rgba(222, 72, 0, 0.42) !important;
   }
 
   body.spatial-theme .divide-stone-100 > :not([hidden]) ~ :not([hidden]),
   body.spatial-theme .divide-stone-200 > :not([hidden]) ~ :not([hidden]) {
-    border-color: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(244, 241, 234, 0.1) !important;
   }
 
-  /* Inputs, Selects & Textareas */
+  /* Inputs, Selects & Textareas (#0e0e0e + #f4f1ea + #de4800 focus) */
   body.spatial-theme .input-glass,
   body.spatial-theme input[type="text"],
   body.spatial-theme input[type="date"],
@@ -668,41 +673,41 @@ body {
   body.spatial-theme select,
   body.spatial-theme textarea {
     color-scheme: dark;
-    background: rgba(15, 23, 30, 0.65) !important;
-    border-color: rgba(255, 255, 255, 0.16) !important;
-    color: rgba(248, 250, 252, 0.95) !important;
+    background: rgba(14, 14, 14, 0.72) !important;
+    border-color: rgba(244, 241, 234, 0.16) !important;
+    color: #f4f1ea !important;
   }
 
   body.spatial-theme .input-glass::placeholder,
   body.spatial-theme input::placeholder,
   body.spatial-theme textarea::placeholder {
-    color: rgba(148, 163, 184, 0.65) !important;
+    color: rgba(244, 241, 234, 0.45) !important;
   }
 
   body.spatial-theme .input-glass:focus,
   body.spatial-theme input:focus,
   body.spatial-theme select:focus,
   body.spatial-theme textarea:focus {
-    background: rgba(15, 23, 30, 0.85) !important;
-    border-color: rgba(96, 165, 250, 0.7) !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.22) !important;
+    background: rgba(14, 14, 14, 0.9) !important;
+    border-color: rgba(222, 72, 0, 0.78) !important;
+    box-shadow: 0 0 0 3px rgba(222, 72, 0, 0.24) !important;
   }
 
   body.spatial-theme select option {
-    background-color: #0f172a;
-    color: #f8fafc;
+    background-color: #0e0e0e;
+    color: #f4f1ea;
   }
 
-  /* Luminous Semantic Badges on Dark Glass */
+  /* Luminous Semantic Badges on Obsidian Glass */
   body.spatial-theme .badge-pendiente {
-    background: rgba(148, 163, 184, 0.2);
-    color: #e2e8f0;
-    border-color: rgba(148, 163, 184, 0.35);
+    background: rgba(244, 241, 234, 0.12);
+    color: #f4f1ea;
+    border-color: rgba(244, 241, 234, 0.28);
   }
   body.spatial-theme .badge-progreso {
-    background: rgba(56, 189, 248, 0.2);
-    color: #7dd3fc;
-    border-color: rgba(56, 189, 248, 0.42);
+    background: rgba(222, 72, 0, 0.22);
+    color: #ff9c6e;
+    border-color: rgba(222, 72, 0, 0.48);
   }
   body.spatial-theme .badge-revision {
     background: rgba(251, 191, 36, 0.2);
@@ -720,32 +725,32 @@ body {
     border-color: rgba(244, 63, 94, 0.45);
   }
   body.spatial-theme .badge-cancelado {
-    background: rgba(100, 116, 139, 0.2);
-    color: #cbd5e1;
-    border-color: rgba(100, 116, 139, 0.35);
+    background: rgba(244, 241, 234, 0.08);
+    color: rgba(244, 241, 234, 0.65);
+    border-color: rgba(244, 241, 234, 0.2);
   }
 
-  /* Modal Dark Glass Panel */
+  /* Modal Obsidian Glass Panel */
   body.spatial-theme #global-modal-root .glass-card {
-    background: linear-gradient(155deg, rgba(22, 33, 41, 0.94) 0%, rgba(14, 21, 27, 0.96) 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    background: linear-gradient(155deg, rgba(24, 21, 19, 0.96) 0%, rgba(14, 14, 14, 0.98) 100%) !important;
+    border: 1px solid rgba(244, 241, 234, 0.2) !important;
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(244, 241, 234, 0.18) !important;
   }
 
-  /* Custom subtle dark scrollbar */
+  /* Custom subtle cream-obsidian scrollbar */
   body.spatial-theme ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   body.spatial-theme ::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(244, 241, 234, 0.03);
   }
   body.spatial-theme ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.18);
+    background: rgba(244, 241, 234, 0.2);
     border-radius: 999px;
   }
   body.spatial-theme ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.32);
+    background: rgba(222, 72, 0, 0.55);
   }
 }
 

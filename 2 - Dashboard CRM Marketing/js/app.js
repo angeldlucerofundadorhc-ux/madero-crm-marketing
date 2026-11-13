@@ -202,7 +202,7 @@ window.MaderoApp = (function () {
     const gobActive = activeModuleId === 'gob-frentes';
     let html = `
       <button type="button" onclick="MaderoApp.navigateModule('gob-frentes')" class="spatial-pill px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 shrink-0 ${gobActive ? 'spatial-pill-active' : ''}">
-        <span class="w-1.5 h-1.5 rounded-full ${gobActive ? 'bg-white' : 'bg-emerald-400'}"></span>
+        <span class="w-1.5 h-1.5 rounded-full ${gobActive ? 'bg-[#f4f1ea]' : 'bg-[#de4800]'}"></span>
         <span>7 Frentes</span>
       </button>
       <span class="hidden sm:inline-block w-px h-4 bg-stone-300/80 mx-0.5 select-none" aria-hidden="true"></span>
@@ -210,7 +210,7 @@ window.MaderoApp = (function () {
 
     window.MaderoData.MODULOS_SISTEMA.forEach(m => {
       const isAct = activeModuleId === m.id;
-      const dotClass = isAct ? 'bg-white' : (m.activoEnPasoActual ? 'bg-emerald-400' : 'bg-stone-400');
+      const dotClass = isAct ? 'bg-[#f4f1ea]' : (m.activoEnPasoActual ? 'bg-[#de4800]' : 'bg-stone-400');
       const stepTag = m.activoEnPasoActual ? '' : `<span class="text-[9px] font-mono opacity-75">P${m.paso}</span>`;
       html += `
         <button type="button" onclick="MaderoApp.navigateModule('${m.id}')" class="spatial-pill px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 shrink-0 ${isAct ? 'spatial-pill-active' : ''}">

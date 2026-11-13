@@ -11,7 +11,7 @@
   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="spatial-theme min-h-screen text-stone-900 pb-24 lg:pb-10 pt-3 sm:pt-6 px-2.5 sm:px-5 lg:px-8 selection:bg-sky-500/30 selection:text-white">
+<body class="spatial-theme min-h-screen text-stone-900 pb-24 lg:pb-10 pt-3 sm:pt-6 px-2.5 sm:px-5 lg:px-8 selection:bg-[#de4800]/35 selection:text-[#f4f1ea]">
 
   <!-- TOAST DE CONFIRMACIÓN -->
   <div id="global-toast" class="hidden"></div>
@@ -63,7 +63,7 @@
           <div>
             <div class="flex items-center gap-2.5 flex-wrap">
               <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-stone-900">
-                Welcome, <span id="hdr-lider" class="text-sky-300">Ángelo</span>
+                Welcome, <span id="hdr-lider" class="text-[#ff7a3d]">Ángelo</span>
               </h1>
               <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-white/10 border border-white/15 text-stone-600">
                 Madero Automotores · CRM MKT
@@ -74,7 +74,7 @@
               <span class="opacity-40">•</span>
               <span>Corte: <strong id="hdr-corte" class="text-stone-700">--</strong></span>
               <span class="opacity-40 hidden sm:inline">•</span>
-              <button type="button" onclick="MaderoApp.toggleBentoHero()" id="btn-toggle-bento" class="hidden sm:inline-flex items-center gap-1 text-[11px] text-sky-300 hover:text-white transition font-sans font-semibold">
+              <button type="button" onclick="MaderoApp.toggleBentoHero()" id="btn-toggle-bento" class="hidden sm:inline-flex items-center gap-1 text-[11px] text-[#ff7a3d] hover:text-[#f4f1ea] transition font-sans font-semibold">
                 <i class="ri-eye-line text-xs"></i> Ocultar Bento
               </button>
             </div>
@@ -125,9 +125,9 @@
             <button type="button" onclick="MaderoUI.openDataCenterModal()" title="Corte Semanal, JSON y CSV" class="w-9 h-9 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-stone-700 hover:bg-white/20 transition">
               <i class="ri-settings-3-line text-base"></i>
             </button>
-            <button type="button" onclick="MaderoUI.openEstadosGuideModal()" title="Perfil Dirección / Guía de Estados" class="relative w-9 h-9 rounded-full bg-gradient-to-br from-sky-500 to-indigo-600 text-white font-bold text-xs flex items-center justify-center border border-white/30 shadow-md">
+            <button type="button" onclick="MaderoUI.openEstadosGuideModal()" title="Perfil Dirección / Guía de Estados" class="relative w-9 h-9 rounded-full bg-gradient-to-br from-[#f0540a] to-[#b83b00] text-[#f4f1ea] font-bold text-xs flex items-center justify-center border border-[#f4f1ea]/35 shadow-md">
               AL
-              <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-slate-900"></span>
+              <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#0e0e0e]"></span>
             </button>
           </div>
         </div>
@@ -142,10 +142,10 @@
         <!-- FILA 1: 3 TARJETAS SUPERIORES (UPGRADE/INFORME + PULSO MEDIA + CÁMARA SHOWROOM) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
-          <!-- Banner Izquierdo Azul Atmosférico -->
+          <!-- Banner Izquierdo Terracotta Madero -->
           <div class="lg:col-span-4 spatial-card-blue p-4 sm:p-5 flex items-center justify-between gap-4">
             <div class="min-w-0">
-              <div class="text-[10px] font-mono uppercase tracking-wider text-sky-300/90 mb-0.5">Nivel 2 · Reporte Ejecutivo</div>
+              <div class="text-[10px] font-mono uppercase tracking-wider text-[#ff9c6e] mb-0.5">Nivel 2 · Reporte Ejecutivo</div>
               <h2 class="text-base font-bold text-stone-900 leading-tight">Informe Dirección</h2>
               <p class="text-[11px] text-stone-600 mt-1 truncate">Resumen de desvíos, bloqueos y decisiones</p>
             </div>
@@ -157,8 +157,8 @@
           <!-- Banner Central Estilo Reproductor Media: Pulso Proveedores & Pauta -->
           <div class="lg:col-span-4 spatial-card p-4 sm:p-5 flex items-center justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0">
-              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/35 via-rose-500/25 to-slate-900/80 border border-white/20 flex items-center justify-center shrink-0 shadow-inner">
-                <i class="ri-radar-line text-xl text-amber-300"></i>
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#de4800]/40 via-amber-500/20 to-[#0e0e0e]/90 border border-[#f4f1ea]/20 flex items-center justify-center shrink-0 shadow-inner">
+                <i class="ri-radar-line text-xl text-[#ff8a5c]"></i>
               </div>
               <div class="min-w-0">
                 <div class="text-xs font-bold text-stone-900 truncate">Proveedores &amp; Pauta</div>
@@ -179,32 +179,32 @@
           </div>
 
           <!-- Banner Derecho Estilo Cámara en Vivo: Showroom Stock Fotográfico -->
-          <div class="lg:col-span-4 spatial-card p-3.5 relative overflow-hidden min-h-[108px] flex flex-col justify-between bg-gradient-to-br from-slate-800/80 via-emerald-950/60 to-amber-950/50">
+          <div class="lg:col-span-4 spatial-card p-3.5 relative overflow-hidden min-h-[108px] flex flex-col justify-between bg-gradient-to-br from-[#1c1815]/90 via-[#141210]/85 to-[#de4800]/25">
             <!-- Ilustración sutil arquitectónica Showroom -->
             <div class="pointer-events-none absolute inset-0 opacity-30">
-              <div class="absolute right-6 top-2 w-24 h-14 rounded-lg border border-white/20 bg-white/5"></div>
-              <div class="absolute left-10 bottom-3 w-36 h-8 rounded-t-2xl bg-gradient-to-r from-amber-300/20 to-sky-300/15 blur-sm"></div>
+              <div class="absolute right-6 top-2 w-24 h-14 rounded-lg border border-[#f4f1ea]/20 bg-[#f4f1ea]/5"></div>
+              <div class="absolute left-10 bottom-3 w-36 h-8 rounded-t-2xl bg-gradient-to-r from-[#de4800]/25 to-[#f4f1ea]/15 blur-sm"></div>
             </div>
 
             <div class="relative z-10 flex items-center justify-between gap-2">
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/45 border border-white/15 text-[10px] font-semibold text-white">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/55 border border-[#f4f1ea]/15 text-[10px] font-semibold text-[#f4f1ea]">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                 Online · <span id="bento-cam-pct">--%</span>
               </span>
-              <span class="px-2.5 py-0.5 rounded-full bg-black/45 border border-white/15 text-[10px] font-mono text-white/90">
+              <span class="px-2.5 py-0.5 rounded-full bg-black/55 border border-[#f4f1ea]/15 text-[10px] font-mono text-[#f4f1ea]/90">
                 Showroom · <span id="bento-cam-stats">--/--</span>
               </span>
             </div>
 
             <div class="relative z-10 flex items-center justify-center gap-2 mt-3">
-              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-md border border-white/15">
-                <button type="button" onclick="MaderoApp.navigateModule('m3-fotos')" title="Ver Stock Fotográfico" class="w-6 h-6 rounded-full bg-sky-500 text-white flex items-center justify-center text-xs hover:brightness-110 transition">
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/55 backdrop-blur-md border border-[#f4f1ea]/15">
+                <button type="button" onclick="MaderoApp.navigateModule('m3-fotos')" title="Ver Stock Fotográfico" class="w-6 h-6 rounded-full bg-[#de4800] text-[#f4f1ea] flex items-center justify-center text-xs hover:brightness-110 transition">
                   <i class="ri-camera-line"></i>
                 </button>
-                <button type="button" onclick="MaderoApp.navigateModule('m3-fotos'); setTimeout(() => { if(window.MaderoFotografias?.openEvolucionModal) MaderoFotografias.openEvolucionModal(); }, 80)" title="Ver Evolución Semanal" class="w-6 h-6 rounded-full bg-rose-500/85 text-white flex items-center justify-center text-xs hover:brightness-110 transition">
+                <button type="button" onclick="MaderoApp.navigateModule('m3-fotos'); setTimeout(() => { if(window.MaderoFotografias?.openEvolucionModal) MaderoFotografias.openEvolucionModal(); }, 80)" title="Ver Evolución Semanal" class="w-6 h-6 rounded-full bg-[#f4f1ea]/20 text-[#f4f1ea] flex items-center justify-center text-xs hover:bg-[#f4f1ea]/30 transition">
                   <i class="ri-line-chart-line"></i>
                 </button>
-                <button type="button" onclick="MaderoApp.navigateModule('m3-fotos'); setTimeout(() => { if(window.MaderoFotografias?.openCreateModal) MaderoFotografias.openCreateModal(); }, 80)" title="Registrar Nueva Unidad" class="w-6 h-6 rounded-full bg-white/15 text-white flex items-center justify-center text-xs hover:bg-white/25 transition">
+                <button type="button" onclick="MaderoApp.navigateModule('m3-fotos'); setTimeout(() => { if(window.MaderoFotografias?.openCreateModal) MaderoFotografias.openCreateModal(); }, 80)" title="Registrar Nueva Unidad" class="w-6 h-6 rounded-full bg-white/15 text-[#f4f1ea] flex items-center justify-center text-xs hover:bg-white/25 transition">
                   <i class="ri-add-line"></i>
                 </button>
               </div>
@@ -220,11 +220,11 @@
           <div onclick="MaderoApp.jumpToEquipoCapacidad()" class="md:col-span-5 lg:col-span-4 spatial-card p-5 cursor-pointer flex flex-col justify-between group">
             <div class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-2">
-                <i class="ri-flashlight-fill text-sky-400 text-base"></i>
+                <i class="ri-flashlight-fill text-[#de4800] text-base"></i>
                 <span class="text-sm font-bold text-stone-900">Capacidad Equipo</span>
               </div>
               <div class="flex items-center gap-2">
-                <span id="kpi-eq-badge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/10 text-sky-300 border border-white/10">--% carga</span>
+                <span id="kpi-eq-badge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#f4f1ea]/10 text-[#ff9c6e] border border-[#f4f1ea]/15">--% carga</span>
                 <span class="ios-switch is-on" aria-hidden="true"></span>
               </div>
             </div>
@@ -234,14 +234,14 @@
               <span class="text-[11px] font-mono text-stone-500 mr-3">0h</span>
               <div class="relative w-36 h-36 flex items-center justify-center">
                 <svg viewBox="0 0 140 140" class="w-full h-full -rotate-90">
-                  <circle cx="70" cy="70" r="56" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="4" stroke-dasharray="2 5"></circle>
-                  <circle cx="70" cy="70" r="46" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="6"></circle>
+                  <circle cx="70" cy="70" r="56" fill="none" stroke="rgba(244,241,234,0.14)" stroke-width="4" stroke-dasharray="2 5"></circle>
+                  <circle cx="70" cy="70" r="46" fill="none" stroke="rgba(244,241,234,0.1)" stroke-width="6"></circle>
                   <circle id="bento-dial-ring" cx="70" cy="70" r="46" fill="none" stroke="url(#dialGrad)" stroke-width="6" stroke-linecap="round" stroke-dasharray="289" stroke-dashoffset="100"></circle>
                   <defs>
                     <linearGradient id="dialGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stop-color="#38bdf8"></stop>
-                      <stop offset="55%" stop-color="#a855f7"></stop>
-                      <stop offset="100%" stop-color="#f97316"></stop>
+                      <stop offset="0%" stop-color="#f4f1ea"></stop>
+                      <stop offset="52%" stop-color="#f59e0b"></stop>
+                      <stop offset="100%" stop-color="#de4800"></stop>
                     </linearGradient>
                   </defs>
                 </svg>
@@ -250,14 +250,14 @@
                   <div id="kpi-eq-sub" class="text-[10px] text-stone-500 mt-1">de --h sem.</div>
                 </div>
               </div>
-              <span id="bento-dial-max" class="text-[11px] font-mono text-amber-300 ml-3">--h</span>
+              <span id="bento-dial-max" class="text-[11px] font-mono text-[#ff9c6e] ml-3">--h</span>
             </div>
 
             <!-- Iconos inferiores rápidos del dial -->
             <div class="flex items-center justify-around pt-2 border-t border-white/10 text-stone-500 text-base">
-              <i class="ri-team-line hover:text-white transition" title="Equipo y Roles"></i>
-              <i class="ri-time-line hover:text-amber-300 transition" title="Horas Asignadas"></i>
-              <i class="ri-bar-chart-2-line hover:text-sky-300 transition" title="Carga Operativa"></i>
+              <i class="ri-team-line hover:text-[#f4f1ea] transition" title="Equipo y Roles"></i>
+              <i class="ri-time-line hover:text-[#ff7a3d] transition" title="Horas Asignadas"></i>
+              <i class="ri-bar-chart-2-line hover:text-[#ff9c6e] transition" title="Carga Operativa"></i>
               <i class="ri-shield-check-line hover:text-emerald-300 transition" title="Balance Semanal"></i>
             </div>
           </div>
@@ -266,11 +266,11 @@
           <div onclick="MaderoApp.jumpToAgendaDesvios()" class="md:col-span-7 lg:col-span-4 spatial-card p-5 cursor-pointer flex flex-col justify-between relative overflow-hidden">
             <div class="flex items-center justify-between gap-2 relative z-10">
               <div class="flex items-center gap-2">
-                <i class="ri-sun-line text-amber-300 text-base"></i>
+                <i class="ri-sun-line text-[#ff9c6e] text-base"></i>
                 <span class="text-sm font-bold text-stone-900">Frentes Activos</span>
               </div>
               <div class="flex items-center gap-2">
-                <span id="kpi-pri-badge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/10 text-amber-300 border border-white/10">-- frentes</span>
+                <span id="kpi-pri-badge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#f4f1ea]/10 text-[#ff9c6e] border border-[#f4f1ea]/15">-- frentes</span>
                 <span class="ios-switch is-on" aria-hidden="true"></span>
               </div>
             </div>
@@ -280,16 +280,16 @@
               <div class="col-span-6 flex flex-col items-start">
                 <span class="text-[10px] text-stone-500 font-semibold mb-1">Bajo</span>
                 <svg viewBox="0 0 110 130" class="w-28 h-28 overflow-visible">
-                  <path d="M 15 16 A 48 48 0 0 1 15 112" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="14" stroke-linecap="round"></path>
-                  <path id="bento-arc-path" d="M 15 16 A 48 48 0 0 1 15 112" fill="none" stroke="#2563eb" stroke-width="14" stroke-linecap="round" stroke-dasharray="151" stroke-dashoffset="48"></path>
-                  <circle id="bento-arc-thumb" cx="62" cy="76" r="7" fill="#ffffff" stroke="#2563eb" stroke-width="2.5"></circle>
+                  <path d="M 15 16 A 48 48 0 0 1 15 112" fill="none" stroke="rgba(244,241,234,0.14)" stroke-width="14" stroke-linecap="round"></path>
+                  <path id="bento-arc-path" d="M 15 16 A 48 48 0 0 1 15 112" fill="none" stroke="#de4800" stroke-width="14" stroke-linecap="round" stroke-dasharray="151" stroke-dashoffset="48"></path>
+                  <circle id="bento-arc-thumb" cx="62" cy="76" r="7" fill="#f4f1ea" stroke="#de4800" stroke-width="2.5"></circle>
                 </svg>
                 <span class="text-[10px] text-stone-500 font-semibold mt-1">Crítico</span>
               </div>
 
-              <!-- Métrica central + cono de luz -->
+              <!-- Métrica central + cono de luz cálido Madero -->
               <div class="col-span-6 flex flex-col items-end text-right relative">
-                <div class="w-20 h-20 rounded-full bg-amber-400/20 blur-xl absolute -top-2 right-2 pointer-events-none"></div>
+                <div class="w-20 h-20 rounded-full bg-[#de4800]/25 blur-xl absolute -top-2 right-2 pointer-events-none"></div>
                 <div class="text-[10px] font-mono uppercase text-stone-500">Prioridades</div>
                 <div id="kpi-pri-count" class="text-3xl font-extrabold font-mono text-stone-900 mt-0.5">--</div>
                 <div id="kpi-pri-closed" class="text-[11px] text-emerald-300 font-medium mt-1">Cerrados c/ ev.: --</div>
@@ -298,7 +298,7 @@
 
             <div class="flex items-center justify-between pt-2 border-t border-white/10 text-[11px] text-stone-500 relative z-10">
               <span>Agenda operativa de la semana</span>
-              <span class="text-sky-300 font-semibold">Ver detalles →</span>
+              <span class="text-[#ff7a3d] font-semibold">Ver detalles →</span>
             </div>
           </div>
 
@@ -308,7 +308,7 @@
             <!-- Mini Card 1: Trabajo Absorbido -->
             <button type="button" onclick="MaderoApp.jumpToTrabajoAbsorbido()" class="spatial-card p-4 text-left flex flex-col justify-between min-h-[118px]">
               <div class="flex items-center justify-between w-full">
-                <div class="w-9 h-9 rounded-xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-300">
+                <div class="w-9 h-9 rounded-xl bg-[#de4800]/20 border border-[#de4800]/40 flex items-center justify-center text-[#ff8a5c]">
                   <i class="ri-shield-user-line text-lg"></i>
                 </div>
                 <span class="ios-switch is-on" aria-hidden="true"></span>
@@ -316,7 +316,7 @@
               <div class="mt-3">
                 <div class="flex items-baseline justify-between gap-1">
                   <span class="text-xs font-bold text-stone-900">Absorbido</span>
-                  <span id="kpi-abs-count" class="text-sm font-extrabold font-mono text-amber-300">--h</span>
+                  <span id="kpi-abs-count" class="text-sm font-extrabold font-mono text-[#ff9c6e]">--h</span>
                 </div>
                 <div id="kpi-abs-badge" class="text-[11px] text-stone-500 mt-0.5">-- casos registrados</div>
               </div>
@@ -325,7 +325,7 @@
             <!-- Mini Card 2: Decisiones Dirección -->
             <button type="button" onclick="MaderoApp.jumpToDecisionesDireccion()" class="spatial-card p-4 text-left flex flex-col justify-between min-h-[118px]">
               <div class="flex items-center justify-between w-full">
-                <div class="w-9 h-9 rounded-xl bg-rose-500/20 border border-rose-400/30 flex items-center justify-center text-rose-300">
+                <div class="w-9 h-9 rounded-xl bg-[#de4800]/20 border border-[#de4800]/40 flex items-center justify-center text-[#ff7a3d]">
                   <i class="ri-alarm-warning-line text-lg"></i>
                 </div>
                 <span class="ios-switch is-on" aria-hidden="true"></span>
@@ -333,7 +333,7 @@
               <div class="mt-3">
                 <div class="flex items-baseline justify-between gap-1">
                   <span class="text-xs font-bold text-stone-900">Dirección</span>
-                  <span id="kpi-dir-count" class="text-sm font-extrabold font-mono text-rose-300">--</span>
+                  <span id="kpi-dir-count" class="text-sm font-extrabold font-mono text-[#ff7a3d]">--</span>
                 </div>
                 <div id="kpi-dir-badge" class="text-[11px] text-stone-500 mt-0.5">-- escalamientos</div>
               </div>
@@ -342,7 +342,7 @@
             <!-- Mini Card 3: Ecosistema & Google -->
             <button type="button" onclick="MaderoApp.navigateCluster('ecosistema')" class="spatial-card p-4 text-left flex flex-col justify-between min-h-[118px]">
               <div class="flex items-center justify-between w-full">
-                <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300">
+                <div class="w-9 h-9 rounded-xl bg-[#f4f1ea]/12 border border-[#f4f1ea]/25 flex items-center justify-center text-[#f4f1ea]">
                   <i class="ri-map-pin-2-line text-lg"></i>
                 </div>
                 <span class="ios-switch is-on" aria-hidden="true"></span>
@@ -395,12 +395,12 @@
                 <svg viewBox="0 0 320 90" preserveAspectRatio="none" class="w-full h-full overflow-visible">
                   <defs>
                     <linearGradient id="energyFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.35"></stop>
-                      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0"></stop>
+                      <stop offset="0%" stop-color="#de4800" stop-opacity="0.38"></stop>
+                      <stop offset="100%" stop-color="#de4800" stop-opacity="0.0"></stop>
                     </linearGradient>
                   </defs>
                   <path id="bento-spline-fill" d="M0,70 C50,55 80,35 125,45 C170,55 215,65 255,40 C285,22 300,18 320,16 L320,90 L0,90 Z" fill="url(#energyFill)"></path>
-                  <path id="bento-spline-path" d="M0,70 C50,55 80,35 125,45 C170,55 215,65 255,40 C285,22 300,18 320,16" fill="none" stroke="rgba(255,255,255,0.88)" stroke-width="2.5" stroke-linecap="round"></path>
+                  <path id="bento-spline-path" d="M0,70 C50,55 80,35 125,45 C170,55 215,65 255,40 C285,22 300,18 320,16" fill="none" stroke="#f4f1ea" stroke-width="2.5" stroke-linecap="round"></path>
                 </svg>
               </div>
             </div>
@@ -414,22 +414,22 @@
                 <span class="ios-switch is-on" aria-hidden="true"></span>
               </div>
               <p id="bento-lucy-sub" class="text-[11px] text-stone-500">Consultas y apoyo comercial</p>
-              <span class="inline-flex items-center gap-1 text-[11px] text-sky-300 font-semibold mt-3">
+              <span class="inline-flex items-center gap-1 text-[11px] text-[#ff7a3d] font-semibold mt-3">
                 Abrir seguimiento →
               </span>
             </div>
-            <!-- Orbe 3D minimalista -->
-            <div class="w-20 h-20 rounded-full shrink-0 relative flex items-center justify-center bg-gradient-to-b from-slate-200 via-slate-400 to-slate-700 shadow-lg border border-white/40">
-              <div class="absolute bottom-1 w-14 h-2.5 rounded-full bg-sky-400/80 blur-[3px]"></div>
-              <i class="ri-customer-service-2-fill text-2xl text-slate-800/80"></i>
+            <!-- Orbe 3D minimalista en crema & terracotta -->
+            <div class="w-20 h-20 rounded-full shrink-0 relative flex items-center justify-center bg-gradient-to-b from-[#f4f1ea] via-[#d6cfc2] to-[#262320] shadow-lg border border-[#f4f1ea]/45">
+              <div class="absolute bottom-1 w-14 h-2.5 rounded-full bg-[#de4800]/85 blur-[3px]"></div>
+              <i class="ri-customer-service-2-fill text-2xl text-[#0e0e0e]/85"></i>
             </div>
           </div>
 
           <!-- Tarjeta Punteada 7 Frentes (estilo Weather Card) -->
           <div onclick="MaderoApp.navigateModule('gob-frentes')" class="md:col-span-6 lg:col-span-3 spatial-card-dashed p-5 cursor-pointer flex flex-col justify-between">
             <div class="flex items-center justify-between gap-3">
-              <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-300/30 to-sky-400/20 border border-white/15 flex items-center justify-center relative">
-                <i class="ri-sun-cloudy-fill text-2xl text-amber-300"></i>
+              <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#de4800]/30 to-[#f4f1ea]/15 border border-[#f4f1ea]/15 flex items-center justify-center relative">
+                <i class="ri-sun-cloudy-fill text-2xl text-[#ff9c6e]"></i>
               </div>
               <div class="text-right">
                 <div id="bento-frentes-pct" class="text-2xl font-extrabold font-mono text-stone-900 leading-none">7/7</div>
