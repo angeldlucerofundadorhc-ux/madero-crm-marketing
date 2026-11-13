@@ -500,7 +500,37 @@ body {
     box-shadow: 0 4px 14px rgba(222, 72, 0, 0.4);
   }
 
-  /* Automatic Obsidian & Warm Ivory Glass Override for Tailwind Surfaces Inside Modules */
+  /* Deep Obsidian Tables & Data Grids (High-Contrast 60% #0e0e0e) */
+  body.spatial-theme .overflow-x-auto:has(> table),
+  body.spatial-theme table {
+    background-color: rgba(14, 14, 14, 0.82) !important;
+    color: #f4f1ea;
+  }
+
+  body.spatial-theme table thead,
+  body.spatial-theme table thead tr {
+    background-color: rgba(10, 10, 10, 0.96) !important;
+  }
+
+  body.spatial-theme table thead th {
+    color: rgba(244, 241, 234, 0.88) !important;
+    border-bottom: 1px solid rgba(244, 241, 234, 0.16) !important;
+  }
+
+  body.spatial-theme table tbody tr {
+    background-color: rgba(14, 14, 14, 0.68) !important;
+    transition: background-color 0.16s ease !important;
+  }
+
+  body.spatial-theme table tbody tr:nth-child(even) {
+    background-color: rgba(22, 19, 17, 0.78) !important;
+  }
+
+  body.spatial-theme table tbody tr:hover {
+    background-color: rgba(222, 72, 0, 0.16) !important;
+  }
+
+  /* Automatic Obsidian Glass Override for ALL White/Stone Surfaces & Fractional Variants */
   body.spatial-theme .bg-white,
   body.spatial-theme .bg-white\/95,
   body.spatial-theme .bg-white\/90,
@@ -509,34 +539,85 @@ body {
   body.spatial-theme .bg-white\/75,
   body.spatial-theme .bg-white\/70,
   body.spatial-theme .bg-white\/60,
-  body.spatial-theme .bg-white\/50 {
-    background-color: rgba(244, 241, 234, 0.065) !important;
+  body.spatial-theme .bg-white\/55,
+  body.spatial-theme .bg-white\/50,
+  body.spatial-theme .bg-white\/45 {
+    background-color: rgba(14, 14, 14, 0.72) !important;
   }
 
   body.spatial-theme .bg-stone-50,
+  body.spatial-theme .bg-stone-50\/90,
   body.spatial-theme .bg-stone-50\/80,
   body.spatial-theme .bg-stone-50\/70,
   body.spatial-theme .bg-stone-50\/60 {
-    background-color: rgba(244, 241, 234, 0.04) !important;
+    background-color: rgba(14, 14, 14, 0.62) !important;
   }
 
   body.spatial-theme .bg-stone-100,
+  body.spatial-theme .bg-stone-100\/90,
+  body.spatial-theme .bg-stone-100\/85,
   body.spatial-theme .bg-stone-100\/80,
+  body.spatial-theme .bg-stone-100\/75,
+  body.spatial-theme .bg-stone-100\/70,
+  body.spatial-theme .bg-stone-200,
+  body.spatial-theme .bg-stone-200\/80,
+  body.spatial-theme .bg-stone-200\/75,
   body.spatial-theme .bg-stone-200\/70,
-  body.spatial-theme .bg-stone-200 {
-    background-color: rgba(244, 241, 234, 0.095) !important;
+  body.spatial-theme .bg-stone-300\/80 {
+    background-color: rgba(244, 241, 234, 0.085) !important;
   }
 
+  /* Complete Zero-White-Out Hover Overrides Across All Interactive Rows & Buttons */
   body.spatial-theme .hover\:bg-white:hover,
+  body.spatial-theme .hover\:bg-white\/90:hover,
+  body.spatial-theme .hover\:bg-white\/70:hover,
+  body.spatial-theme .hover\:bg-white\/60:hover,
+  body.spatial-theme .hover\:bg-white\/55:hover,
+  body.spatial-theme .hover\:bg-white\/12:hover,
   body.spatial-theme .hover\:bg-stone-50:hover,
   body.spatial-theme .hover\:bg-stone-100:hover,
-  body.spatial-theme .hover\:bg-stone-200:hover {
-    background-color: rgba(244, 241, 234, 0.14) !important;
+  body.spatial-theme .hover\:bg-stone-200:hover,
+  body.spatial-theme .hover\:bg-stone-300\/70:hover {
+    background-color: rgba(222, 72, 0, 0.18) !important;
+    color: #f4f1ea !important;
+  }
+
+  body.spatial-theme .hover\:bg-amber-100:hover,
+  body.spatial-theme .hover\:bg-amber-100\/60:hover,
+  body.spatial-theme .hover\:bg-amber-100\/80:hover,
+  body.spatial-theme .hover\:bg-amber-200:hover {
+    background-color: rgba(245, 158, 11, 0.24) !important;
+    color: #fde68a !important;
+  }
+
+  body.spatial-theme .hover\:bg-emerald-100:hover {
+    background-color: rgba(16, 185, 129, 0.24) !important;
+    color: #a7f3d0 !important;
+  }
+
+  body.spatial-theme .hover\:bg-rose-100:hover,
+  body.spatial-theme .hover\:bg-red-50:hover {
+    background-color: rgba(222, 72, 0, 0.28) !important;
+    color: #ffd4c2 !important;
+  }
+
+  body.spatial-theme .group:hover .group-hover\:text-blue-900,
+  body.spatial-theme .hover\:text-blue-900:hover {
+    color: #ff8a5c !important;
+  }
+
+  body.spatial-theme .group:hover .group-hover\:text-stone-800,
+  body.spatial-theme .hover\:text-stone-700:hover,
+  body.spatial-theme .hover\:text-stone-800:hover,
+  body.spatial-theme .hover\:text-stone-900:hover,
+  body.spatial-theme .hover\:text-stone-950:hover {
+    color: #f4f1ea !important;
   }
 
   /* Keep dark stone primary buttons crisp in Madero #de4800 Accent */
   body.spatial-theme button.bg-stone-900,
-  body.spatial-theme .bg-stone-900:not(.fixed) {
+  body.spatial-theme .bg-stone-900:not(.fixed),
+  body.spatial-theme .bg-stone-800 {
     background-color: #de4800 !important;
     color: #f4f1ea !important;
     border-color: rgba(244, 241, 234, 0.32) !important;
@@ -545,102 +626,156 @@ body {
   body.spatial-theme button.bg-stone-900:hover,
   body.spatial-theme .hover\:bg-stone-800:hover {
     background-color: #c23f00 !important;
+    color: #f4f1ea !important;
   }
 
-  /* Soft Semantic Alert Backgrounds Adapted to Obsidian Glass */
+  /* Soft Semantic Alert Backgrounds Adapted to Dark Obsidian Glass */
   body.spatial-theme .bg-amber-50,
+  body.spatial-theme .bg-amber-50\/90,
+  body.spatial-theme .bg-amber-50\/85,
   body.spatial-theme .bg-amber-50\/80,
-  body.spatial-theme .bg-amber-50\/60 {
-    background-color: rgba(245, 158, 11, 0.12) !important;
+  body.spatial-theme .bg-amber-50\/70,
+  body.spatial-theme .bg-amber-50\/60,
+  body.spatial-theme .bg-amber-50\/50,
+  body.spatial-theme .bg-amber-50\/40,
+  body.spatial-theme .bg-amber-50\/30,
+  body.spatial-theme .bg-amber-100,
+  body.spatial-theme .bg-amber-100\/80,
+  body.spatial-theme .bg-amber-100\/75,
+  body.spatial-theme .bg-amber-200\/80 {
+    background-color: rgba(245, 158, 11, 0.14) !important;
   }
 
   body.spatial-theme .bg-emerald-50,
   body.spatial-theme .bg-emerald-50\/80,
-  body.spatial-theme .bg-emerald-50\/60 {
-    background-color: rgba(16, 185, 129, 0.12) !important;
+  body.spatial-theme .bg-emerald-50\/75,
+  body.spatial-theme .bg-emerald-50\/60,
+  body.spatial-theme .bg-emerald-100 {
+    background-color: rgba(16, 185, 129, 0.14) !important;
   }
 
   body.spatial-theme .bg-rose-50,
+  body.spatial-theme .bg-rose-50\/90,
+  body.spatial-theme .bg-rose-50\/85,
   body.spatial-theme .bg-rose-50\/80,
-  body.spatial-theme .bg-red-50 {
+  body.spatial-theme .bg-rose-50\/75,
+  body.spatial-theme .bg-rose-50\/70,
+  body.spatial-theme .bg-rose-50\/40,
+  body.spatial-theme .bg-rose-50\/35,
+  body.spatial-theme .bg-rose-100\/85,
+  body.spatial-theme .bg-rose-100\/80,
+  body.spatial-theme .bg-red-50,
+  body.spatial-theme .bg-red-50\/60,
+  body.spatial-theme .bg-red-50\/50,
+  body.spatial-theme .bg-red-50\/20,
+  body.spatial-theme .bg-red-100 {
     background-color: rgba(222, 72, 0, 0.16) !important;
   }
 
   body.spatial-theme .bg-sky-50,
   body.spatial-theme .bg-sky-50\/80,
   body.spatial-theme .bg-blue-50,
-  body.spatial-theme .bg-blue-50\/80 {
+  body.spatial-theme .bg-blue-50\/80,
+  body.spatial-theme .bg-blue-50\/50 {
     background-color: rgba(244, 241, 234, 0.08) !important;
   }
 
   body.spatial-theme .bg-indigo-50,
-  body.spatial-theme .bg-violet-50 {
-    background-color: rgba(222, 72, 0, 0.11) !important;
+  body.spatial-theme .bg-violet-50,
+  body.spatial-theme .bg-purple-50\/50,
+  body.spatial-theme .bg-purple-100,
+  body.spatial-theme .bg-orange-50\/50 {
+    background-color: rgba(222, 72, 0, 0.13) !important;
   }
 
   /* 30% #f4f1ea Warm Ivory Typography & Contrast Overrides */
+  body.spatial-theme .text-stone-950,
   body.spatial-theme .text-stone-900,
   body.spatial-theme .text-stone-800 {
     color: #f4f1ea !important;
   }
 
   body.spatial-theme .text-stone-700 {
-    color: rgba(244, 241, 234, 0.86) !important;
+    color: rgba(244, 241, 234, 0.88) !important;
   }
 
   body.spatial-theme .text-stone-600 {
-    color: rgba(244, 241, 234, 0.72) !important;
+    color: rgba(244, 241, 234, 0.74) !important;
   }
 
   body.spatial-theme .text-stone-500 {
-    color: rgba(244, 241, 234, 0.56) !important;
+    color: rgba(244, 241, 234, 0.6) !important;
   }
 
   body.spatial-theme .text-stone-400 {
-    color: rgba(244, 241, 234, 0.42) !important;
+    color: rgba(244, 241, 234, 0.46) !important;
   }
 
+  body.spatial-theme .text-amber-950,
   body.spatial-theme .text-amber-900,
   body.spatial-theme .text-amber-800,
   body.spatial-theme .text-amber-700 {
     color: #fcd34d !important;
   }
 
+  body.spatial-theme .text-emerald-950,
   body.spatial-theme .text-emerald-900,
   body.spatial-theme .text-emerald-800,
   body.spatial-theme .text-emerald-700 {
     color: #6ee7b7 !important;
   }
 
+  body.spatial-theme .text-rose-950,
   body.spatial-theme .text-rose-900,
   body.spatial-theme .text-rose-800,
   body.spatial-theme .text-rose-700,
+  body.spatial-theme .text-red-950,
+  body.spatial-theme .text-red-900,
   body.spatial-theme .text-red-800,
-  body.spatial-theme .text-red-700 {
-    color: #ff8a5c !important;
+  body.spatial-theme .text-red-700,
+  body.spatial-theme .text-red-600 {
+    color: #ff9c6e !important;
   }
 
   body.spatial-theme .text-sky-900,
   body.spatial-theme .text-sky-800,
   body.spatial-theme .text-sky-700,
+  body.spatial-theme .text-blue-950,
+  body.spatial-theme .text-blue-900,
   body.spatial-theme .text-blue-800,
-  body.spatial-theme .text-blue-700 {
+  body.spatial-theme .text-blue-700,
+  body.spatial-theme .text-blue-600,
+  body.spatial-theme .text-blue-500 {
     color: #f4f1ea !important;
   }
 
-  body.spatial-theme .text-indigo-800,
-  body.spatial-theme .text-violet-800 {
+  body.spatial-theme .text-orange-900,
+  body.spatial-theme .text-orange-700,
+  body.spatial-theme .text-orange-600,
+  body.spatial-theme .text-orange-500 {
     color: #ff9c6e !important;
+  }
+
+  body.spatial-theme .text-indigo-800,
+  body.spatial-theme .text-violet-800,
+  body.spatial-theme .text-violet-700,
+  body.spatial-theme .text-purple-900,
+  body.spatial-theme .text-purple-700,
+  body.spatial-theme .text-purple-600 {
+    color: #e9d5ff !important;
   }
 
   /* Warm Cream Hairline Borders */
   body.spatial-theme .border-stone-100,
   body.spatial-theme .border-stone-200,
+  body.spatial-theme .border-stone-200\/60,
   body.spatial-theme .border-stone-200\/70,
   body.spatial-theme .border-stone-200\/80,
   body.spatial-theme .border-stone-200\/90,
-  body.spatial-theme .border-stone-300 {
-    border-color: rgba(244, 241, 234, 0.13) !important;
+  body.spatial-theme .border-stone-300,
+  body.spatial-theme .border-stone-300\/60,
+  body.spatial-theme .border-stone-300\/80 {
+    border-color: rgba(244, 241, 234, 0.14) !important;
   }
 
   body.spatial-theme .border-amber-200,
@@ -659,8 +794,9 @@ body {
   }
 
   body.spatial-theme .divide-stone-100 > :not([hidden]) ~ :not([hidden]),
-  body.spatial-theme .divide-stone-200 > :not([hidden]) ~ :not([hidden]) {
-    border-color: rgba(244, 241, 234, 0.1) !important;
+  body.spatial-theme .divide-stone-200 > :not([hidden]) ~ :not([hidden]),
+  body.spatial-theme .divide-stone-200\/60 > :not([hidden]) ~ :not([hidden]) {
+    border-color: rgba(244, 241, 234, 0.12) !important;
   }
 
   /* Inputs, Selects & Textareas (#0e0e0e + #f4f1ea + #de4800 focus) */
@@ -673,8 +809,8 @@ body {
   body.spatial-theme select,
   body.spatial-theme textarea {
     color-scheme: dark;
-    background: rgba(14, 14, 14, 0.72) !important;
-    border-color: rgba(244, 241, 234, 0.16) !important;
+    background: rgba(14, 14, 14, 0.84) !important;
+    border-color: rgba(244, 241, 234, 0.18) !important;
     color: #f4f1ea !important;
   }
 
@@ -688,9 +824,9 @@ body {
   body.spatial-theme input:focus,
   body.spatial-theme select:focus,
   body.spatial-theme textarea:focus {
-    background: rgba(14, 14, 14, 0.9) !important;
-    border-color: rgba(222, 72, 0, 0.78) !important;
-    box-shadow: 0 0 0 3px rgba(222, 72, 0, 0.24) !important;
+    background: #0e0e0e !important;
+    border-color: rgba(222, 72, 0, 0.85) !important;
+    box-shadow: 0 0 0 3px rgba(222, 72, 0, 0.26) !important;
   }
 
   body.spatial-theme select option {
@@ -698,7 +834,59 @@ body {
     color: #f4f1ea;
   }
 
-  /* Luminous Semantic Badges on Obsidian Glass */
+  /* Official High-Contrast Badges Across All Tables & Modules */
+  body.spatial-theme .badge-emerald {
+    background: rgba(16, 185, 129, 0.22) !important;
+    color: #6ee7b7 !important;
+    border-color: rgba(52, 211, 153, 0.45) !important;
+  }
+  body.spatial-theme .badge-amber {
+    background: rgba(245, 158, 11, 0.22) !important;
+    color: #fcd34d !important;
+    border-color: rgba(251, 191, 36, 0.45) !important;
+  }
+  body.spatial-theme .badge-orange {
+    background: rgba(222, 72, 0, 0.24) !important;
+    color: #ff9c6e !important;
+    border-color: rgba(222, 72, 0, 0.5) !important;
+  }
+  body.spatial-theme .badge-blue {
+    background: rgba(59, 130, 246, 0.22) !important;
+    color: #93c5fd !important;
+    border-color: rgba(96, 165, 250, 0.45) !important;
+  }
+  body.spatial-theme .badge-sky {
+    background: rgba(14, 165, 233, 0.22) !important;
+    color: #7dd3fc !important;
+    border-color: rgba(56, 189, 248, 0.45) !important;
+  }
+  body.spatial-theme .badge-purple {
+    background: rgba(168, 85, 247, 0.22) !important;
+    color: #d8b4fe !important;
+    border-color: rgba(192, 132, 252, 0.45) !important;
+  }
+  body.spatial-theme .badge-violet {
+    background: rgba(139, 92, 246, 0.22) !important;
+    color: #c4b5fd !important;
+    border-color: rgba(167, 139, 250, 0.45) !important;
+  }
+  body.spatial-theme .badge-red {
+    background: rgba(239, 68, 68, 0.24) !important;
+    color: #fca5a5 !important;
+    border-color: rgba(248, 113, 113, 0.45) !important;
+  }
+  body.spatial-theme .badge-stone {
+    background: rgba(244, 241, 234, 0.14) !important;
+    color: #f4f1ea !important;
+    border-color: rgba(244, 241, 234, 0.28) !important;
+  }
+  body.spatial-theme .badge-dark {
+    background: rgba(222, 72, 0, 0.26) !important;
+    color: #f4f1ea !important;
+    border-color: rgba(222, 72, 0, 0.52) !important;
+  }
+
+  /* Legacy Badge Aliases */
   body.spatial-theme .badge-pendiente {
     background: rgba(244, 241, 234, 0.12);
     color: #f4f1ea;
