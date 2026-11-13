@@ -205,6 +205,7 @@ window.MaderoApp = (function () {
         <span class="w-1.5 h-1.5 rounded-full ${gobActive ? 'bg-white' : 'bg-emerald-400'}"></span>
         <span>7 Frentes</span>
       </button>
+      <span class="hidden sm:inline-block w-px h-4 bg-stone-300/80 mx-0.5 select-none" aria-hidden="true"></span>
     `;
 
     window.MaderoData.MODULOS_SISTEMA.forEach(m => {

@@ -233,12 +233,12 @@ window.MaderoProveedores = (function () {
           </td>
 
           <!-- Col 2: Compromiso y Entregable -->
-          <td class="py-3 px-3 align-top min-w-[240px]">
+          <td class="py-3 px-3 align-top min-w-[240px] max-w-[360px]">
             <div class="font-extrabold text-stone-900 text-xs leading-snug cursor-pointer hover:underline" onclick="MaderoProveedores.openCompromisoModal('${esc(c.id)}')">
               ${esc(titulo)}
             </div>
-            <p class="text-[11px] text-stone-600 mt-0.5 leading-relaxed line-clamp-2">${esc(entregable)}</p>
-            <div class="text-[10px] text-stone-500 mt-1 flex items-center gap-2">
+            <p class="text-[11px] text-stone-600 mt-0.5 leading-relaxed">${esc(entregable)}</p>
+            <div class="text-[10px] text-stone-500 mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
               <span><strong>Resp:</strong> ${esc(resp)}</span>
               <span>•</span>
               <span><strong>Canal:</strong> ${esc(canal)}</span>
@@ -384,7 +384,7 @@ window.MaderoProveedores = (function () {
         <!-- Barra de Búsqueda y Filtros Multidimensionales -->
         <div class="glass-card p-4 space-y-3">
           <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0">
+            <div class="flex flex-wrap items-center gap-1.5">
               <span class="text-[11px] font-bold text-stone-500 uppercase mr-1">Proveedor:</span>
               ${provFilterButtons}
             </div>

@@ -265,8 +265,8 @@ window.MaderoConduccion = (function () {
 
       const hasExternalUrl = item.evidencia_url && /^https?:\/\//i.test(item.evidencia_url);
       const evidenciaCellHtml = hasExternalUrl
-        ? `<a href="${esc(item.evidencia_url)}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-blue-700 hover:text-blue-900 underline font-semibold truncate block max-w-[185px]" title="${esc(item.evidencia_label || item.evidencia_url)}">📎 ${esc(item.evidencia_label || 'Abrir evidencia')} ↗</a>`
-        : `<div class="text-[11px] text-stone-700 font-medium truncate max-w-[185px]" title="${esc((item.evidencia_label || 'Sin adjunto') + (item.evidencia_url ? ' · ' + item.evidencia_url : ''))}">📎 ${esc(item.evidencia_label || 'Sin adjunto')}</div>`;
+        ? `<a href="${esc(item.evidencia_url)}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-blue-700 hover:text-blue-900 underline font-semibold leading-snug block max-w-[210px]" title="${esc(item.evidencia_label || item.evidencia_url)}">📎 ${esc(item.evidencia_label || 'Abrir evidencia')} ↗</a>`
+        : `<div class="text-[11px] text-stone-700 font-medium leading-snug max-w-[210px]" title="${esc((item.evidencia_label || 'Sin adjunto') + (item.evidencia_url ? ' · ' + item.evidencia_url : ''))}">📎 ${esc(item.evidencia_label || 'Sin adjunto')}</div>`;
 
       return `
         <tr class="hover:bg-white/55 transition align-top">
@@ -286,10 +286,10 @@ window.MaderoConduccion = (function () {
             ${item.criterio_lider ? `<p class="text-[10px] text-stone-500 italic mt-1">Criterio Ángelo: "${esc(item.criterio_lider)}"</p>` : ''}
           </td>
 
-          <td class="py-3 px-3 whitespace-nowrap">
+          <td class="py-3 px-3">
             <div class="mb-1">${actorBadge(item.actor_id, true)}</div>
             <span class="text-xs font-semibold text-stone-800 block">${esc(item.responsable)}</span>
-            <span class="text-[10px] text-stone-500 block truncate max-w-[175px]" title="${esc(item.plaza)}">${esc(item.plaza)}</span>
+            <span class="text-[10px] text-stone-500 block leading-snug max-w-[200px]" title="${esc(item.plaza)}">${esc(item.plaza)}</span>
           </td>
 
           <td class="py-3 px-3 min-w-[200px] max-w-[260px]">
@@ -383,7 +383,7 @@ window.MaderoConduccion = (function () {
             </div>
 
             <div class="flex flex-wrap items-center justify-between gap-2.5">
-              <div class="flex items-center gap-1 bg-stone-200/70 p-1 rounded-xl overflow-x-auto max-w-full no-scrollbar">
+              <div class="flex flex-wrap items-center gap-1 bg-stone-200/70 p-1 rounded-xl max-w-full">
                 ${actorButtons}
               </div>
 
@@ -733,8 +733,8 @@ window.MaderoConduccion = (function () {
               ${contBadge}
             </div>
 
-            <div class="text-[11px] text-stone-600 flex items-center gap-1.5">
-              <span>📍</span><span class="truncate" title="${esc(m.plaza_base)}">${esc(m.plaza_base)}</span>
+            <div class="text-[11px] text-stone-600 flex items-start gap-1.5 leading-snug">
+              <span class="shrink-0">📍</span><span>${esc(m.plaza_base)}</span>
             </div>
 
             <!-- Barra de Carga Horaria -->

@@ -252,7 +252,7 @@ window.MaderoFotografias = (function () {
         <div class="w-full bg-stone-200/80 rounded-full h-1.5 overflow-hidden">
           <div class="${barColor} h-1.5 rounded-full transition-all duration-300" style="width: ${pct}%"></div>
         </div>
-        ${faltantes && !isComplete ? `<p class="text-[10px] text-amber-800 line-clamp-1 mt-0.5" title="${esc(faltantes)}">${esc(faltantes)}</p>` : ''}
+        ${faltantes && !isComplete ? `<p class="text-[10px] text-amber-800 leading-snug max-w-[180px] mt-0.5" title="${esc(faltantes)}">${esc(faltantes)}</p>` : ''}
       </div>
     `;
   }
@@ -319,7 +319,7 @@ window.MaderoFotografias = (function () {
             <span class="text-xs text-stone-500 font-mono">Línea de base: 163 unidades · Corte: ${esc(meta.fecha_corte || '2026-11-06')}</span>
           </div>
 
-          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+          <div class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-3">
             
             <!-- 1. Universo Controlado -->
             <div onclick="MaderoFotografias.resetFilters()" class="glass-card p-3 rounded-2xl border cursor-pointer hover:border-stone-400 transition group ${estadoFilter === 'ALL' && !onlyInconsistencias && !onlyCalidadObs ? 'ring-2 ring-stone-800' : ''}">
@@ -331,7 +331,7 @@ window.MaderoFotografias = (function () {
                 <span class="text-xl font-extrabold text-stone-900 font-mono">${summary.universoControladoTotal}</span>
                 <span class="text-[10px] text-stone-500 font-mono">unid.</span>
               </div>
-              <p class="text-[10px] text-stone-600 mt-0.5 line-clamp-1">
+              <p class="text-[10px] text-stone-600 mt-0.5 leading-snug">
                 <strong>${summary.conFotoLucyTotal}</strong> con foto (<strong class="text-emerald-700">${summary.coberturaGeneralLucyPct}%</strong>)
               </p>
             </div>
@@ -346,7 +346,7 @@ window.MaderoFotografias = (function () {
                 <span class="text-xl font-extrabold text-blue-900 font-mono">${summary.fotosListosParaFotografiarCount}</span>
                 <span class="text-[10px] text-blue-600 font-mono">preparados</span>
               </div>
-              <p class="text-[10px] text-stone-600 mt-0.5 line-clamp-1">En salón/playón listos</p>
+              <p class="text-[10px] text-stone-600 mt-0.5 leading-snug">En salón/playón listos</p>
             </div>
 
             <!-- 3. Pendientes de Coordinación -->
@@ -359,7 +359,7 @@ window.MaderoFotografias = (function () {
                 <span class="text-xl font-extrabold text-purple-900 font-mono">${summary.fotosPendientesCoordinacionCount}</span>
                 <span class="text-[10px] text-purple-600 font-mono">bloqueos</span>
               </div>
-              <p class="text-[10px] text-stone-600 mt-0.5 line-clamp-1">Con causa y próx. acción</p>
+              <p class="text-[10px] text-stone-600 mt-0.5 leading-snug">Con causa y próx. acción</p>
             </div>
 
             <!-- 4. Fotografiados Pendientes de Carga -->
@@ -372,7 +372,7 @@ window.MaderoFotografias = (function () {
                 <span class="text-xl font-extrabold text-orange-900 font-mono">${summary.fotosPendientesCargaCount}</span>
                 <span class="text-[10px] text-orange-600 font-mono">producidos</span>
               </div>
-              <p class="text-[10px] text-stone-600 mt-0.5 line-clamp-1">Falta Drive/Lucy/Web</p>
+              <p class="text-[10px] text-stone-600 mt-0.5 leading-snug">Falta Drive/Lucy/Web</p>
             </div>
 
             <!-- 5. Cobertura Incompleta -->
@@ -385,7 +385,7 @@ window.MaderoFotografias = (function () {
                 <span class="text-xl font-extrabold text-amber-900 font-mono">${summary.fotosCoberturaIncompletaCount}</span>
                 <span class="text-[10px] text-amber-600 font-mono">&lt; 8 tomas</span>
               </div>
-              <p class="text-[10px] text-stone-600 mt-0.5 line-clamp-1">Set parcial de fotos</p>
+              <p class="text-[10px] text-stone-600 mt-0.5 leading-snug">Set parcial de fotos</p>
             </div>
 
             <!-- 6. Calidad Observada -->
@@ -398,7 +398,7 @@ window.MaderoFotografias = (function () {
                 <span class="text-xl font-extrabold text-red-700 font-mono">${summary.fotosCalidadObservadaCount}</span>
                 <span class="text-[10px] text-red-600 font-mono">desvíos</span>
               </div>
-              <p class="text-[10px] text-stone-600 mt-0.5 line-clamp-1">Ventas/Marketing Mkt</p>
+              <p class="text-[10px] text-stone-600 mt-0.5 leading-snug">Ventas / Marketing</p>
             </div>
 
             <!-- 7. Consistencia Inter-Canales -->
@@ -411,7 +411,7 @@ window.MaderoFotografias = (function () {
                 <span class="text-xl font-extrabold text-red-800 font-mono">${summary.fotosInconsistenciasCanalesCount}</span>
                 <span class="text-[10px] text-red-600 font-mono">cruces</span>
               </div>
-              <p class="text-[10px] text-stone-600 mt-0.5 line-clamp-1">Lucy vs Web vs Salón</p>
+              <p class="text-[10px] text-stone-600 mt-0.5 leading-snug">Lucy vs Web vs Salón</p>
             </div>
 
             <!-- 8. Evolución Semanal -->
@@ -424,7 +424,7 @@ window.MaderoFotografias = (function () {
                 <span class="text-xl font-extrabold text-emerald-700 font-mono">+${ev.regularizadas_semana || 14}</span>
                 <span class="text-[10px] text-emerald-600 font-mono">regul.</span>
               </div>
-              <p class="text-[10px] text-stone-600 mt-0.5 line-clamp-1">Saldo: ${ev.pendientes_actuales || 31} pend.</p>
+              <p class="text-[10px] text-stone-600 mt-0.5 leading-snug">Saldo: ${ev.pendientes_actuales || 31} pend.</p>
             </div>
 
           </div>
@@ -463,9 +463,9 @@ window.MaderoFotografias = (function () {
               return `
                 <div onclick="MaderoFotografias.setSucursalFilter('${esc(filterTarget)}')"
                   class="p-3 rounded-xl border transition cursor-pointer ${isSelected ? 'bg-stone-900 text-white border-stone-900 shadow-md' : 'bg-white/80 hover:bg-white border-stone-200/90 hover:border-stone-400'}">
-                  <div class="flex items-center justify-between mb-1.5">
-                    <span class="text-xs font-bold truncate max-w-[170px]" title="${esc(suc.nombre)}">${esc(suc.nombre)}</span>
-                    <span class="text-[10px] font-mono px-2 py-0.5 rounded font-bold ${isSelected ? 'bg-white/20 text-white' : badgeClass}">${suc.pct_oficial}%</span>
+                  <div class="flex items-start justify-between gap-2 mb-1.5">
+                    <span class="text-xs font-bold leading-snug" title="${esc(suc.nombre)}">${esc(suc.nombre)}</span>
+                    <span class="text-[10px] font-mono px-2 py-0.5 rounded font-bold shrink-0 ${isSelected ? 'bg-white/20 text-white' : badgeClass}">${suc.pct_oficial}%</span>
                   </div>
                   <div class="flex items-center justify-between text-[11px] font-mono mb-1.5 ${isSelected ? 'text-stone-300' : 'text-stone-600'}">
                     <span>${suc.con_foto} con foto / ${suc.total_stock} stock</span>
@@ -682,12 +682,12 @@ window.MaderoFotografias = (function () {
                         <div>
                           ${getEstadoProcesoBadge(u.estado_proceso, u.causa_demora)}
                           ${u.causa_demora ? `
-                            <p class="text-[10px] text-stone-600 mt-1 max-w-[200px] line-clamp-2" title="${esc(u.causa_demora)}">
+                            <p class="text-[10px] text-stone-600 mt-1 max-w-[220px] leading-snug" title="${esc(u.causa_demora)}">
                               <strong>Causa:</strong> ${esc(u.causa_demora)}
                             </p>
                           ` : ''}
                           ${u.proxima_accion ? `
-                            <p class="text-[10px] text-emerald-800 mt-0.5 max-w-[200px] line-clamp-1 font-medium" title="${esc(u.proxima_accion)}">
+                            <p class="text-[10px] text-emerald-800 mt-0.5 max-w-[220px] leading-snug font-medium" title="${esc(u.proxima_accion)}">
                               <strong>Acción:</strong> ${esc(u.proxima_accion)}
                             </p>
                           ` : ''}
@@ -713,7 +713,7 @@ window.MaderoFotografias = (function () {
                       <td class="py-3 px-3">
                         ${getCalidadBadge(u.calidad_estado, u.motivo_calidad)}
                         ${u.motivo_calidad ? `
-                          <p class="text-[10px] text-red-800 mt-1 max-w-[170px] line-clamp-2" title="${esc(u.motivo_calidad)}">
+                          <p class="text-[10px] text-red-800 mt-1 max-w-[190px] leading-snug" title="${esc(u.motivo_calidad)}">
                             ${esc(u.motivo_calidad)}
                           </p>
                           ${u.responsable_correccion ? `
@@ -729,7 +729,7 @@ window.MaderoFotografias = (function () {
                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-900 border border-red-300 animate-pulse">
                               <i class="ri-alert-fill"></i> Desvío Canales
                             </span>
-                            <p class="text-[10px] text-red-800 mt-1 max-w-[190px] line-clamp-2 font-medium" title="${esc(u.detalle_inconsistencia)}">
+                            <p class="text-[10px] text-red-800 mt-1 max-w-[210px] leading-snug font-medium" title="${esc(u.detalle_inconsistencia)}">
                               ${esc(u.detalle_inconsistencia)}
                             </p>
                             ${Array.isArray(u.canales_inconsistentes) && u.canales_inconsistentes.length > 0 ? `

@@ -91,6 +91,45 @@ body {
   box-shadow: 0 2px 8px -1px rgba(28, 25, 23, 0.25);
 }
 
+/* Apple Glass Segmented Module Tray (12 Operational Modules) */
+.apple-module-tray {
+  background: rgba(255, 255, 255, 0.56);
+  backdrop-filter: blur(26px) saturate(190%);
+  -webkit-backdrop-filter: blur(26px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  border-radius: 1.25rem;
+  padding: 0.45rem 0.55rem;
+  box-shadow: 0 8px 28px -10px rgba(45, 35, 25, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.apple-module-pill {
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(214, 211, 209, 0.65);
+  color: #44403c;
+  border-radius: 0.75rem;
+  padding: 0.38rem 0.72rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.03);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.apple-module-pill:hover {
+  background: #ffffff;
+  color: #1c1917;
+  border-color: rgba(168, 162, 158, 0.85);
+  transform: translateY(-0.5px);
+  box-shadow: 0 4px 10px -2px rgba(28, 25, 23, 0.08);
+}
+
+.apple-module-pill.subtab-btn-active {
+  background: #1c1917 !important;
+  color: #ffffff !important;
+  border-color: #1c1917 !important;
+  box-shadow: 0 4px 12px -2px rgba(28, 25, 23, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
 /* Semantic Badges System (9 Official States + 6 Actors + Priorities) */
 .badge-pill {
   display: inline-flex;
