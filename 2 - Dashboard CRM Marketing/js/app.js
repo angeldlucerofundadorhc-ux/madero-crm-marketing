@@ -315,6 +315,12 @@ window.MaderoApp = (function () {
     renderModuleStrip();
     updateDockActiveState();
     renderActiveView();
+    if (window.MaderoTracker) {
+      window.MaderoTracker.trackView(
+        activeNivel,
+        activeNivel === 'gerencial' ? 'informe-direccion' : activeModuleId
+      );
+    }
   }
 
   // ------------------------------------------------------------------------
