@@ -465,9 +465,9 @@ window.MaderoContenidoPauta = (function () {
         </div>
 
         <!-- Tabla de Seguimiento de Piezas -->
-        <div class="glass-card p-4 sm:p-6 space-y-4">
-          <div class="flex flex-wrap items-center justify-between gap-2.5">
-            <div class="flex flex-wrap items-center gap-2 flex-1 min-w-[240px]">
+        <div class="glass-card p-4 sm:p-6 space-y-4 w-full max-w-full min-w-0">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
+            <div class="flex flex-wrap items-center gap-2 flex-1 min-w-0">
               <input type="text" id="contenido-search-input" value="${esc(filtersContenido.search)}" oninput="MaderoContenidoPauta.setContenidoSearch(this.value)" placeholder="Buscar pieza, formato, plaza, observación..." class="input-glass px-3.5 py-2 w-full sm:w-64">
 
               <select onchange="MaderoContenidoPauta.setContenidoFilter('mes', this.value)" class="input-glass px-3 py-2">
