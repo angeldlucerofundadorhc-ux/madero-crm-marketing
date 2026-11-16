@@ -14,13 +14,18 @@
   --ink-secondary: #57534e;
 }
 
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 body {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: radial-gradient(circle at 10% 20%, var(--bg-stone-1), var(--bg-stone-2) 50%, var(--bg-stone-3) 100%);
   min-height: 100vh;
   color: var(--ink-primary);
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
 }
 
 .font-mono {
@@ -297,6 +302,8 @@ body {
   /* Main Spatial Frosted Glass Frame (60% Obsidian Glass + 30% Cream Hairlines) */
   body.spatial-theme .spatial-shell {
     position: relative;
+    max-width: 100%;
+    overflow-x: hidden;
     background: linear-gradient(145deg, rgba(26, 23, 21, 0.78) 0%, rgba(14, 14, 14, 0.88) 55%, rgba(20, 18, 16, 0.84) 100%);
     backdrop-filter: blur(42px) saturate(145%);
     -webkit-backdrop-filter: blur(42px) saturate(145%);
