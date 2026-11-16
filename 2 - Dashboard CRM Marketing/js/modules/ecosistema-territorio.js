@@ -124,7 +124,7 @@ window.MaderoEcosistemaTerritorio = (function () {
     const herramientas = ['Business Profile', 'Workspace', 'Analytics 4', 'Tag Manager', 'Search Console', 'Google Ads'];
 
     const rowsHtml = filtered.length === 0 ? `
-      <tr><td colspan="7" class="py-10 text-center text-xs text-stone-500">No hay activos de Google para el filtro seleccionado.</td></tr>
+      <tr><td colspan="7" class="py-10 text-center text-xs text-stone-500">Módulo 7 · Google pausado por Enzo. No hay registros inventados ni activos cargados.</td></tr>
     ` : filtered.map(g => {
       const estadoOpts = Object.values(window.MaderoData.ESTADOS_SEGUIMIENTO).map(st =>
         `<option value="${st.id}" ${g.estado === st.id ? 'selected' : ''}>${esc(st.shortLabel)}</option>`
@@ -187,12 +187,12 @@ window.MaderoEcosistemaTerritorio = (function () {
             <div>
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="badge-pill badge-dark font-mono">Módulo 7 de 12</span>
-                <span class="badge-pill badge-emerald">Operativo · Paso 5</span>
-                <span class="badge-pill badge-blue">Sección 4, 5.7 y 12 · Pedido de Accesos Google</span>
+                <span class="badge-pill badge-amber font-bold">⏸ Pausado por Enzo</span>
+                <span class="badge-pill badge-stone">Sección 4, 5.7 y 12</span>
               </div>
-              <h2 class="text-base sm:text-xl font-extrabold text-stone-900 tracking-tight">Ecosistema Google: Propiedad Institucional, Accesos y Entregables</h2>
+              <h2 class="text-base sm:text-xl font-extrabold text-stone-900 tracking-tight">7. Google · Pausado por Enzo</h2>
               <p class="text-xs text-stone-600 mt-0.5">
-                Control de <strong>Business Profile</strong> por sucursal, <strong>Workspace</strong>, <strong>Analytics 4</strong>, <strong>Tag Manager</strong>, <strong>Search Console</strong> y <strong>Google Ads</strong>.
+                Frente pausado por decisión de Enzo. Sin datos inventados activos; listo para cargar registros reales cuando se reactive.
               </p>
             </div>
             <div class="flex flex-wrap items-center gap-2 shrink-0">
@@ -527,6 +527,15 @@ window.MaderoEcosistemaTerritorio = (function () {
               </p>
             </div>
             <div class="flex flex-wrap items-center gap-2 shrink-0">
+              <a href="https://maderoautomotores.com/" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-xl bg-sky-50 border border-sky-300 text-sky-900 text-xs font-bold hover:bg-sky-100 transition">
+                🌐 maderoautomotores.com ↗
+              </a>
+              <a href="https://dashboard-alistamiento-pi.vercel.app/" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-bold hover:bg-emerald-100 transition">
+                🚗 Dashboard Alistamiento ↗
+              </a>
+              <a href="https://madero-evento-neuquen.vercel.app/" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-xl bg-purple-50 border border-purple-300 text-purple-900 text-xs font-bold hover:bg-purple-100 transition">
+                🎟 Evento Neuquén ↗
+              </a>
               <button type="button" onclick="MaderoStore.exportWebCSV(MaderoEcosistemaTerritorio.getFilteredWeb()); MaderoUI.showToast('CSV de Web descargado')" class="px-3 py-2 rounded-xl bg-white border border-stone-300 text-stone-800 text-xs font-semibold hover:bg-stone-50">
                 ⬇ Exportar CSV Web
               </button>

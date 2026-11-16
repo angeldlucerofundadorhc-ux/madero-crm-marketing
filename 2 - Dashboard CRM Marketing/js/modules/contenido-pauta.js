@@ -10,12 +10,17 @@ window.MaderoContenidoPauta = (function () {
   // Estado local de filtros para Módulo 4 (Contenido)
   let filtersContenido = {
     search: '',
+    tipo: 'ALL', // 'ALL' | 'ORGANICO' | 'CAMPANAS'
     etapa: 'ALL',
     actor: 'ALL',
+    creador: 'ALL',
+    mes: 'ALL',
     plaza: 'ALL',
     onlyObservadas: false,
     onlyAbsorbido: false
   };
+
+  let parsedCalendarioPreview = [];
 
   // Estado local de filtros para Módulo 6 (Campañas Pagas)
   let filtersCampanas = {
@@ -147,8 +152,11 @@ window.MaderoContenidoPauta = (function () {
   function resetContenidoFilters() {
     filtersContenido = {
       search: '',
+      tipo: 'ALL',
       etapa: 'ALL',
       actor: 'ALL',
+      creador: 'ALL',
+      mes: 'ALL',
       plaza: 'ALL',
       onlyObservadas: false,
       onlyAbsorbido: false
@@ -161,8 +169,11 @@ window.MaderoContenidoPauta = (function () {
     const q = filtersContenido.search.trim().toLowerCase();
 
     return list.filter(item => {
+      if (filtersContenido.tipo !== 'ALL' && (item.tipo_contenido || 'CAMPANAS') !== filtersContenido.tipo) return false;
       if (filtersContenido.etapa !== 'ALL' && item.etapa_contenido !== filtersContenido.etapa) return false;
       if (filtersContenido.actor !== 'ALL' && item.actor_id !== filtersContenido.actor) return false;
+      if (filtersContenido.creador !== 'ALL' && (item.creador_flujo || 'REM') !== filtersContenido.creador) return false;
+      if (filtersContenido.mes !== 'ALL' && String(item.fecha_acordada || '').slice(0, 7) !== filtersContenido.mes) return false;
       if (filtersContenido.plaza !== 'ALL' && item.plaza !== filtersContenido.plaza) return false;
       if (filtersContenido.onlyObservadas) {
         const isObs = item.etapa_contenido === 'OBSERVADO' || item.estado === 'OBSERVADO_MADERO' || item.estado === 'DEVUELTO_CORRECCION' || item.estado === 'ATRASADO';
@@ -197,17 +208,37 @@ window.MaderoContenidoPauta = (function () {
     window.MaderoUI.showToast(`Estado de ${id} actualizado`);
   }
 
+  function quickToggleCampanaContenido(id) {
+    const list = window.MaderoStore.getState().contenido_piezas || [];
+    const item = list.find(x => x.id === id);
+    if (!item) return;
+    const nextActive = !item.en_campana;
+    const todayIso = new Date().toISOString().slice(0, 10);
+    window.MaderoStore.upsertContenidoPieza(Object.assign({}, item, {
+      en_campana: nextActive,
+      fecha_inicio_campana: nextActive ? (item.fecha_inicio_campana || todayIso) : ''
+    }));
+    window.MaderoUI.showToast(
+      nextActive ? `Pieza ${id} marcada corriendo en campaña` : `Pieza ${id} quitada de campaña activa`,
+      nextActive ? 'emerald' : 'amber'
+    );
+  }
+
   function renderContenidoModule() {
     const state = window.MaderoStore.getState();
     const allPiezas = state.contenido_piezas || [];
     const filtered = getFilteredContenido();
     const sum = window.MaderoStore.getComputedSummary();
 
-    // Circuito de 6 etapas interactivo
-    const etapasOrder = ['PLANIFICADO', 'PRODUCIDO', 'ENVIADO', 'OBSERVADO', 'APROBADO', 'PUBLICADO'];
+    const piezasBaseTipo = filtersContenido.tipo === 'ALL'
+      ? allPiezas
+      : allPiezas.filter(p => (p.tipo_contenido || 'CAMPANAS') === filtersContenido.tipo);
+
+    // Circuito de 8 etapas interactivo
+    const etapasOrder = ['PLANIFICADO', 'PRODUCIDO', 'EN_EDICION_REM', 'EDITADO_ANGELO', 'ENVIADO', 'OBSERVADO', 'APROBADO', 'PUBLICADO'];
     const pipelineHtml = etapasOrder.map(etKey => {
       const cat = window.MaderoData.ETAPAS_CONTENIDO[etKey];
-      const count = allPiezas.filter(p => p.etapa_contenido === etKey).length;
+      const count = piezasBaseTipo.filter(p => p.etapa_contenido === etKey).length;
       const isSelected = filtersContenido.etapa === etKey;
       const isWarning = etKey === 'OBSERVADO' && count > 0;
 
@@ -249,6 +280,12 @@ window.MaderoContenidoPauta = (function () {
           </td>
 
           <td class="py-3.5 px-3 min-w-[240px] max-w-[330px]">
+            <div class="flex items-center gap-1.5 flex-wrap mb-1">
+              <span class="badge-pill ${(p.tipo_contenido || 'CAMPANAS') === 'ORGANICO' ? 'badge-emerald' : 'badge-amber'} text-[9px] font-bold">
+                ${(p.tipo_contenido || 'CAMPANAS') === 'ORGANICO' ? '🌱 Orgánico' : '🚗 Campañas Drive'}
+              </span>
+              ${p.tags_naming ? `<span class="font-mono text-[9px] text-stone-500">${esc(p.tags_naming)}</span>` : ''}
+            </div>
             <button type="button" onclick="MaderoContenidoPauta.openPiezaModal('${esc(p.id)}')" class="text-left group">
               <span class="font-bold text-stone-900 group-hover:text-blue-900 text-xs block leading-snug">${esc(p.titulo)}</span>
             </button>
@@ -268,7 +305,10 @@ window.MaderoContenidoPauta = (function () {
           </td>
 
           <td class="py-3.5 px-3 min-w-[155px]">
-            <div class="mb-1">${window.MaderoUI.actorBadge(p.actor_id, false)}</div>
+            <div class="mb-1 flex items-center gap-1 flex-wrap">
+              ${window.MaderoUI.actorBadge(p.actor_id, false)}
+              ${p.creador_flujo ? `<span class="badge-pill badge-stone font-mono text-[9px]">${esc(p.creador_flujo)}</span>` : ''}
+            </div>
             <span class="text-[10px] text-stone-600 block leading-snug">${esc(p.responsable_nombre)}</span>
           </td>
 
@@ -280,7 +320,25 @@ window.MaderoContenidoPauta = (function () {
           </td>
 
           <td class="py-3.5 px-3 whitespace-nowrap">
-            <div class="font-mono text-[11px] text-stone-800 font-semibold">Acordada: ${window.MaderoUI.formatDateDisplay(p.fecha_acordada)}</div>
+            ${p.fecha_crudos_cargados ? `<div class="font-mono text-[10px] text-sky-700 font-semibold">📤 Crudos Drive: ${window.MaderoUI.formatDateDisplay(p.fecha_crudos_cargados)}</div>` : ''}
+            ${(() => {
+              if (!p.fecha_crudos_cargados) return '';
+              const dStart = new Date(p.fecha_crudos_cargados + 'T12:00:00');
+              if (p.fecha_entrega_final) {
+                const dEnd = new Date(p.fecha_entrega_final + 'T12:00:00');
+                const days = Math.max(0, Math.round((dEnd - dStart) / 86400000));
+                return `<div class="font-mono text-[10px] text-emerald-700 font-bold">📥 Entregado: ${window.MaderoUI.formatDateDisplay(p.fecha_entrega_final)} (${days}d)</div>`;
+              }
+              if (p.etapa_contenido !== 'PUBLICADO') {
+                const refIso = (window.MaderoStore.getState().meta && window.MaderoStore.getState().meta.fecha_corte) || new Date().toISOString().slice(0, 10);
+                const dRef = new Date(refIso + 'T12:00:00');
+                const daysWait = Math.max(0, Math.round((dRef - dStart) / 86400000));
+                const colorCls = daysWait >= 5 ? 'text-rose-600 font-bold' : 'text-amber-700 font-semibold';
+                return `<div class="font-mono text-[10px] ${colorCls}">⏱ ${daysWait} día(s) desde carga de crudos</div>`;
+              }
+              return '';
+            })()}
+            <div class="font-mono text-[11px] text-stone-800 font-semibold mt-0.5">Meta: ${window.MaderoUI.formatDateDisplay(p.fecha_acordada)}</div>
             <div class="font-mono text-[10px] text-emerald-800 mb-1.5">Publicada: ${p.fecha_publicacion_real ? window.MaderoUI.formatDateDisplay(p.fecha_publicacion_real) : 'Pendiente'}</div>
             <div class="mb-1">${window.MaderoUI.estadoBadge(p.estado, true)}</div>
             <select onchange="MaderoContenidoPauta.quickChangeEstadoContenido('${esc(p.id)}', this.value)" class="text-[10px] bg-white border border-stone-300 rounded-lg px-2 py-1 text-stone-700 font-medium focus:outline-none w-full">
@@ -288,7 +346,7 @@ window.MaderoContenidoPauta = (function () {
             </select>
           </td>
 
-          <td class="py-3.5 px-3 min-w-[250px] max-w-[340px]">
+          <td class="py-3.5 px-3 min-w-[200px] max-w-[280px]">
             <div class="p-2 rounded-xl ${p.etapa_contenido === 'OBSERVADO' || p.estado === 'OBSERVADO_MADERO' ? 'bg-amber-100/80 border border-amber-300 text-amber-950' : 'bg-stone-100/80 border border-stone-200/80 text-stone-700'} text-[11px] leading-snug mb-1.5">
               <strong class="block text-[10px] uppercase tracking-wider text-stone-900 mb-0.5">Posición / Observación Madero:</strong>
               ${esc(p.observacion_madero || 'Sin observaciones registradas.')}
@@ -298,6 +356,40 @@ window.MaderoContenidoPauta = (function () {
                 <strong class="text-stone-800">📊 Resultado:</strong> ${esc(p.resultado_metricas)}
               </div>
             ` : ''}
+          </td>
+
+          <td class="py-3.5 px-3 whitespace-nowrap">
+            ${(() => {
+              const isCamp = Boolean(p.en_campana);
+              const dCrudos = p.fecha_crudos_cargados ? new Date(p.fecha_crudos_cargados + 'T12:00:00') : null;
+              const dEnt = p.fecha_entrega_final ? new Date(p.fecha_entrega_final + 'T12:00:00') : null;
+              const dCamp = p.fecha_inicio_campana ? new Date(p.fecha_inicio_campana + 'T12:00:00') : null;
+
+              let slaHtml = '';
+              if (isCamp) {
+                const editDays = (dCrudos && dEnt) ? Math.max(0, Math.round((dEnt - dCrudos) / 86400000)) : null;
+                const actDays = (dEnt && dCamp) ? Math.max(0, Math.round((dCamp - dEnt) / 86400000)) : null;
+                const totDays = (dCrudos && dCamp) ? Math.max(0, Math.round((dCamp - dCrudos) / 86400000)) : null;
+                slaHtml = `
+                  <div class="mt-1.5 text-[10px] font-mono space-y-0.5">
+                    <div class="text-emerald-700 font-bold">🚀 Desde ${window.MaderoUI.formatDateDisplay(p.fecha_inicio_campana)}</div>
+                    ${totDays !== null ? `<div class="text-stone-600">Total REM: <strong class="text-stone-900">${totDays}d</strong>${editDays !== null && actDays !== null ? ` (${editDays}d ed. + ${actDays}d act.)` : ''}</div>` : ''}
+                  </div>
+                `;
+              } else if (dEnt) {
+                const refIso = (window.MaderoStore.getState().meta && window.MaderoStore.getState().meta.fecha_corte) || new Date().toISOString().slice(0, 10);
+                const dRef = new Date(refIso + 'T12:00:00');
+                const waitAct = Math.max(0, Math.round((dRef - dEnt) / 86400000));
+                slaHtml = `<div class="mt-1 text-[10px] font-mono ${waitAct >= 3 ? 'text-rose-600 font-bold' : 'text-amber-700'}">⏳ ${waitAct}d sin activar</div>`;
+              }
+
+              return `
+                <button type="button" onclick="MaderoContenidoPauta.quickToggleCampanaContenido('${esc(p.id)}')" class="px-2.5 py-1 rounded-full text-[10px] font-bold border transition ${isCamp ? 'bg-emerald-600 text-white border-emerald-700 shadow-xs' : 'bg-white/80 text-stone-600 border-stone-300 hover:border-stone-500'}">
+                  ${isCamp ? '✓ Corriendo' : '○ Sin activar'}
+                </button>
+                ${slaHtml}
+              `;
+            })()}
           </td>
 
           <td class="py-3.5 px-3 text-right whitespace-nowrap">
@@ -333,6 +425,9 @@ window.MaderoContenidoPauta = (function () {
               </p>
             </div>
             <div class="flex flex-wrap items-center gap-2 shrink-0">
+              <button type="button" onclick="MaderoContenidoPauta.openImportCalendarioModal()" class="px-3 py-2 rounded-xl bg-amber-50 border border-amber-300 text-amber-950 text-xs font-bold hover:bg-amber-100 transition">
+                📥 Importar Calendario REM
+              </button>
               <button type="button" onclick="MaderoStore.exportContenidoCSV(MaderoContenidoPauta.getFilteredContenido()); MaderoUI.showToast('CSV de Contenido descargado')" class="px-3 py-2 rounded-xl bg-white border border-stone-300 text-stone-800 text-xs font-semibold hover:bg-stone-50">
                 ⬇ Exportar CSV
               </button>
@@ -342,13 +437,28 @@ window.MaderoContenidoPauta = (function () {
             </div>
           </div>
 
-          <!-- Pipeline Interactivo de 6 Etapas -->
+          <!-- Separador Oficial: Orgánico (Calendario) vs Campañas (Vehículos Drive) -->
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <div class="inline-flex flex-wrap p-1 rounded-2xl bg-stone-200/75 border border-stone-300/60 gap-1">
+              ${[
+                { id: 'ALL', label: `Todo (${allPiezas.length})` },
+                { id: 'ORGANICO', label: `🌱 Orgánico · Calendario (${allPiezas.filter(x => x.tipo_contenido === 'ORGANICO').length})` },
+                { id: 'CAMPANAS', label: `🚗 Campañas · Vehículos Drive (${allPiezas.filter(x => (x.tipo_contenido || 'CAMPANAS') === 'CAMPANAS').length})` }
+              ].map(tab => {
+                const act = filtersContenido.tipo === tab.id;
+                return `<button type="button" onclick="MaderoContenidoPauta.setContenidoFilter('tipo', '${tab.id}')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition ${act ? 'bg-stone-900 text-white shadow-xs' : 'text-stone-600 hover:text-stone-900'}">${esc(tab.label)}</button>`;
+              }).join('')}
+            </div>
+            <span class="text-[11px] text-stone-500"><strong>Orgánico:</strong> calendario mensual (tags PLAZA · CAPA · fecha · slug) · <strong>Campañas:</strong> vehículos del Drive.</span>
+          </div>
+
+          <!-- Pipeline Interactivo de 8 Etapas -->
           <div>
             <div class="flex items-center justify-between mb-2">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-stone-600">Circuito Editorial de 6 Etapas (Clic para filtrar bandeja)</span>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-stone-600">Circuito Editorial de 8 Etapas (Clic para filtrar bandeja)</span>
               <span class="text-[11px] text-stone-500 font-mono">REM: ${sum.contRemCount} piezas · Mkt Interno: ${sum.contInternoCount} piezas · Absorbidas: ${sum.contAbsorbidosCount}</span>
             </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
               ${pipelineHtml}
             </div>
           </div>
@@ -359,6 +469,23 @@ window.MaderoContenidoPauta = (function () {
           <div class="flex flex-wrap items-center justify-between gap-2.5">
             <div class="flex flex-wrap items-center gap-2 flex-1 min-w-[240px]">
               <input type="text" id="contenido-search-input" value="${esc(filtersContenido.search)}" oninput="MaderoContenidoPauta.setContenidoSearch(this.value)" placeholder="Buscar pieza, formato, plaza, observación..." class="input-glass px-3.5 py-2 w-full sm:w-64">
+
+              <select onchange="MaderoContenidoPauta.setContenidoFilter('mes', this.value)" class="input-glass px-3 py-2">
+                <option value="ALL">Todos los Meses (Historial)</option>
+                ${Array.from(new Set(allPiezas.map(x => String(x.fecha_acordada || '').slice(0, 7)).filter(m => /^\d{4}-\d{2}$/.test(m))))
+                  .sort()
+                  .reverse()
+                  .map(m => `<option value="${esc(m)}" ${filtersContenido.mes === m ? 'selected' : ''}>Mes ${esc(m)}</option>`)
+                  .join('')}
+              </select>
+
+              <select onchange="MaderoContenidoPauta.setContenidoFilter('creador', this.value)" class="input-glass px-3 py-2">
+                <option value="ALL">Todos los Creadores</option>
+                <option value="REM" ${filtersContenido.creador === 'REM' ? 'selected' : ''}>REM (Agencia)</option>
+                <option value="Ángelo" ${filtersContenido.creador === 'Ángelo' ? 'selected' : ''}>Ángelo</option>
+                <option value="Antonella" ${filtersContenido.creador === 'Antonella' ? 'selected' : ''}>Antonella (IG/TikTok)</option>
+                <option value="Agustina" ${filtersContenido.creador === 'Agustina' ? 'selected' : ''}>Agustina (NQN)</option>
+              </select>
 
               <select onchange="MaderoContenidoPauta.setContenidoFilter('actor', this.value)" class="input-glass px-3 py-2">
                 <option value="ALL">Todos los Responsables</option>
@@ -380,22 +507,23 @@ window.MaderoContenidoPauta = (function () {
               <button type="button" onclick="MaderoContenidoPauta.toggleContenidoFlag('onlyAbsorbido')" class="px-3 py-1.5 rounded-xl text-xs font-semibold border transition ${filtersContenido.onlyAbsorbido ? 'bg-rose-600 text-white border-rose-700' : 'bg-rose-50 text-rose-900 border-rose-200'}">
                 🛡️ Trabajo Absorbido (${sum.contAbsorbidosCount})
               </button>
-              ${(filtersContenido.search || filtersContenido.etapa !== 'ALL' || filtersContenido.actor !== 'ALL' || filtersContenido.plaza !== 'ALL' || filtersContenido.onlyObservadas || filtersContenido.onlyAbsorbido)
+              ${(filtersContenido.search || filtersContenido.tipo !== 'ALL' || filtersContenido.etapa !== 'ALL' || filtersContenido.actor !== 'ALL' || filtersContenido.creador !== 'ALL' || filtersContenido.mes !== 'ALL' || filtersContenido.plaza !== 'ALL' || filtersContenido.onlyObservadas || filtersContenido.onlyAbsorbido)
                 ? `<button type="button" onclick="MaderoContenidoPauta.resetContenidoFilters()" class="text-xs font-semibold text-stone-500 hover:text-stone-900 underline">Limpiar filtros</button>`
                 : ''}
             </div>
           </div>
 
           <div class="overflow-x-auto -mx-1 sm:mx-0 rounded-xl border border-stone-200/70 bg-white/50">
-            <table class="w-full text-left text-xs min-w-[980px]">
+            <table class="w-full text-left text-xs">
               <thead>
                 <tr class="border-b border-stone-200/80 text-[11px] font-bold uppercase tracking-wider text-stone-500 bg-stone-100/70">
                   <th class="py-3 px-3">ID / Formato</th>
-                  <th class="py-3 px-3">Pieza / Plaza / Evidencia Drive</th>
-                  <th class="py-3 px-3">Actor / Elaboración</th>
-                  <th class="py-3 px-3">Etapa Flujo (Secc. 5.4)</th>
+                  <th class="py-3 px-3">Pieza / Plaza / Evidencia</th>
+                  <th class="py-3 px-3">Actor / Creador</th>
+                  <th class="py-3 px-3">Etapa Flujo</th>
                   <th class="py-3 px-3">Fechas y Estado</th>
-                  <th class="py-3 px-3">Observación de Madero y Resultado</th>
+                  <th class="py-3 px-3">Observación y Resultado</th>
+                  <th class="py-3 px-3">En Campaña</th>
                   <th class="py-3 px-3 text-right">Acciones</th>
                 </tr>
               </thead>
@@ -509,13 +637,21 @@ window.MaderoContenidoPauta = (function () {
             </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
-              <label class="block text-[11px] font-bold text-stone-700 mb-1">Fecha Acordada de Entrega / Salida</label>
+              <label class="block text-[11px] font-bold text-sky-800 mb-1">📤 Crudos Cargados en Drive</label>
+              <input type="date" id="cnt-fecha-crudos" value="${esc(item.fecha_crudos_cargados || '')}" class="input-glass w-full px-3 py-2">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-stone-700 mb-1">Meta Acordada</label>
               <input type="date" id="cnt-fecha-acordada" value="${esc(item.fecha_acordada)}" class="input-glass w-full px-3 py-2">
             </div>
             <div>
-              <label class="block text-[11px] font-bold text-stone-700 mb-1">Fecha Real de Publicación</label>
+              <label class="block text-[11px] font-bold text-emerald-800 mb-1">📥 Entrega Final REM</label>
+              <input type="date" id="cnt-fecha-entrega" value="${esc(item.fecha_entrega_final || '')}" class="input-glass w-full px-3 py-2">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-stone-700 mb-1">Publicación Real</label>
               <input type="date" id="cnt-fecha-real" value="${esc(item.fecha_publicacion_real)}" class="input-glass w-full px-3 py-2">
             </div>
           </div>
@@ -533,6 +669,17 @@ window.MaderoContenidoPauta = (function () {
             <div>
               <label class="block text-[11px] font-bold text-stone-700 mb-1">Resultado / Desempeño de Publicación</label>
               <input type="text" id="cnt-resultado" value="${esc(item.resultado_metricas)}" placeholder="Alcance, reproducciones, guardados, consultas..." class="input-glass w-full px-3 py-2">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-xl bg-emerald-50/70 border border-emerald-200/80">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="cnt-en-campana" ${item.en_campana ? 'checked' : ''} class="rounded text-emerald-600 focus:ring-emerald-500">
+              <span class="text-xs font-bold text-emerald-950">🚀 Ya está corriendo como campaña (REM)</span>
+            </label>
+            <div>
+              <label class="block text-[11px] font-bold text-emerald-900 mb-1">Fecha puesta en campaña</label>
+              <input type="date" id="cnt-fecha-campana" value="${esc(item.fecha_inicio_campana || '')}" class="input-glass w-full px-3 py-1.5">
             </div>
           </div>
 
@@ -569,8 +716,12 @@ window.MaderoContenidoPauta = (function () {
       responsable_nombre: document.getElementById('cnt-resp-nombre').value.trim(),
       etapa_contenido: document.getElementById('cnt-etapa').value,
       estado: document.getElementById('cnt-estado').value,
+      fecha_crudos_cargados: document.getElementById('cnt-fecha-crudos') ? document.getElementById('cnt-fecha-crudos').value : '',
       fecha_acordada: document.getElementById('cnt-fecha-acordada').value,
+      fecha_entrega_final: document.getElementById('cnt-fecha-entrega') ? document.getElementById('cnt-fecha-entrega').value : '',
       fecha_publicacion_real: document.getElementById('cnt-fecha-real').value,
+      en_campana: document.getElementById('cnt-en-campana') ? document.getElementById('cnt-en-campana').checked : false,
+      fecha_inicio_campana: document.getElementById('cnt-fecha-campana') ? document.getElementById('cnt-fecha-campana').value : '',
       observacion_madero: document.getElementById('cnt-observacion').value.trim(),
       enlace_pieza: document.getElementById('cnt-enlace').value.trim(),
       resultado_metricas: document.getElementById('cnt-resultado').value.trim(),
@@ -588,6 +739,261 @@ window.MaderoContenidoPauta = (function () {
       window.MaderoStore.deleteContenidoPieza(id);
       window.MaderoUI.showToast(`Pieza ${id} eliminada`, 'amber');
     }
+  }
+
+  // ------------------------------------------------------------------------
+  // IMPORTADOR INTELIGENTE DE CALENDARIO MENSUAL REM (Texto / Excel / CSV)
+  // ------------------------------------------------------------------------
+  function parseCalendarioText(rawText, defaultDate, defaultCreador) {
+    const lines = String(rawText || '')
+      .split(/\r?\n/)
+      .map(l => l.trim())
+      .filter(l => l && l.length > 3 && !/^[-_=]{3,}$/.test(l));
+
+    const yearNow = new Date().getFullYear();
+
+    return lines.map(line => {
+      const clean = line.replace(/^[-•*]\s*/, '').replace(/\t+/g, ' | ').trim();
+      const lower = clean.toLowerCase();
+
+      // 1. Detectar fecha dd/mm/yyyy, dd/mm o formato Google Drive ("3 nov", "13 nov", "2 dic")
+      let fecha = defaultDate || '2026-11-20';
+      const mesesMap = { ene: '01', feb: '02', mar: '03', abr: '04', may: '05', jun: '06', jul: '07', ago: '08', sep: '09', set: '09', oct: '10', nov: '11', dic: '12' };
+      const dateMatchFull = clean.match(/\b(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})\b/);
+      const dateMatchShort = !dateMatchFull ? clean.match(/\b(\d{1,2})[\/\-](\d{1,2})\b/) : null;
+      const dateMatchDrive = (!dateMatchFull && !dateMatchShort) ? clean.match(/\b(\d{1,2})\s+(ene|feb|mar|abr|may|jun|jul|ago|sep|set|oct|nov|dic)\b/i) : null;
+      if (dateMatchFull) {
+        const d = dateMatchFull[1].padStart(2, '0');
+        const m = dateMatchFull[2].padStart(2, '0');
+        const y = dateMatchFull[3].length === 2 ? `20${dateMatchFull[3]}` : dateMatchFull[3];
+        fecha = `${y}-${m}-${d}`;
+      } else if (dateMatchShort) {
+        const d = dateMatchShort[1].padStart(2, '0');
+        const m = dateMatchShort[2].padStart(2, '0');
+        fecha = `${yearNow}-${m}-${d}`;
+      } else if (dateMatchDrive) {
+        const d = dateMatchDrive[1].padStart(2, '0');
+        const m = mesesMap[dateMatchDrive[2].toLowerCase()] || '11';
+        fecha = `${yearNow}-${m}-${d}`;
+      }
+
+      // 2. Detectar formato
+      let formato = 'Reel / Short Vertical';
+      if (/carrusel|placa|gr[aá]fica|flyer|imagen/i.test(lower)) formato = 'Gráfica Feed / Placa Comercial';
+      if (/carrusel/i.test(lower)) formato = 'Carrusel Educativo / Stock';
+      if (/story|stories|historia/i.test(lower)) formato = 'Story Secuencia';
+      if (/youtube|horizontal/i.test(lower)) formato = 'Video YouTube (Horizontal)';
+
+      // 3. Detectar etapa y estado según palabras clave
+      let etapa_contenido = 'PLANIFICADO';
+      let estado = 'PENDIENTE_INICIO';
+      let obs = 'Importado desde calendario mensual.';
+
+      if (/falta cierre|falta hook|observad|corregir|malo|rehacer/i.test(lower)) {
+        etapa_contenido = 'OBSERVADO';
+        estado = 'OBSERVADO_MADERO';
+        obs = 'Detectado en calendario: requiere cierre/hook o corrección antes de editar.';
+      } else if (/publicad|subid/i.test(lower)) {
+        etapa_contenido = 'PUBLICADO';
+        estado = 'CERRADO_EVIDENCIA';
+        obs = 'Marcado como publicado en calendario.';
+      } else if (/aprobad|mover a campa/i.test(lower)) {
+        etapa_contenido = 'APROBADO';
+        estado = 'EN_ELABORACION';
+        obs = 'Listo/aprobado para pasar a campaña o programación.';
+      } else if (/editado por angelo|editado angelo|editado mkt/i.test(lower)) {
+        etapa_contenido = 'EDITADO_ANGELO';
+        estado = 'EN_ELABORACION';
+        obs = 'Editado internamente por Ángelo.';
+      } else if (/edici[oó]n rem|editando rem|en rem/i.test(lower)) {
+        etapa_contenido = 'EN_EDICION_REM';
+        estado = 'EN_ELABORACION';
+        obs = 'Enviado y actualmente en edición por REM.';
+      } else if (/revisi[oó]n|enviad/i.test(lower)) {
+        etapa_contenido = 'ENVIADO';
+        estado = 'ENTREGADO_REVISION';
+        obs = 'Enviado para revisión de Madero.';
+      } else if (/lista para editar|filmado|crudo|producid/i.test(lower)) {
+        etapa_contenido = 'PRODUCIDO';
+        estado = 'EN_ELABORACION';
+        obs = 'Material producido / listo para edición.';
+      }
+
+      // 4. Detectar plaza
+      let plaza = window.MaderoData.PLAZAS[0];
+      if (/neuqu[eé]n|nqn/i.test(lower)) plaza = 'Neuquén · Madero Neuquén';
+      else if (/bols[oó]n/i.test(lower)) plaza = 'Cordillera · El Bolsón';
+      else if (/cordillera|esquel/i.test(lower)) plaza = 'Cordillera · Cordillera Venta';
+      else if (/cam|d'andrea|dandrea/i.test(lower)) plaza = 'Comodoro · CAM (Monseñor D\'Andrea 1967)';
+      else if (/alem/i.test(lower)) plaza = 'Comodoro · Av. Alem 828';
+      else if (/polonia|comodoro/i.test(lower)) plaza = 'Comodoro · Av. Polonia 546 (Salón Principal)';
+
+      const creador = defaultCreador || 'REM';
+      const actor_id = creador === 'REM' ? 'REM' : 'MKT_INTERNO';
+
+      return {
+        creador_flujo: creador,
+        titulo: clean.replace(/^\d{1,2}[\/\-]\d{1,2}([\/\-]\d{2,4})?\s*[-:|]?\s*/, '').trim() || clean,
+        formato,
+        canal_destino: /story|historia/i.test(lower) ? 'Instagram Stories' : 'Meta Ads / Instagram / Facebook',
+        plaza,
+        actor_id,
+        responsable_nombre: creador === 'REM' ? 'REM (Calendario Mensual)' : `${creador} · Mkt Interno`,
+        etapa_contenido,
+        estado,
+        fecha_crudos_cargados: fecha,
+        fecha_acordada: fecha,
+        fecha_entrega_final: etapa_contenido === 'PUBLICADO' ? fecha : '',
+        fecha_publicacion_real: etapa_contenido === 'PUBLICADO' ? fecha : '',
+        observacion_madero: obs,
+        enlace_pieza: '',
+        resultado_metricas: 'Cargado desde importador de calendario.',
+        trabajo_absorbido: false,
+        trabajo_absorbido_detalle: ''
+      };
+    });
+  }
+
+  function openImportCalendarioModal() {
+    parsedCalendarioPreview = [];
+    const defaultDate = (window.MaderoStore.getState().meta && window.MaderoStore.getState().meta.fecha_corte) || '2026-11-20';
+
+    window.MaderoUI.openModal({
+      title: 'Importar Calendario Mensual (REM / Equipo)',
+      subtitle: 'Se suma al historial sin borrar meses anteriores. Pegá desde WhatsApp, Excel o Word (o subí un .csv/.txt).',
+      maxWidth: 'max-w-3xl',
+      bodyHtml: `
+        <div class="space-y-3.5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-stone-700 mb-1">Tipo de Contenido</label>
+              <select id="imp-cal-tipo" class="input-glass w-full px-3 py-2 font-semibold">
+                <option value="ORGANICO" selected>🌱 Orgánico (Calendario Mensual)</option>
+                <option value="CAMPANAS">🚗 Campañas (Vehículos del Drive)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-stone-700 mb-1">Origen / Creador por defecto</label>
+              <select id="imp-cal-creador" class="input-glass w-full px-3 py-2">
+                <option value="REM" selected>REM (Agencia Externa)</option>
+                <option value="Agustina">Agustina (NQN)</option>
+                <option value="Antonella">Antonella (IG/TikTok)</option>
+                <option value="Ángelo">Ángelo (Mkt Interno)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-stone-700 mb-1">Fecha base (si falta fecha)</label>
+              <input type="date" id="imp-cal-fecha" value="${esc(defaultDate)}" class="input-glass w-full px-3 py-2">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-stone-700 mb-1">O subir archivo (.csv / .txt)</label>
+              <input type="file" accept=".csv,.txt" onchange="MaderoContenidoPauta.handleCalendarioFile(event)" class="text-[11px] text-stone-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-stone-900 file:text-white hover:file:bg-stone-800 cursor-pointer w-full">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-stone-700 mb-1">Pegá acá las líneas del calendario (una pieza por renglón):</label>
+            <textarea id="imp-cal-raw" rows="6" placeholder="Ejemplo:
+18/11 - Reel Hilux vs Amarok Neuquén (Falta Hook)
+20/11 - Carrusel SUVs Polonia - Lista para editar
+22/11 - Placa Financiación Ford 0km - Aprobado" class="input-glass w-full px-3 py-2 font-mono text-xs leading-relaxed"></textarea>
+          </div>
+
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-[11px] text-stone-500">Detecta fechas, patentes, plazas, formato (Reel/Placa/Carrusel/Story) y observaciones (*Falta Hook*, *Falta Cierre*, *Aprobado*).</span>
+            <button type="button" onclick="MaderoContenidoPauta.previewCalendarioImport()" class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shrink-0 transition">
+              ⚡ Analizar y Acomodar
+            </button>
+          </div>
+
+          <div id="imp-cal-preview" class="hidden space-y-2 pt-2 border-t border-stone-200/70"></div>
+        </div>
+      `,
+      footerHtml: `
+        <button type="button" onclick="MaderoUI.closeModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:bg-stone-100">Cancelar</button>
+        <button type="button" id="btn-confirm-imp-cal" onclick="MaderoContenidoPauta.confirmCalendarioImport()" disabled class="px-4 py-2 rounded-xl text-xs font-bold bg-stone-900 text-white disabled:opacity-40 hover:bg-stone-800">
+          Importar Piezas al Tablero
+        </button>
+      `
+    });
+  }
+
+  function handleCalendarioFile(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const ta = document.getElementById('imp-cal-raw');
+      if (ta) {
+        ta.value = String(e.target.result || '');
+        previewCalendarioImport();
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function previewCalendarioImport() {
+    const raw = (document.getElementById('imp-cal-raw')?.value || '').trim();
+    const defaultDate = document.getElementById('imp-cal-fecha')?.value || '2026-11-20';
+    const defaultCreador = document.getElementById('imp-cal-creador')?.value || 'REM';
+    const defaultTipo = document.getElementById('imp-cal-tipo')?.value || 'ORGANICO';
+    const previewBox = document.getElementById('imp-cal-preview');
+    const confirmBtn = document.getElementById('btn-confirm-imp-cal');
+
+    if (!raw) {
+      window.MaderoUI.showToast('Pegá al menos una línea o subí un archivo del calendario', 'red');
+      return;
+    }
+
+    parsedCalendarioPreview = parseCalendarioText(raw, defaultDate, defaultCreador).map(x => Object.assign(x, { tipo_contenido: defaultTipo }));
+    if (!previewBox) return;
+
+    const rowsHtml = parsedCalendarioPreview.map((p, idx) => `
+      <tr class="border-b border-stone-200/60 text-[11px]">
+        <td class="py-2 px-2 font-mono text-stone-500">${idx + 1}</td>
+        <td class="py-2 px-2 font-bold text-stone-900">${esc(p.titulo)}</td>
+        <td class="py-2 px-2 whitespace-nowrap">${esc(p.formato)}</td>
+        <td class="py-2 px-2 whitespace-nowrap">${etapaContenidoBadge(p.etapa_contenido)}</td>
+        <td class="py-2 px-2 font-mono whitespace-nowrap">${esc(p.fecha_acordada)}</td>
+      </tr>
+    `).join('');
+
+    previewBox.innerHTML = `
+      <div class="text-xs font-extrabold text-stone-900 flex items-center justify-between">
+        <span>Vista Previa Acomodada (${parsedCalendarioPreview.length} piezas detectadas)</span>
+        <span class="text-[11px] font-normal text-emerald-700">Listo para cargar</span>
+      </div>
+      <div class="overflow-x-auto max-h-52 rounded-xl border border-stone-200/80 bg-white/70">
+        <table class="w-full text-left">
+          <thead class="bg-stone-100 text-[10px] uppercase text-stone-600">
+            <tr>
+              <th class="py-1.5 px-2">#</th>
+              <th class="py-1.5 px-2">Pieza Detectada</th>
+              <th class="py-1.5 px-2">Formato</th>
+              <th class="py-1.5 px-2">Etapa</th>
+              <th class="py-1.5 px-2">Fecha</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>
+    `;
+    previewBox.classList.remove('hidden');
+    if (confirmBtn) {
+      confirmBtn.disabled = parsedCalendarioPreview.length === 0;
+      confirmBtn.textContent = `Importar ${parsedCalendarioPreview.length} Pieza(s) al Tablero`;
+    }
+  }
+
+  function confirmCalendarioImport() {
+    if (!parsedCalendarioPreview.length) return;
+    parsedCalendarioPreview.forEach(p => {
+      window.MaderoStore.upsertContenidoPieza(p);
+    });
+    const count = parsedCalendarioPreview.length;
+    parsedCalendarioPreview = [];
+    window.MaderoUI.closeModal();
+    window.MaderoUI.showToast(`Se importaron ${count} piezas del calendario`);
   }
 
   // ========================================================================
@@ -1539,9 +1945,14 @@ window.MaderoContenidoPauta = (function () {
     getFilteredContenido,
     quickChangeEtapaContenido,
     quickChangeEstadoContenido,
+    quickToggleCampanaContenido,
     openPiezaModal,
     savePiezaFromModal,
     handleDeletePieza,
+    openImportCalendarioModal,
+    handleCalendarioFile,
+    previewCalendarioImport,
+    confirmCalendarioImport,
     // Redes handlers
     openRedModal,
     saveRedFromModal,

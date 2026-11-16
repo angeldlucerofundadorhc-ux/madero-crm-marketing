@@ -26,15 +26,33 @@ window.MaderoConduccion = (function () {
     onlyAbsorbido: false
   };
 
-  let weeklyFocusFilter = 'ALL'; // 'ALL' | 'CRITICAS' | 'ATRASADAS' | 'AGENDA' | 'EQUIPO'
+  let weeklyFocusFilter = 'ALL'; // 'ALL' | 'CRITICAS' | 'ATRASADAS' | 'SEG:Mario' | ...
+  let weeklyGroupMode = 'SEGMENTO'; // 'SEGMENTO' | 'URGENCIA'
 
   function setWeeklyFocusFilter(val) {
     weeklyFocusFilter = val || 'ALL';
     window.MaderoApp.renderActiveView();
   }
 
+  function setWeeklyGroupMode(mode) {
+    weeklyGroupMode = mode === 'URGENCIA' ? 'URGENCIA' : 'SEGMENTO';
+    window.MaderoApp.renderActiveView();
+  }
+
   function buildWeeklyStartPanel(state) {
     const prioWeight = { CRITICA: 4, ALTA: 3, MEDIA: 2, BAJA: 1 };
+    const segmentoOrden = ['Mario', 'Carlos', 'Bet', 'Agustín', 'REM', 'Diarias', 'Objetivo Mkt', 'Equipo Interno'];
+    const segmentoTitulos = {
+      Mario: 'Tareas Solicitadas por Mario',
+      Carlos: 'Tareas Solicitadas por Carlos',
+      Bet: 'Tareas Solicitadas por Bet',
+      Agustín: 'Tareas Solicitadas por Agustín',
+      REM: 'Tareas REM (Campañas NOV & Revisión)',
+      Diarias: 'Tareas Diarias',
+      'Objetivo Mkt': 'Tareas Objetivo de Marketing',
+      'Equipo Interno': 'Otras Tareas del Equipo Interno'
+    };
+
     const miembrosMap = {};
     (state.equipo_miembros || []).forEach(m => {
       miembrosMap[m.id] = m.nombre || m.id;
@@ -45,12 +63,14 @@ window.MaderoConduccion = (function () {
       .map(p => ({
         kind: 'AGENDA',
         id: p.id,
+        segmento: p.segmento || (p.frente && p.frente.startsWith('Solicitado por ') ? p.frente.replace('Solicitado por ', '') : 'Agenda'),
         titulo: p.objetivo,
         subtitulo: p.proximo_paso || p.dependencia || p.frente || '',
         responsable: p.responsable || 'Conducción',
-        origenLabel: 'Agenda',
+        origenLabel: p.segmento || 'Agenda',
         prioridad: p.prioridad || 'MEDIA',
         estado: p.estado,
+        horas: Number(p.horas_estimadas) || 0,
         fecha: p.fecha_compromiso || '9999-12-31'
       }));
 
@@ -61,12 +81,14 @@ window.MaderoConduccion = (function () {
         return {
           kind: 'EQUIPO',
           id: t.id,
+          segmento: t.segmento || 'Equipo Interno',
           titulo: t.tarea,
           subtitulo: t.bloqueo ? `Bloqueo: ${t.bloqueo}` : (t.categoria || ''),
           responsable: miembrosMap[t.miembro_id] || t.miembro_id || 'Equipo Interno',
           origenLabel: 'Equipo',
           prioridad: inferredPrio,
           estado: t.estado,
+          horas: Number(t.horas_estimadas) || 0,
           fecha: t.fecha_entrega || '9999-12-31'
         };
       });
@@ -86,30 +108,42 @@ window.MaderoConduccion = (function () {
     const atrasadasCount = allPending.filter(x => x.estado === 'ATRASADO').length;
     const criticasAltasCount = allPending.filter(x => x.prioridad === 'CRITICA' || x.prioridad === 'ALTA').length;
 
+    const segCounts = {};
+    allPending.forEach(x => {
+      segCounts[x.segmento] = (segCounts[x.segmento] || 0) + 1;
+    });
+
     const filtered = allPending.filter(x => {
       if (weeklyFocusFilter === 'ATRASADAS') return x.estado === 'ATRASADO';
       if (weeklyFocusFilter === 'CRITICAS') return x.prioridad === 'CRITICA' || x.prioridad === 'ALTA';
-      if (weeklyFocusFilter === 'AGENDA') return x.kind === 'AGENDA';
-      if (weeklyFocusFilter === 'EQUIPO') return x.kind === 'EQUIPO';
+      if (weeklyFocusFilter.startsWith('SEG:')) {
+        return x.segmento === weeklyFocusFilter.slice(4);
+      }
       return true;
     });
 
-    const filterBtns = [
+    const filterDefs = [
       { id: 'ALL', label: `Todas (${allPending.length})` },
       { id: 'CRITICAS', label: `Críticas / Altas (${criticasAltasCount})` },
-      { id: 'ATRASADAS', label: `Atrasadas (${atrasadasCount})` },
-      { id: 'AGENDA', label: `Agenda (${agendaPendientes.length})` },
-      { id: 'EQUIPO', label: `Equipo (${equipoPendientes.length})` }
-    ].map(btn => {
+      { id: 'ATRASADAS', label: `Atrasadas (${atrasadasCount})` }
+    ];
+
+    Object.keys(segCounts)
+      .sort((a, b) => {
+        const ia = segmentoOrden.indexOf(a);
+        const ib = segmentoOrden.indexOf(b);
+        return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+      })
+      .forEach(seg => {
+        filterDefs.push({ id: `SEG:${seg}`, label: `${seg} (${segCounts[seg]})` });
+      });
+
+    const filterBtns = filterDefs.map(btn => {
       const isAct = weeklyFocusFilter === btn.id;
-      return `<button type="button" onclick="MaderoConduccion.setWeeklyFocusFilter('${btn.id}')" class="px-2.5 py-1 rounded-full text-[11px] font-semibold transition ${isAct ? 'bg-[#de4800] text-white shadow-xs' : 'bg-white/10 text-stone-600 hover:text-stone-900 border border-stone-200/50'}">${esc(btn.label)}</button>`;
+      return `<button type="button" onclick="MaderoConduccion.setWeeklyFocusFilter('${esc(btn.id)}')" class="px-2.5 py-1 rounded-full text-[11px] font-semibold transition ${isAct ? 'bg-[#de4800] text-white shadow-xs' : 'bg-white/10 text-stone-600 hover:text-stone-900 border border-stone-200/50'}">${esc(btn.label)}</button>`;
     }).join('');
 
-    const rowsHtml = filtered.length === 0 ? `
-      <div class="py-8 text-center text-xs text-stone-500">
-        No hay tareas ni prioridades pendientes en este filtro. ¡Semana al día!
-      </div>
-    ` : filtered.map(item => {
+    const renderItemRow = item => {
       const isAgenda = item.kind === 'AGENDA';
       const openCall = isAgenda
         ? `MaderoConduccion.openPrioridadModal('${esc(item.id)}')`
@@ -125,6 +159,7 @@ window.MaderoConduccion = (function () {
               ${prioridadBadge(item.prioridad)}
               ${estadoBadge(item.estado, true)}
               <span class="badge-pill badge-stone font-mono text-[10px]">${esc(item.origenLabel)} · ${esc(item.id)}</span>
+              ${item.horas ? `<span class="badge-pill badge-amber font-mono text-[10px]">⏱ ${item.horas}h</span>` : ''}
               <span class="text-[11px] font-semibold text-stone-600">👤 ${esc(item.responsable)}</span>
               <span class="text-[11px] font-mono ${item.estado === 'ATRASADO' ? 'text-rose-600 font-bold' : 'text-stone-500'}">📅 ${formatDateDisplay(item.fecha)}</span>
             </div>
@@ -143,7 +178,46 @@ window.MaderoConduccion = (function () {
           </div>
         </div>
       `;
-    }).join('');
+    };
+
+    let listBodyHtml = '';
+    if (filtered.length === 0) {
+      listBodyHtml = `
+        <div class="py-8 text-center text-xs text-stone-500">
+          No hay tareas ni prioridades pendientes en este filtro. ¡Semana al día!
+        </div>
+      `;
+    } else if (weeklyGroupMode === 'SEGMENTO') {
+      const grouped = {};
+      filtered.forEach(item => {
+        const key = item.segmento || 'Otros';
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(item);
+      });
+
+      const orderedKeys = Object.keys(grouped).sort((a, b) => {
+        const ia = segmentoOrden.indexOf(a);
+        const ib = segmentoOrden.indexOf(b);
+        return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+      });
+
+      listBodyHtml = orderedKeys.map(seg => `
+        <div class="space-y-2 pt-1">
+          <div class="flex items-center justify-between px-1">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-[#ff7a3d] flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#de4800]"></span>
+              ${esc(segmentoTitulos[seg] || seg)}
+            </h3>
+            <span class="text-[10px] font-mono text-stone-500">${grouped[seg].length} pendiente(s)</span>
+          </div>
+          <div class="space-y-2">
+            ${grouped[seg].map(renderItemRow).join('')}
+          </div>
+        </div>
+      `).join('');
+    } else {
+      listBodyHtml = `<div class="space-y-2">${filtered.map(renderItemRow).join('')}</div>`;
+    }
 
     return `
       <div class="glass-card p-4 sm:p-5 space-y-3.5">
@@ -156,9 +230,17 @@ window.MaderoConduccion = (function () {
               ${atrasadasCount > 0 ? `<span class="badge-pill badge-red font-bold text-[10px]">${atrasadasCount} atrasadas</span>` : ''}
             </div>
             <h2 class="text-base sm:text-lg font-extrabold text-stone-900 tracking-tight">Tareas y Prioridades Pendientes</h2>
-            <p class="text-xs text-stone-500 mt-0.5">Ordenado automáticamente por urgencia: atrasadas, prioridad (Crítica → Media) y fecha más próxima.</p>
+            <p class="text-xs text-stone-500 mt-0.5">Segmentadas por solicitante y frente, ordenadas por urgencia dentro de cada grupo.</p>
           </div>
           <div class="flex items-center gap-2 flex-wrap shrink-0">
+            <div class="inline-flex p-0.5 rounded-xl bg-stone-200/70 border border-stone-300/60">
+              <button type="button" onclick="MaderoConduccion.setWeeklyGroupMode('SEGMENTO')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${weeklyGroupMode === 'SEGMENTO' ? 'bg-stone-900 text-white' : 'text-stone-600 hover:text-stone-900'}">
+                Segmentado
+              </button>
+              <button type="button" onclick="MaderoConduccion.setWeeklyGroupMode('URGENCIA')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${weeklyGroupMode === 'URGENCIA' ? 'bg-stone-900 text-white' : 'text-stone-600 hover:text-stone-900'}">
+                Por Urgencia
+              </button>
+            </div>
             <button type="button" onclick="MaderoConduccion.openPrioridadModal(null)" class="px-3 py-1.5 rounded-xl bg-[#de4800] hover:brightness-110 text-white text-xs font-bold shadow-xs transition">
               + Nueva Prioridad
             </button>
@@ -172,8 +254,8 @@ window.MaderoConduccion = (function () {
           ${filterBtns}
         </div>
 
-        <div class="space-y-2">
-          ${rowsHtml}
+        <div class="space-y-3">
+          ${listBodyHtml}
         </div>
       </div>
     `;
@@ -591,7 +673,8 @@ window.MaderoConduccion = (function () {
     const existing = id ? window.MaderoStore.getState().agenda_prioridades.find(p => p.id === id) : null;
     const item = existing || {
       id: '',
-      frente: 'Fotografías y Digitalización',
+      segmento: 'Mario',
+      frente: 'Solicitado por Mario',
       objetivo: '',
       descripcion: '',
       actor_id: 'MKT_INTERNO',
@@ -599,7 +682,8 @@ window.MaderoConduccion = (function () {
       plaza: window.MaderoData.PLAZAS[0],
       prioridad: 'ALTA',
       estado: 'PENDIENTE_INICIO',
-      fecha_compromiso: window.MaderoStore.getState().meta.fecha_corte || '2026-11-10',
+      horas_estimadas: 2,
+      fecha_compromiso: window.MaderoStore.getState().meta.fecha_corte || '2026-11-16',
       dependencia: '',
       proximo_paso: '',
       requiere_decision_direccion: false,
@@ -627,10 +711,19 @@ window.MaderoConduccion = (function () {
       maxWidth: 'max-w-2xl',
       bodyHtml: `
         <div class="space-y-3.5">
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
-              <label class="block text-[11px] font-bold text-stone-700 mb-1">Frente de Marketing</label>
-              <input type="text" id="pri-frente" value="${esc(item.frente)}" placeholder="Ej. Proveedores (REM), Fotos, Google..." class="input-glass w-full px-3 py-2">
+              <label class="block text-[11px] font-bold text-stone-700 mb-1">Segmento / Solicitante</label>
+              <select id="pri-segmento" class="input-glass w-full px-3 py-2" onchange="const f=document.getElementById('pri-frente'); if(!f.value || f.value.startsWith('Solicitado') || f.value.startsWith('Tareas')) f.value=(['Mario','Carlos','Bet','Agustín'].includes(this.value)?'Solicitado por '+this.value:this.value);">
+                <option value="Mario" ${(item.segmento || '') === 'Mario' ? 'selected' : ''}>Solicitado por Mario</option>
+                <option value="Carlos" ${(item.segmento || '') === 'Carlos' ? 'selected' : ''}>Solicitado por Carlos</option>
+                <option value="Bet" ${(item.segmento || '') === 'Bet' ? 'selected' : ''}>Solicitado por Bet</option>
+                <option value="Agustín" ${(item.segmento || '') === 'Agustín' ? 'selected' : ''}>Solicitado por Agustín</option>
+                <option value="REM" ${(item.segmento || '') === 'REM' ? 'selected' : ''}>Tareas REM</option>
+                <option value="Diarias" ${(item.segmento || '') === 'Diarias' ? 'selected' : ''}>Tareas Diarias</option>
+                <option value="Objetivo Mkt" ${(item.segmento || '') === 'Objetivo Mkt' ? 'selected' : ''}>Objetivo de Marketing</option>
+                <option value="General" ${!['Mario','Carlos','Bet','Agustín','REM','Diarias','Objetivo Mkt'].includes(item.segmento || '') ? 'selected' : ''}>General / Otro</option>
+              </select>
             </div>
             <div>
               <label class="block text-[11px] font-bold text-stone-700 mb-1">Prioridad</label>
@@ -642,10 +735,15 @@ window.MaderoConduccion = (function () {
               </select>
             </div>
             <div>
+              <label class="block text-[11px] font-bold text-stone-700 mb-1">Horas Estimadas (42.5h)</label>
+              <input type="number" step="0.5" min="0" max="45" id="pri-horas" value="${esc(item.horas_estimadas ?? 2)}" class="input-glass w-full px-3 py-2 font-mono font-bold">
+            </div>
+            <div>
               <label class="block text-[11px] font-bold text-stone-700 mb-1">Fecha Acordada / Meta</label>
               <input type="date" id="pri-fecha" value="${esc(item.fecha_compromiso)}" class="input-glass w-full px-3 py-2">
             </div>
           </div>
+          <input type="hidden" id="pri-frente" value="${esc(item.frente)}">
 
           <div>
             <label class="block text-[11px] font-bold text-stone-700 mb-1">Objetivo / Compromiso Concreto *</label>
@@ -726,10 +824,16 @@ window.MaderoConduccion = (function () {
       return;
     }
 
+    const segVal = document.getElementById('pri-segmento') ? document.getElementById('pri-segmento').value : 'General';
+    const frenteVal = document.getElementById('pri-frente').value.trim() || (['Mario','Carlos','Bet','Agustín'].includes(segVal) ? `Solicitado por ${segVal}` : segVal);
+    const horasVal = Number(document.getElementById('pri-horas') ? document.getElementById('pri-horas').value : 0) || 0;
+
     window.MaderoStore.upsertPrioridad({
       id: existingId || undefined,
-      frente: document.getElementById('pri-frente').value.trim() || 'General',
+      segmento: segVal,
+      frente: frenteVal,
       prioridad: document.getElementById('pri-prioridad').value,
+      horas_estimadas: horasVal,
       fecha_compromiso: document.getElementById('pri-fecha').value,
       objetivo,
       descripcion: document.getElementById('pri-descripcion').value.trim(),
@@ -863,69 +967,95 @@ window.MaderoConduccion = (function () {
     const memberMap = {};
     members.forEach(m => { memberMap[m.id] = m; });
 
-    // Tarjetas de Capacidad, Cobertura y Reemplazos (Continuidad Sección 2)
-    const memberCardsHtml = members.map(m => {
+    // Tarjetas limpias de Equipo Real y Red de Apoyo (sin paredes de texto)
+    const renderMemberCard = m => {
       const mTasks = allTasks.filter(t => t.miembro_id === m.id);
-      const totalHs = mTasks.reduce((acc, t) => acc + (Number(t.horas_estimadas) || 0), 0);
+      const pendingCount = mTasks.filter(t => t.estado !== 'CERRADO_EVIDENCIA').length;
       const absHs = mTasks.filter(t => t.es_trabajo_absorbido).reduce((acc, t) => acc + (Number(t.horas_estimadas) || 0), 0);
-      const cap = Number(m.horas_capacidad_semanal) || 40;
-      const pct = Math.min(100, Math.round((totalHs / cap) * 100));
-      const over = totalHs > cap;
 
-      let contBadge = '<span class="badge-pill badge-emerald">Backup Documentado</span>';
-      if (m.estado_continuidad === 'EN_PROCESO') contBadge = '<span class="badge-pill badge-amber">Manual en Proceso</span>';
-      if (m.estado_continuidad === 'RIESGO_SIN_BACKUP') contBadge = '<span class="badge-pill badge-red font-bold">Riesgo · Sin Backup</span>';
+      let contBadge = '<span class="badge-pill badge-emerald">Backup OK</span>';
+      if (m.estado_continuidad === 'EN_PROCESO') contBadge = '<span class="badge-pill badge-amber">Guía en Proceso</span>';
+      if (m.estado_continuidad === 'RIESGO_SIN_BACKUP') contBadge = '<span class="badge-pill badge-red font-bold">Sin Backup</span>';
 
       const isSelected = filtersEquipo.miembro === m.id;
+      const isCore = m.grupo !== 'APOYO_SUCURSAL';
 
       return `
-        <div class="glass-card p-4 sm:p-5 flex flex-col justify-between gap-3 ${isSelected ? 'ring-2 ring-stone-900' : ''}">
-          <div class="space-y-2.5">
+        <div class="glass-card p-4 flex flex-col justify-between gap-3 ${isSelected ? 'ring-2 ring-[#de4800]' : ''}">
+          <div class="space-y-2">
             <div class="flex items-start justify-between gap-2">
-              <div>
-                <span class="font-mono text-[10px] font-bold text-stone-500">${esc(m.id)}</span>
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5 flex-wrap mb-0.5">
+                  <span class="badge-pill ${isCore ? 'badge-blue' : 'badge-stone'} text-[10px]">${isCore ? 'Marketing Interno' : 'Apoyo Sucursal'}</span>
+                  ${contBadge}
+                </div>
                 <h3 class="text-sm font-extrabold text-stone-900 leading-snug">${esc(m.nombre)}</h3>
-                <p class="text-[11px] text-stone-600 font-medium">${esc(m.rol)}</p>
+                <p class="text-[11px] text-stone-600 font-medium leading-snug mt-0.5">${esc(m.rol)}</p>
               </div>
-              ${contBadge}
             </div>
 
-            <div class="text-[11px] text-stone-600 flex items-start gap-1.5 leading-snug">
-              <span class="shrink-0">📍</span><span>${esc(m.plaza_base)}</span>
+            <div class="text-[11px] text-stone-600 flex items-center gap-1.5">
+              <span>📍</span><span>${esc(m.plaza_base)}</span>
             </div>
 
-            <!-- Barra de Carga Horaria -->
-            <div class="p-2.5 rounded-xl bg-white/80 border border-stone-200/80 space-y-1.5">
-              <div class="flex items-center justify-between text-[11px]">
-                <span class="font-bold text-stone-700">Carga Semanal Asignada</span>
-                <span class="font-mono font-bold ${over ? 'text-rose-700' : 'text-stone-900'}">${totalHs} / ${cap} hs (${Math.round((totalHs / cap) * 100)}%)</span>
+            <div class="text-[11px] text-stone-700 bg-stone-100/75 p-2.5 rounded-xl border border-stone-200/60 space-y-1">
+              <p class="leading-snug">${esc(m.detalle_continuidad)}</p>
+              <div class="text-[10px] text-stone-500 pt-1 border-t border-stone-200/60">
+                <strong class="text-stone-700">Backup:</strong> ${esc(m.reemplazo_designado)}
               </div>
-              <div class="w-full h-2 rounded-full bg-stone-200 overflow-hidden">
-                <div class="h-full ${over ? 'bg-rose-600' : pct > 80 ? 'bg-amber-500' : 'bg-emerald-600'} rounded-full transition-all" style="width:${pct}%"></div>
-              </div>
-              ${absHs > 0 ? `<div class="text-[10px] text-rose-700 font-semibold">⚠ Incluye ${absHs} hs de trabajo absorbido por desvíos externos</div>` : `<div class="text-[10px] text-stone-500">Sin desvío por sustitución de proveedores</div>`}
             </div>
 
-            <!-- Reemplazo / Continuidad y Calidad -->
-            <div class="text-[11px] text-stone-700 space-y-1 bg-stone-100/75 p-2.5 rounded-xl border border-stone-200/60">
-              <div><strong class="text-stone-900">Reemplazo / Cobertura:</strong> ${esc(m.reemplazo_designado)}</div>
-              <div class="text-[10px] text-stone-500">${esc(m.detalle_continuidad)}</div>
-              ${m.estandar_calidad ? `<div class="text-[10px] text-emerald-900 pt-1 border-t border-stone-200/70"><strong>Calidad:</strong> ${esc(m.estandar_calidad)}</div>` : ''}
-              ${m.observaciones ? `<div class="text-[10px] text-stone-600 italic">${esc(m.observaciones)}</div>` : ''}
-            </div>
+            ${absHs > 0 ? `<div class="text-[10px] text-rose-700 font-bold">⚠ Absorbió ${absHs}h por desvíos de terceros</div>` : ''}
           </div>
 
-          <div class="pt-2.5 border-t border-stone-200/60 flex items-center justify-between gap-2">
+          <div class="pt-2 border-t border-stone-200/60 flex items-center justify-between gap-2">
             <button type="button" onclick="MaderoConduccion.openMiembroModal('${esc(m.id)}')" class="text-xs font-semibold text-stone-600 hover:text-stone-900">
-              ✎ Editar Rol / Backup
+              ✎ Editar
             </button>
-            <button type="button" onclick="MaderoConduccion.setEquipoFilter('miembro', '${isSelected ? 'ALL' : esc(m.id)}')" class="px-2.5 py-1 rounded-lg ${isSelected ? 'bg-stone-900 text-white' : 'bg-stone-200/75 text-stone-800 hover:bg-stone-300/70'} text-[11px] font-bold transition">
-              ${isSelected ? 'Mostrando tareas ✓' : `Ver tareas (${mTasks.length}) →`}
+            <button type="button" onclick="MaderoConduccion.setEquipoFilter('miembro', '${isSelected ? 'ALL' : esc(m.id)}')" class="px-2.5 py-1 rounded-lg ${isSelected ? 'bg-[#de4800] text-white' : 'bg-stone-200/75 text-stone-800 hover:bg-stone-300/70'} text-[11px] font-bold transition">
+              ${isSelected ? '✓ Viendo tareas' : `${pendingCount} activa(s) · ${mTasks.length} total`}
             </button>
           </div>
         </div>
       `;
-    }).join('');
+    };
+
+    const coreMembers = members.filter(m => m.grupo !== 'APOYO_SUCURSAL');
+    const apoyoMembers = members.filter(m => m.grupo === 'APOYO_SUCURSAL');
+
+    const memberCardsHtml = `
+      <div class="space-y-4">
+        <div class="space-y-2">
+          <div class="flex items-center justify-between px-1">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-[#ff7a3d]">Núcleo Marketing Interno (${coreMembers.length})</h3>
+            <span class="text-[11px] text-stone-500">Conducción, contenido propio IG/TikTok y crudos NQN</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+            ${coreMembers.map(renderMemberCard).join('')}
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <div class="flex items-center justify-between px-1">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-stone-600">Red de Apoyo en Sucursales &amp; Alistamiento (${apoyoMembers.length})</h3>
+            <span class="text-[11px] text-stone-500">Fotos NQN, El Bolsón 0km y preparación en Comodoro</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+            ${apoyoMembers.map(renderMemberCard).join('')}
+          </div>
+        </div>
+
+        <div class="p-3 sm:px-4 rounded-2xl bg-white/40 border border-stone-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="badge-pill badge-blue font-bold">Circuito con REM (Externo)</span>
+            <span class="text-stone-700">Agustina / Antonella graban crudos → Ángelo filtra y reenvía → REM edita videos de calendario y gestiona campañas pagas.</span>
+          </div>
+          <button type="button" onclick="MaderoApp.navigateModule('m9-proveedores')" class="text-[#ff7a3d] font-bold hover:underline shrink-0">
+            Auditar REM →
+          </button>
+        </div>
+      </div>
+    `;
 
     // Tabla de Tareas Internas
     const taskRowsHtml = filteredTasks.length === 0 ? `
@@ -1018,7 +1148,7 @@ window.MaderoConduccion = (function () {
                 <span class="badge-pill badge-emerald">Operativo · Paso 1</span>
               </div>
               <h2 class="text-base sm:text-lg font-extrabold text-stone-900 tracking-tight">Equipo Interno: Capacidad, Cobertura, Reemplazos y Calidad</h2>
-              <p class="text-xs text-stone-500 mt-0.5">Supervisión de carga semanal (base jornada Lun a Vie · 9:30 a 19:00 = 47.5h semanales), continuidad documental ante ausencias y trabajo absorbido.</p>
+              <p class="text-xs text-stone-500 mt-0.5">Supervisión de carga semanal (base jornada Lun a Vie · 9:30 a 19:00 con 1h de almuerzo = 42.5h netas semanales), continuidad documental ante ausencias y trabajo absorbido.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
               <button type="button" onclick="MaderoConduccion.openMiembroModal(null)" class="px-3 py-1.5 rounded-xl bg-white border border-stone-300 text-stone-800 text-xs font-semibold hover:bg-stone-50">
@@ -1038,7 +1168,7 @@ window.MaderoConduccion = (function () {
             <div class="p-3.5 rounded-2xl bg-white/75 border border-stone-200/80">
               <span class="text-[10px] font-bold uppercase tracking-wider text-stone-500 block">Ocupación Planificada</span>
               <span class="font-mono text-xl font-extrabold text-stone-900">${summary.horasAsignadas} / ${summary.capacidadTotalHs} hs</span>
-              <span class="text-[11px] text-emerald-700 font-semibold block mt-0.5">${summary.ocupacionPct}% de capacidad semanal (Lun–Vie 9:30–19:00)</span>
+              <span class="text-[11px] text-emerald-700 font-semibold block mt-0.5">${summary.ocupacionPct}% de capacidad semanal (Lun–Vie 9:30–19:00 · 1h almuerzo)</span>
             </div>
             <div class="p-3.5 rounded-2xl bg-white/75 border border-stone-200/80">
               <span class="text-[10px] font-bold uppercase tracking-wider text-stone-500 block">Continuidad / Reemplazos</span>
@@ -1058,10 +1188,8 @@ window.MaderoConduccion = (function () {
           </div>
         </div>
 
-        <!-- Grid de Células / Integrantes -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          ${memberCardsHtml}
-        </div>
+        <!-- Grid de Equipo Interno Real & Red de Apoyo -->
+        ${memberCardsHtml}
 
         <!-- Tabla de Tareas del Equipo Interno -->
         <div class="glass-card p-4 sm:p-6 space-y-4">
@@ -1663,6 +1791,7 @@ window.MaderoConduccion = (function () {
     focusAgendaDesvios,
     focusAgendaDireccion,
     setWeeklyFocusFilter,
+    setWeeklyGroupMode,
     exportAgendaCSV,
     renderEquipoModule,
     openMiembroModal,

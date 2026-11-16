@@ -18,11 +18,12 @@ window.MaderoStore = (function () {
     if (!loaded || typeof loaded !== 'object') return base;
 
     const merged = Object.assign({}, base, loaded);
+    const prevVersion = loaded.schema_version;
     merged.schema_version = base.schema_version;
 
     Object.keys(base).forEach(key => {
       if (Array.isArray(base[key])) {
-        if (!Array.isArray(merged[key]) || (merged[key].length === 0 && base[key].length > 0 && loaded.schema_version !== base.schema_version)) {
+        if (!Array.isArray(merged[key]) || (merged[key].length === 0 && base[key].length > 0 && prevVersion !== base.schema_version)) {
           merged[key] = base[key];
         }
       } else if (base[key] && typeof base[key] === 'object') {
@@ -33,6 +34,23 @@ window.MaderoStore = (function () {
         );
       }
     });
+
+    // Actualización automática a la carga real segmentada Nov 2026 cuando viene de una versión anterior
+    if (prevVersion !== base.schema_version && base.schema_version === '2.6.3-web-real-madero') {
+      if (!prevVersion || !prevVersion.startsWith('2.6')) {
+        merged.agenda_prioridades = deepClone(base.agenda_prioridades);
+        merged.equipo_miembros = deepClone(base.equipo_miembros);
+        merged.equipo_tareas = deepClone(base.equipo_tareas);
+        merged.contenido_piezas = deepClone(base.contenido_piezas);
+      }
+      merged.google_activos = [];
+      merged.web_cambios = deepClone(base.web_cambios);
+      merged.meta = Object.assign({}, merged.meta, {
+        semana_activa: base.meta.semana_activa,
+        fecha_corte: base.meta.fecha_corte,
+        resumen_ejecutivo_lider: base.meta.resumen_ejecutivo_lider
+      });
+    }
 
     // Migrar capacidad semanal heredada (180h sintéticas -> 47.5h reales Lun-Vie 9:30 a 19:00)
     if (Array.isArray(merged.equipo_miembros)) {
@@ -145,9 +163,15 @@ window.MaderoStore = (function () {
     const priPendInfoMadero = pri.filter(p => p.estado === 'PENDIENTE_INFO_MADERO');
     const priCerradas = pri.filter(p => p.estado === 'CERRADO_EVIDENCIA');
 
-    // Equipo Interno (Módulo 2)
-    const capacidadTotalHs = members.reduce((acc, m) => acc + (Number(m.horas_capacidad_semanal) || 0), 0);
-    const horasAsignadas = tasks.reduce((acc, t) => acc + (Number(t.horas_estimadas) || 0), 0);
+    // Equipo Interno + Carga Semanal Real de Ángelo (42.5h Lun-Vie 9:30-19:00 con 1h almuerzo)
+    // Incluye: tareas operativas de Ángelo en equipo_tareas (curación crudos) + pedidos en agenda_prioridades
+    const angeloMember = members.find(m => m.id === 'MEM-01');
+    const capacidadTotalHs = angeloMember ? (Number(angeloMember.horas_capacidad_semanal) || 42.5) : 42.5;
+    const horasAgendaAngelo = pri.reduce((acc, p) => acc + (Number(p.horas_estimadas) || 0), 0);
+    const horasEquipoAngelo = tasks
+      .filter(t => t.miembro_id === 'MEM-01' && t.id !== 'INT-05' && t.id !== 'INT-07')
+      .reduce((acc, t) => acc + (Number(t.horas_estimadas) || 0), 0);
+    const horasAsignadas = Math.round((horasAgendaAngelo + horasEquipoAngelo) * 10) / 10;
     const ocupacionPct = capacidadTotalHs > 0 ? Math.round((horasAsignadas / capacidadTotalHs) * 100) : 0;
 
     const tareasAbsorbidas = tasks.filter(t => t.es_trabajo_absorbido);
