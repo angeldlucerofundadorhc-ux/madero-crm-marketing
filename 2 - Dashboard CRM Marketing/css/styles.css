@@ -34,6 +34,8 @@ body {
 
 /* Apple Glassmorphism Surfaces */
 .glass-card {
+  max-width: 100%;
+  min-width: 0;
   background: rgba(244, 241, 234, 0.84);
   backdrop-filter: blur(28px) saturate(190%);
   -webkit-backdrop-filter: blur(28px) saturate(190%);

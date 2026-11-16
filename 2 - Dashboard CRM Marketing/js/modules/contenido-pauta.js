@@ -513,7 +513,7 @@ window.MaderoContenidoPauta = (function () {
             </div>
           </div>
 
-          <div class="overflow-x-auto -mx-1 sm:mx-0 rounded-xl border border-stone-200/70 bg-white/50">
+          <div class="w-full max-w-full min-w-0 overflow-x-auto rounded-xl border border-stone-200/70 bg-white/50">
             <table class="w-full text-left text-xs">
               <thead>
                 <tr class="border-b border-stone-200/80 text-[11px] font-bold uppercase tracking-wider text-stone-500 bg-stone-100/70">
@@ -1705,7 +1705,7 @@ window.MaderoContenidoPauta = (function () {
             </div>
           </div>
 
-          <div class="overflow-x-auto -mx-1 sm:mx-0 rounded-xl border border-stone-200/70 bg-white/50">
+          <div class="w-full max-w-full min-w-0 overflow-x-auto rounded-xl border border-stone-200/70 bg-white/50">
             <table class="w-full text-left text-xs min-w-[1020px]">
               <thead>
                 <tr class="border-b border-stone-200/80 text-[11px] font-bold uppercase tracking-wider text-stone-500 bg-stone-100/70">
