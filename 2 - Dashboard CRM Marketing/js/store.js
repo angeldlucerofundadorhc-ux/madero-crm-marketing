@@ -36,20 +36,52 @@ window.MaderoStore = (function () {
     });
 
     // Actualización automática a la carga real segmentada Nov 2026 cuando viene de una versión anterior
-    if (prevVersion !== base.schema_version && base.schema_version === '2.6.3-web-real-madero') {
+    if (prevVersion !== base.schema_version && base.schema_version === '2.6.4-avances-archivos-fecha') {
       if (!prevVersion || !prevVersion.startsWith('2.6')) {
         merged.agenda_prioridades = deepClone(base.agenda_prioridades);
         merged.equipo_miembros = deepClone(base.equipo_miembros);
         merged.equipo_tareas = deepClone(base.equipo_tareas);
         merged.contenido_piezas = deepClone(base.contenido_piezas);
+        merged.google_activos = [];
+        merged.web_cambios = deepClone(base.web_cambios);
+        merged.meta = Object.assign({}, merged.meta, {
+          semana_activa: base.meta.semana_activa,
+          fecha_corte: base.meta.fecha_corte,
+          resumen_ejecutivo_lider: base.meta.resumen_ejecutivo_lider
+        });
       }
-      merged.google_activos = [];
-      merged.web_cambios = deepClone(base.web_cambios);
-      merged.meta = Object.assign({}, merged.meta, {
-        semana_activa: base.meta.semana_activa,
-        fecha_corte: base.meta.fecha_corte,
-        resumen_ejecutivo_lider: base.meta.resumen_ejecutivo_lider
-      });
+
+      // Precargar avance/guía REM del 16/11/2026 en PRI-C01 al migrar desde versiones 2.6.0..2.6.3
+      const baseC01 = (base.agenda_prioridades || []).find(p => p.id === 'PRI-C01');
+      if (baseC01 && Array.isArray(merged.agenda_prioridades)) {
+        merged.agenda_prioridades = merged.agenda_prioridades.map(p => {
+          if (p.id !== 'PRI-C01') return p;
+          const currentAvances = Array.isArray(p.avances_archivos) ? p.avances_archivos : [];
+          if (currentAvances.some(a => a && a.id === 'AV-C01-2')) return p;
+          const seedAvances = deepClone(baseC01.avances_archivos || []);
+          const existingIds = new Set(currentAvances.map(a => a.id));
+          const combined = [...seedAvances.filter(a => !existingIds.has(a.id)), ...currentAvances];
+          combined.sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
+          return Object.assign({}, p, {
+            avances_archivos: combined,
+            evidencia_label: p.evidencia_label && p.evidencia_label !== 'Pedido Carlos 06/11/2026' ? p.evidencia_label : baseC01.evidencia_label,
+            evidencia_url: p.evidencia_url || baseC01.evidencia_url,
+            proximo_paso: baseC01.proximo_paso
+          });
+        });
+      }
+    }
+
+    // Garantizar array avances_archivos en todas las prioridades y tareas internas
+    if (Array.isArray(merged.agenda_prioridades)) {
+      merged.agenda_prioridades = merged.agenda_prioridades.map(p =>
+        Array.isArray(p.avances_archivos) ? p : Object.assign({}, p, { avances_archivos: [] })
+      );
+    }
+    if (Array.isArray(merged.equipo_tareas)) {
+      merged.equipo_tareas = merged.equipo_tareas.map(t =>
+        Array.isArray(t.avances_archivos) ? t : Object.assign({}, t, { avances_archivos: [] })
+      );
     }
 
     // Migrar capacidad semanal heredada (180h sintéticas -> 47.5h reales Lun-Vie 9:30 a 19:00)
@@ -559,7 +591,9 @@ window.MaderoStore = (function () {
         return list[idx];
       }
     }
-    const nuevo = Object.assign({}, payload, {
+    const nuevo = Object.assign({
+      avances_archivos: []
+    }, payload, {
       id: nextId('PRI', list)
     });
     list.unshift(nuevo);
@@ -617,7 +651,9 @@ window.MaderoStore = (function () {
         return list[idx];
       }
     }
-    const nuevo = Object.assign({}, payload, {
+    const nuevo = Object.assign({
+      avances_archivos: []
+    }, payload, {
       id: nextId('INT', list)
     });
     list.unshift(nuevo);
@@ -637,6 +673,59 @@ window.MaderoStore = (function () {
       item.estado = nuevoEstado;
       persist(true);
     }
+  }
+
+  // Bitácora de Avances y Archivos con Fecha (Agenda + Tareas Equipo)
+  function getAgendaOrEquipoItem(kind, itemId) {
+    const s = getState();
+    const list = kind === 'AGENDA' ? s.agenda_prioridades : s.equipo_tareas;
+    return Array.isArray(list) ? list.find(i => i.id === itemId) : null;
+  }
+
+  function addAvanceItem(kind, itemId, payload) {
+    const item = getAgendaOrEquipoItem(kind, itemId);
+    if (!item) return null;
+
+    item.avances_archivos = Array.isArray(item.avances_archivos) ? item.avances_archivos : [];
+    const nuevo = {
+      id: `AV-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      fecha: (payload && payload.fecha) || '2026-11-16',
+      autor: (payload && payload.autor) || 'Ángelo Lucero',
+      nota: (payload && payload.nota) || '',
+      archivo_nombre: (payload && payload.archivo_nombre) || '',
+      archivo_url: (payload && payload.archivo_url) || ''
+    };
+
+    item.avances_archivos.unshift(nuevo);
+    item.avances_archivos.sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
+
+    if (payload && payload.actualizar_proximo_paso && payload.nota && kind === 'AGENDA') {
+      item.proximo_paso = payload.nota;
+    }
+
+    if (payload && (payload.archivo_url || payload.archivo_nombre)) {
+      if (kind === 'AGENDA') {
+        item.evidencia_label = payload.archivo_nombre || item.evidencia_label || 'Archivo adjunto';
+        if (payload.archivo_url) item.evidencia_url = payload.archivo_url;
+      } else {
+        item.evidencia = payload.archivo_nombre || payload.archivo_url || item.evidencia;
+      }
+    }
+
+    if (payload && payload.nuevo_estado) {
+      item.estado = payload.nuevo_estado;
+    }
+
+    persist(true);
+    return nuevo;
+  }
+
+  function deleteAvanceItem(kind, itemId, avanceId) {
+    const item = getAgendaOrEquipoItem(kind, itemId);
+    if (!item || !Array.isArray(item.avances_archivos)) return false;
+    item.avances_archivos = item.avances_archivos.filter(av => av.id !== avanceId);
+    persist(true);
+    return true;
   }
 
   // Módulo 9: Auditoría y Seguimiento de Proveedores (Paso 2)
@@ -1832,6 +1921,8 @@ window.MaderoStore = (function () {
     upsertTareaEquipo,
     deleteTareaEquipo,
     setTareaEquipoEstado,
+    addAvanceItem,
+    deleteAvanceItem,
     // Módulo 9 (Paso 2)
     upsertCompromiso,
     deleteCompromiso,

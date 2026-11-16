@@ -39,6 +39,273 @@ window.MaderoConduccion = (function () {
     window.MaderoApp.renderActiveView();
   }
 
+  // ------------------------------------------------------------------------
+  // BITÁCORA DE AVANCES Y ARCHIVOS CON FECHA (COMPARTIDA AGENDA + EQUIPO)
+  // ------------------------------------------------------------------------
+  function getAgendaOrEquipoRecord(kind, id) {
+    const state = window.MaderoStore.getState();
+    if (kind === 'AGENDA') {
+      const p = (state.agenda_prioridades || []).find(item => item.id === id);
+      if (!p) return null;
+      return {
+        kind: 'AGENDA',
+        item: p,
+        titulo: p.objetivo,
+        subtitulo: p.frente || 'Agenda y Prioridades',
+        estado: p.estado,
+        avances: Array.isArray(p.avances_archivos) ? p.avances_archivos : [],
+        evidenciaLabel: p.evidencia_label || '',
+        evidenciaUrl: p.evidencia_url || ''
+      };
+    }
+
+    const t = (state.equipo_tareas || []).find(item => item.id === id);
+    if (!t) return null;
+    return {
+      kind: 'EQUIPO',
+      item: t,
+      titulo: t.tarea,
+      subtitulo: t.categoria || 'Equipo Interno',
+      estado: t.estado,
+      avances: Array.isArray(t.avances_archivos) ? t.avances_archivos : [],
+      evidenciaLabel: t.evidencia || '',
+      evidenciaUrl: ''
+    };
+  }
+
+  function buildAvanceFileBadgeHtml(av) {
+    const rawUrl = String((av && av.archivo_url) || '').trim();
+    const fileName = String((av && av.archivo_nombre) || '').trim();
+    const isClickableUrl = /^(https?:\/\/|data:)/i.test(rawUrl);
+
+    if (isClickableUrl) {
+      const isDataUrl = /^data:/i.test(rawUrl);
+      const dlAttr = isDataUrl ? ` download="${esc(fileName || 'archivo_adjunto')}"` : '';
+      return `<a href="${esc(rawUrl)}" target="_blank" rel="noopener noreferrer"${dlAttr} class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#de4800]/15 hover:bg-[#de4800] text-[#ff9c6e] hover:text-white border border-[#de4800]/35 text-[10px] font-semibold transition max-w-full truncate" title="${esc(fileName || rawUrl)}">📄 <span class="truncate">${esc(fileName || 'Abrir archivo')}</span> ↗</a>`;
+    }
+
+    const fallbackText = fileName || rawUrl;
+    if (!fallbackText) return '';
+    return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/10 text-stone-700 border border-stone-200/60 text-[10px] font-medium max-w-full truncate" title="${esc(fallbackText)}">📎 <span class="truncate">${esc(fallbackText)}</span></span>`;
+  }
+
+  function renderAvancesTimelineHtml(avances, kind, itemId, options = {}) {
+    const list = Array.isArray(avances) ? avances : [];
+    if (list.length === 0) return '';
+
+    const { compact = true, maxItems = list.length, showDelete = false } = options;
+    const sliced = list.slice(0, maxItems);
+    const hiddenCount = Math.max(0, list.length - sliced.length);
+
+    const entriesHtml = sliced.map(av => {
+      const fileHtml = buildAvanceFileBadgeHtml(av);
+      return `
+        <div class="${compact ? 'p-2 rounded-lg bg-white/10 border border-stone-200/45' : 'p-2.5 rounded-xl bg-white/10 border border-stone-200/55'} space-y-1">
+          <div class="flex items-center justify-between gap-2 flex-wrap">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="badge-pill badge-orange font-mono text-[10px]">📅 ${formatDateDisplay(av.fecha)}</span>
+              ${av.autor ? `<span class="text-[10px] font-bold text-stone-800">${esc(av.autor)}</span>` : ''}
+            </div>
+            ${showDelete ? `<button type="button" onclick="MaderoConduccion.deleteAvance('${esc(kind)}', '${esc(itemId)}', '${esc(av.id)}')" title="Eliminar avance" class="px-1.5 py-0.5 rounded bg-stone-100 hover:bg-rose-100 text-stone-500 hover:text-rose-700 text-[10px] font-bold transition">×</button>` : ''}
+          </div>
+          ${av.nota ? `<p class="text-[11px] text-stone-700 leading-snug">${esc(av.nota)}</p>` : ''}
+          ${fileHtml ? `<div class="pt-0.5 flex flex-wrap gap-1.5">${fileHtml}</div>` : ''}
+        </div>
+      `;
+    }).join('');
+
+    const moreHtml = hiddenCount > 0
+      ? `<button type="button" onclick="MaderoConduccion.openAvanceModal('${esc(kind)}', '${esc(itemId)}')" class="text-[10px] font-semibold text-[#ff9c6e] hover:underline">+ Ver ${hiddenCount} registro(s) anterior(es) →</button>`
+      : '';
+
+    return `
+      <div class="mt-2 pt-2 border-t border-stone-200/45 space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-extrabold uppercase tracking-wider text-stone-500">Avances y Archivos con Fecha (${list.length})</span>
+        </div>
+        <div class="space-y-1.5">
+          ${entriesHtml}
+          ${moreHtml}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderModalAvancesBlock(kind, item) {
+    const avances = Array.isArray(item.avances_archivos) ? item.avances_archivos : [];
+    const timelineHtml = avances.length > 0
+      ? renderAvancesTimelineHtml(avances, kind, item.id, { compact: false, showDelete: false })
+      : '<p class="text-[11px] text-stone-500">Sin avances ni archivos cargados con fecha todavía.</p>';
+
+    return `
+      <div class="p-3.5 rounded-2xl bg-stone-100/75 border border-stone-200/75 space-y-2">
+        <div class="flex items-center justify-between gap-2 flex-wrap">
+          <div>
+            <span class="text-xs font-extrabold text-stone-900">📎 Bitácora de Avances y Archivos con Fecha</span>
+            <span class="text-[10px] text-stone-500 block">Guías, devoluciones, links de Drive/Docs o archivos adjuntos ordenados por fecha.</span>
+          </div>
+          <button type="button" onclick="MaderoConduccion.openAvanceModal('${esc(kind)}', '${esc(item.id)}')" class="px-2.5 py-1.5 rounded-xl bg-[#de4800] hover:brightness-110 text-white text-[11px] font-bold transition shrink-0">
+            + Agregar Avance / Archivo
+          </button>
+        </div>
+        ${timelineHtml}
+      </div>
+    `;
+  }
+
+  function handleAvanceFileSelect(inputEl) {
+    const file = inputEl && inputEl.files && inputEl.files[0];
+    if (!file) return;
+
+    const nameEl = document.getElementById('av-archivo-nombre');
+    const urlEl = document.getElementById('av-archivo-url');
+    if (nameEl) nameEl.value = file.name;
+
+    if (file.size <= 350 * 1024 && typeof FileReader !== 'undefined') {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (urlEl && typeof reader.result === 'string') {
+          urlEl.value = reader.result;
+          window.MaderoUI.showToast(`Archivo "${file.name}" adjuntado para guardar`);
+        }
+      };
+      reader.readAsDataURL(file);
+    } else {
+      if (urlEl && /^data:/i.test(urlEl.value)) urlEl.value = '';
+      window.MaderoUI.showToast(`Nombre "${file.name}" cargado (>350 KB: pegá el link de Drive/Docs si querés abrirlo online)`, 'amber');
+    }
+  }
+
+  function openAvanceModal(kind, id) {
+    const rec = getAgendaOrEquipoRecord(kind, id);
+    if (!rec) {
+      window.MaderoUI.showToast('No se encontró la tarea o prioridad seleccionada', 'red');
+      return;
+    }
+
+    const todayIso = new Date().toISOString().slice(0, 10);
+    const currentEstadoMeta = window.MaderoData.ESTADOS_SEGUIMIENTO[rec.estado] || { label: rec.estado };
+    const estadoOpts = [
+      `<option value="">Mantener estado actual (${esc(currentEstadoMeta.label)})</option>`,
+      ...Object.values(window.MaderoData.ESTADOS_SEGUIMIENTO).map(st =>
+        `<option value="${st.id}">${esc(st.label)}</option>`
+      )
+    ].join('');
+
+    const historyHtml = rec.avances.length > 0
+      ? renderAvancesTimelineHtml(rec.avances, kind, id, { compact: false, showDelete: true })
+      : '<p class="text-xs text-stone-500 p-3 rounded-xl bg-stone-100/70 border border-stone-200/60">Todavía no hay avances ni archivos registrados con fecha en este ítem.</p>';
+
+    window.MaderoUI.openModal({
+      title: `Avances y Archivos con Fecha · ${rec.item.id}`,
+      subtitle: `${rec.titulo}`,
+      maxWidth: 'max-w-2xl',
+      bodyHtml: `
+        <div class="space-y-4">
+          <div class="p-3.5 rounded-2xl bg-stone-100/75 border border-stone-200/75 space-y-3">
+            <div class="text-xs font-extrabold text-stone-900">+ Registrar Nuevo Avance o Archivo con Fecha</div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-stone-700 mb-1">Fecha *</label>
+                <input type="date" id="av-fecha" value="${esc(todayIso)}" class="input-glass w-full px-3 py-2 font-mono">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-stone-700 mb-1">Quién envía / Registra</label>
+                <input type="text" id="av-autor" value="Ángelo Lucero" placeholder="Ej. REM GrowthSulting, Ángelo, Carlos..." class="input-glass w-full px-3 py-2">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-stone-700 mb-1">Estado tras este avance</label>
+                <select id="av-nuevo-estado" class="input-glass w-full px-3 py-2">${estadoOpts}</select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-stone-700 mb-1">Qué se recibió o avanzó en esta fecha</label>
+              <textarea id="av-nota" rows="2" placeholder="Ej. REM envió guía para revisar fichas de Google en Neuquén antes de depurar fotos viejas..." class="input-glass w-full px-3 py-2"></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-stone-700 mb-1">Nombre del Archivo / Documento</label>
+                <input type="text" id="av-archivo-nombre" value="" placeholder="Ej. Guía para revisar fichas Google Neuquén" class="input-glass w-full px-3 py-2">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-stone-700 mb-1">Enlace (Google Docs / Drive / Web)</label>
+                <input type="text" id="av-archivo-url" value="" placeholder="https://docs.google.com/..." class="input-glass w-full px-3 py-2">
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1">
+              <label class="inline-flex items-center gap-2 text-[11px] text-stone-700 cursor-pointer">
+                <span class="px-2.5 py-1 rounded-lg bg-white border border-stone-300 text-stone-800 font-semibold hover:bg-stone-50 transition">📁 Adjuntar archivo desde PC</span>
+                <input type="file" id="av-file-input" onchange="MaderoConduccion.handleAvanceFileSelect(this)" class="hidden">
+                <span class="text-[10px] text-stone-500">Hasta 350 KB directo (o pegá el link arriba)</span>
+              </label>
+
+              ${kind === 'AGENDA' ? `
+                <label class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-stone-700 cursor-pointer">
+                  <input type="checkbox" id="av-act-prox" class="rounded text-stone-900">
+                  <span>Actualizar "Próx. paso" con esta nota</span>
+                </label>
+              ` : ''}
+            </div>
+          </div>
+
+          <div>
+            ${historyHtml}
+          </div>
+        </div>
+      `,
+      footerHtml: `
+        <button type="button" onclick="${kind === 'AGENDA' ? `MaderoConduccion.openPrioridadModal('${esc(id)}')` : `MaderoConduccion.openTareaEquipoModal('${esc(id)}')`}" class="px-3 py-2 rounded-xl bg-white border border-stone-300 text-stone-800 text-xs font-semibold mr-auto">Ver Ficha Completa</button>
+        <button type="button" onclick="MaderoUI.closeModal()" class="px-3.5 py-2 rounded-xl bg-stone-100 text-stone-700 text-xs font-semibold">Cerrar</button>
+        <button type="button" onclick="MaderoConduccion.saveAvanceFromModal('${esc(kind)}', '${esc(id)}')" class="px-4 py-2 rounded-xl bg-[#de4800] hover:brightness-110 text-white text-xs font-bold">Guardar Avance / Archivo</button>
+      `
+    });
+  }
+
+  function saveAvanceFromModal(kind, id) {
+    const fecha = (document.getElementById('av-fecha') && document.getElementById('av-fecha').value) || new Date().toISOString().slice(0, 10);
+    const autor = (document.getElementById('av-autor') && document.getElementById('av-autor').value.trim()) || 'Ángelo Lucero';
+    const nota = (document.getElementById('av-nota') && document.getElementById('av-nota').value.trim()) || '';
+    const archivo_nombre = (document.getElementById('av-archivo-nombre') && document.getElementById('av-archivo-nombre').value.trim()) || '';
+    const archivo_url = (document.getElementById('av-archivo-url') && document.getElementById('av-archivo-url').value.trim()) || '';
+    const nuevo_estado = (document.getElementById('av-nuevo-estado') && document.getElementById('av-nuevo-estado').value) || '';
+    const actProxEl = document.getElementById('av-act-prox');
+    const actualizar_proximo_paso = Boolean(actProxEl && actProxEl.checked);
+
+    if (!nota && !archivo_nombre && !archivo_url) {
+      window.MaderoUI.showToast('Ingresá una nota de avance o adjuntá un archivo / link', 'red');
+      return;
+    }
+
+    const res = window.MaderoStore.addAvanceItem(kind, id, {
+      fecha,
+      autor,
+      nota,
+      archivo_nombre,
+      archivo_url,
+      nuevo_estado,
+      actualizar_proximo_paso
+    });
+
+    if (!res) {
+      window.MaderoUI.showToast('No se pudo guardar el avance', 'red');
+      return;
+    }
+
+    window.MaderoUI.closeModal();
+    window.MaderoUI.showToast('Avance / archivo registrado con fecha');
+  }
+
+  function deleteAvance(kind, id, avanceId) {
+    if (!confirm('¿Eliminar este registro de avance / archivo?')) return;
+    window.MaderoStore.deleteAvanceItem(kind, id, avanceId);
+    openAvanceModal(kind, id);
+    window.MaderoUI.showToast('Registro eliminado', 'amber');
+  }
+
   function buildWeeklyStartPanel(state) {
     const prioWeight = { CRITICA: 4, ALTA: 3, MEDIA: 2, BAJA: 1 };
     const segmentoOrden = ['Mario', 'Carlos', 'Bet', 'Agustín', 'REM', 'Diarias', 'Objetivo Mkt', 'Equipo Interno'];
@@ -71,7 +338,10 @@ window.MaderoConduccion = (function () {
         prioridad: p.prioridad || 'MEDIA',
         estado: p.estado,
         horas: Number(p.horas_estimadas) || 0,
-        fecha: p.fecha_compromiso || '9999-12-31'
+        fecha: p.fecha_compromiso || '9999-12-31',
+        avances: Array.isArray(p.avances_archivos) ? p.avances_archivos : [],
+        evidencia_label: p.evidencia_label || '',
+        evidencia_url: p.evidencia_url || ''
       }));
 
     const equipoPendientes = (state.equipo_tareas || [])
@@ -89,7 +359,10 @@ window.MaderoConduccion = (function () {
           prioridad: inferredPrio,
           estado: t.estado,
           horas: Number(t.horas_estimadas) || 0,
-          fecha: t.fecha_entrega || '9999-12-31'
+          fecha: t.fecha_entrega || '9999-12-31',
+          avances: Array.isArray(t.avances_archivos) ? t.avances_archivos : [],
+          evidencia_label: t.evidencia || '',
+          evidencia_url: ''
         };
       });
 
@@ -152,8 +425,10 @@ window.MaderoConduccion = (function () {
         ? `MaderoConduccion.quickChangeEstadoPrioridad('${esc(item.id)}', 'CERRADO_EVIDENCIA')`
         : `MaderoConduccion.quickChangeEstadoTarea('${esc(item.id)}', 'CERRADO_EVIDENCIA')`;
 
+      const avancesHtml = renderAvancesTimelineHtml(item.avances, item.kind, item.id, { compact: true, maxItems: 3 });
+
       return `
-        <div class="p-3 sm:px-4 rounded-xl bg-white/60 border border-stone-200/70 hover:border-[#de4800]/45 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="p-3 sm:px-4 rounded-xl bg-white/60 border border-stone-200/70 hover:border-[#de4800]/45 transition flex flex-col sm:flex-row sm:items-start justify-between gap-3">
           <div class="space-y-1 min-w-0 flex-1">
             <div class="flex items-center gap-1.5 flex-wrap">
               ${prioridadBadge(item.prioridad)}
@@ -167,8 +442,12 @@ window.MaderoConduccion = (function () {
               <div class="text-xs sm:text-sm font-bold text-stone-900 group-hover:text-[#de4800] transition leading-snug">${esc(item.titulo)}</div>
             </button>
             ${item.subtitulo ? `<p class="text-[11px] text-stone-500 leading-snug">${esc(item.subtitulo)}</p>` : ''}
+            ${avancesHtml}
           </div>
-          <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+          <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end self-end sm:self-center">
+            <button type="button" onclick="MaderoConduccion.openAvanceModal('${item.kind}', '${esc(item.id)}')" title="Agregar archivo o avance con fecha" class="px-2.5 py-1.5 rounded-lg bg-[#de4800]/15 hover:bg-[#de4800] text-[#ff9c6e] hover:text-white border border-[#de4800]/35 text-[11px] font-bold transition whitespace-nowrap">
+              📎 ${item.avances.length > 0 ? `+ Avance / Archivo (${item.avances.length})` : '+ Avance / Archivo'}
+            </button>
             <button type="button" onclick="${closeCall}" title="Marcar como cerrada con evidencia" class="px-2.5 py-1.5 rounded-lg bg-emerald-600/15 hover:bg-emerald-600 text-emerald-700 hover:text-white border border-emerald-500/30 text-[11px] font-bold transition">
               ✓ Cerrar
             </button>
@@ -519,6 +798,11 @@ window.MaderoConduccion = (function () {
             </button>
             <p class="text-[11px] text-stone-600 mt-1 leading-relaxed"><strong class="text-stone-800">Próx. paso:</strong> ${esc(item.proximo_paso || '—')}</p>
             ${item.criterio_lider ? `<p class="text-[10px] text-stone-500 italic mt-1">Criterio Ángelo: "${esc(item.criterio_lider)}"</p>` : ''}
+            ${Array.isArray(item.avances_archivos) && item.avances_archivos.length > 0 ? `
+              <button type="button" onclick="MaderoConduccion.openAvanceModal('AGENDA', '${esc(item.id)}')" class="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold text-[#ff9c6e] hover:underline">
+                📎 ${item.avances_archivos.length} avance(s) / archivo(s) con fecha →
+              </button>
+            ` : ''}
           </td>
 
           <td class="py-3 px-3">
@@ -552,6 +836,9 @@ window.MaderoConduccion = (function () {
 
           <td class="py-3 px-3 text-right whitespace-nowrap">
             <div class="inline-flex items-center gap-1">
+              <button type="button" onclick="MaderoConduccion.openAvanceModal('AGENDA', '${esc(item.id)}')" title="Avances y archivos con fecha" class="px-2 py-1 rounded-lg bg-[#de4800]/15 hover:bg-[#de4800] text-[#ff9c6e] hover:text-white border border-[#de4800]/35 text-[11px] font-bold transition">
+                📎${Array.isArray(item.avances_archivos) && item.avances_archivos.length ? ` ${item.avances_archivos.length}` : ''}
+              </button>
               <button type="button" onclick="MaderoConduccion.openPrioridadModal('${esc(item.id)}')" class="px-2.5 py-1 rounded-lg bg-stone-900 text-white text-[11px] font-semibold hover:bg-stone-800 transition">
                 Ficha
               </button>
@@ -808,6 +1095,7 @@ window.MaderoConduccion = (function () {
             </label>
             <textarea id="pri-det-dir" rows="2" placeholder="Si requiere decisión de Dirección: indicar antecedentes, opciones y recomendación concreta de Ángelo..." class="input-glass w-full px-3 py-2">${esc(item.detalle_decision_direccion)}</textarea>
           </div>
+          ${existing ? renderModalAvancesBlock('AGENDA', item) : ''}
         </div>
       `,
       footerHtml: `
@@ -1091,6 +1379,11 @@ window.MaderoConduccion = (function () {
               </div>
             ` : ''}
             ${t.evidencia ? `<span class="text-[10px] text-stone-500 block mt-1">📎 Evidencia: ${esc(t.evidencia)}</span>` : ''}
+            ${Array.isArray(t.avances_archivos) && t.avances_archivos.length > 0 ? `
+              <button type="button" onclick="MaderoConduccion.openAvanceModal('EQUIPO', '${esc(t.id)}')" class="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold text-[#ff9c6e] hover:underline">
+                📎 ${t.avances_archivos.length} avance(s) / archivo(s) con fecha →
+              </button>
+            ` : ''}
           </td>
 
           <td class="py-3 px-3 min-w-[170px]">
@@ -1125,6 +1418,9 @@ window.MaderoConduccion = (function () {
 
           <td class="py-3 px-3 text-right whitespace-nowrap">
             <div class="inline-flex items-center gap-1">
+              <button type="button" onclick="MaderoConduccion.openAvanceModal('EQUIPO', '${esc(t.id)}')" title="Avances y archivos con fecha" class="px-2 py-1 rounded-lg bg-[#de4800]/15 hover:bg-[#de4800] text-[#ff9c6e] hover:text-white border border-[#de4800]/35 text-[11px] font-bold transition">
+                📎${Array.isArray(t.avances_archivos) && t.avances_archivos.length ? ` ${t.avances_archivos.length}` : ''}
+              </button>
               <button type="button" onclick="MaderoConduccion.openTareaEquipoModal('${esc(t.id)}')" class="px-2.5 py-1 rounded-lg bg-stone-900 text-white text-[11px] font-semibold hover:bg-stone-800">
                 Editar
               </button>
@@ -1470,6 +1766,7 @@ window.MaderoConduccion = (function () {
             </label>
             <input type="text" id="tsk-origen-abs" value="${esc(item.origen_absorbido)}" placeholder="Indicar qué proveedor debía hacerlo, motivo e impacto para reclamar solución de origen..." class="input-glass w-full px-3 py-2">
           </div>
+          ${existing ? renderModalAvancesBlock('EQUIPO', item) : ''}
         </div>
       `,
       footerHtml: `
@@ -1792,6 +2089,10 @@ window.MaderoConduccion = (function () {
     focusAgendaDireccion,
     setWeeklyFocusFilter,
     setWeeklyGroupMode,
+    openAvanceModal,
+    handleAvanceFileSelect,
+    saveAvanceFromModal,
+    deleteAvance,
     exportAgendaCSV,
     renderEquipoModule,
     openMiembroModal,

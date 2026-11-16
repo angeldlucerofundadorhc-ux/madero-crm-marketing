@@ -415,8 +415,8 @@ window.MaderoData = (function () {
   // 5. LÍNEA DE BASE INICIAL (Fiel al corte post-devolución 28/10/2026)
   // ------------------------------------------------------------------------
   const INITIAL_STATE = {
-    schema_version: '2.6.3-web-real-madero',
-    updated_at: '2026-11-16T00:40:00-03:00',
+    schema_version: '2.6.4-avances-archivos-fecha',
+    updated_at: '2026-11-16T16:45:00-03:00',
 
     meta: {
       titulo: 'Madero Automotores · Control Integral de Marketing',
@@ -623,11 +623,29 @@ window.MaderoData = (function () {
         horas_estimadas: 2,
         fecha_compromiso: '2026-11-06',
         dependencia: 'Acceso de propiedad en Google Business Profile (vinculado a Módulo 7 Google).',
-        proximo_paso: 'Depurar fotos viejas en fichas de Google y subir fotos actuales de salón.',
+        proximo_paso: '16/11/2026: Seguir guía enviada por REM (relevar fichas NQN en Maps incógnito + business.google.com y completar tabla comparativa) antes de unificar y depurar fotos viejas.',
         requiere_decision_direccion: false,
         detalle_decision_direccion: '',
-        evidencia_label: 'Pedido Carlos 06/11/2026',
-        evidencia_url: '',
+        evidencia_label: 'Guía REM Fichas Google NQN (16/11/2026)',
+        evidencia_url: 'https://docs.google.com/document/d/16lWKuc2ikG6OPxQIHCjZl9flkvFWuxSGUPPXVl00mxbI/edit?tab=t.0',
+        avances_archivos: [
+          {
+            id: 'AV-C01-2',
+            fecha: '2026-11-16',
+            autor: 'REM GrowthSulting',
+            nota: 'Envío de guía paso a paso para relevar las 2 o 3 fichas de Google Maps en Neuquén (incógnito + business.google.com) y completar tabla comparativa antes de unificar o depurar fotos viejas (~30 min).',
+            archivo_nombre: 'Guía para revisar las fichas de Google de Neuquén · Madero · 16-11-2026 (Google Docs)',
+            archivo_url: 'https://docs.google.com/document/d/16lWKuc2ikG6OPxQIHCjZl9flkvFWuxSGUPPXVl00mxbI/edit?tab=t.0'
+          },
+          {
+            id: 'AV-C01-1',
+            fecha: '2026-11-06',
+            autor: 'Carlos',
+            nota: 'Pedido inicial de Carlos: revisar Google porque aparecen fotos viejas de sucursales.',
+            archivo_nombre: '',
+            archivo_url: ''
+          }
+        ],
         criterio_lider: 'Impacta directo en imagen de marca cuando buscan la concesionaria en Maps.'
       },
       {
