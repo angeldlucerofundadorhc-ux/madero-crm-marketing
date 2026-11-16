@@ -483,8 +483,8 @@ window.MaderoApp = (function () {
     const isHidden = hero.classList.toggle('hidden');
     if (btn) {
       btn.innerHTML = isHidden
-        ? '<i class="ri-eye-off-line text-xs"></i> Mostrar Bento'
-        : '<i class="ri-eye-line text-xs"></i> Ocultar Bento';
+        ? '<i class="ri-eye-off-line text-xs"></i> Mostrar Pulso / Gráficos'
+        : '<i class="ri-eye-line text-xs"></i> Ocultar Pulso / Gráficos';
     }
   }
 

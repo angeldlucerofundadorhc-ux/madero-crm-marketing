@@ -26,6 +26,159 @@ window.MaderoConduccion = (function () {
     onlyAbsorbido: false
   };
 
+  let weeklyFocusFilter = 'ALL'; // 'ALL' | 'CRITICAS' | 'ATRASADAS' | 'AGENDA' | 'EQUIPO'
+
+  function setWeeklyFocusFilter(val) {
+    weeklyFocusFilter = val || 'ALL';
+    window.MaderoApp.renderActiveView();
+  }
+
+  function buildWeeklyStartPanel(state) {
+    const prioWeight = { CRITICA: 4, ALTA: 3, MEDIA: 2, BAJA: 1 };
+    const miembrosMap = {};
+    (state.equipo_miembros || []).forEach(m => {
+      miembrosMap[m.id] = m.nombre || m.id;
+    });
+
+    const agendaPendientes = (state.agenda_prioridades || [])
+      .filter(p => p.estado !== 'CERRADO_EVIDENCIA')
+      .map(p => ({
+        kind: 'AGENDA',
+        id: p.id,
+        titulo: p.objetivo,
+        subtitulo: p.proximo_paso || p.dependencia || p.frente || '',
+        responsable: p.responsable || 'Conducción',
+        origenLabel: 'Agenda',
+        prioridad: p.prioridad || 'MEDIA',
+        estado: p.estado,
+        fecha: p.fecha_compromiso || '9999-12-31'
+      }));
+
+    const equipoPendientes = (state.equipo_tareas || [])
+      .filter(t => t.estado !== 'CERRADO_EVIDENCIA')
+      .map(t => {
+        const inferredPrio = t.prioridad || (t.estado === 'ATRASADO' || t.bloqueo ? 'ALTA' : 'MEDIA');
+        return {
+          kind: 'EQUIPO',
+          id: t.id,
+          titulo: t.tarea,
+          subtitulo: t.bloqueo ? `Bloqueo: ${t.bloqueo}` : (t.categoria || ''),
+          responsable: miembrosMap[t.miembro_id] || t.miembro_id || 'Equipo Interno',
+          origenLabel: 'Equipo',
+          prioridad: inferredPrio,
+          estado: t.estado,
+          fecha: t.fecha_entrega || '9999-12-31'
+        };
+      });
+
+    const allPending = [...agendaPendientes, ...equipoPendientes].sort((a, b) => {
+      const aLate = a.estado === 'ATRASADO' ? 1 : 0;
+      const bLate = b.estado === 'ATRASADO' ? 1 : 0;
+      if (aLate !== bLate) return bLate - aLate;
+
+      const pa = prioWeight[a.prioridad] || 0;
+      const pb = prioWeight[b.prioridad] || 0;
+      if (pa !== pb) return pb - pa;
+
+      return String(a.fecha).localeCompare(String(b.fecha));
+    });
+
+    const atrasadasCount = allPending.filter(x => x.estado === 'ATRASADO').length;
+    const criticasAltasCount = allPending.filter(x => x.prioridad === 'CRITICA' || x.prioridad === 'ALTA').length;
+
+    const filtered = allPending.filter(x => {
+      if (weeklyFocusFilter === 'ATRASADAS') return x.estado === 'ATRASADO';
+      if (weeklyFocusFilter === 'CRITICAS') return x.prioridad === 'CRITICA' || x.prioridad === 'ALTA';
+      if (weeklyFocusFilter === 'AGENDA') return x.kind === 'AGENDA';
+      if (weeklyFocusFilter === 'EQUIPO') return x.kind === 'EQUIPO';
+      return true;
+    });
+
+    const filterBtns = [
+      { id: 'ALL', label: `Todas (${allPending.length})` },
+      { id: 'CRITICAS', label: `Críticas / Altas (${criticasAltasCount})` },
+      { id: 'ATRASADAS', label: `Atrasadas (${atrasadasCount})` },
+      { id: 'AGENDA', label: `Agenda (${agendaPendientes.length})` },
+      { id: 'EQUIPO', label: `Equipo (${equipoPendientes.length})` }
+    ].map(btn => {
+      const isAct = weeklyFocusFilter === btn.id;
+      return `<button type="button" onclick="MaderoConduccion.setWeeklyFocusFilter('${btn.id}')" class="px-2.5 py-1 rounded-full text-[11px] font-semibold transition ${isAct ? 'bg-[#de4800] text-white shadow-xs' : 'bg-white/10 text-stone-600 hover:text-stone-900 border border-stone-200/50'}">${esc(btn.label)}</button>`;
+    }).join('');
+
+    const rowsHtml = filtered.length === 0 ? `
+      <div class="py-8 text-center text-xs text-stone-500">
+        No hay tareas ni prioridades pendientes en este filtro. ¡Semana al día!
+      </div>
+    ` : filtered.map(item => {
+      const isAgenda = item.kind === 'AGENDA';
+      const openCall = isAgenda
+        ? `MaderoConduccion.openPrioridadModal('${esc(item.id)}')`
+        : `MaderoConduccion.openTareaEquipoModal('${esc(item.id)}')`;
+      const closeCall = isAgenda
+        ? `MaderoConduccion.quickChangeEstadoPrioridad('${esc(item.id)}', 'CERRADO_EVIDENCIA')`
+        : `MaderoConduccion.quickChangeEstadoTarea('${esc(item.id)}', 'CERRADO_EVIDENCIA')`;
+
+      return `
+        <div class="p-3 sm:px-4 rounded-xl bg-white/60 border border-stone-200/70 hover:border-[#de4800]/45 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="space-y-1 min-w-0 flex-1">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              ${prioridadBadge(item.prioridad)}
+              ${estadoBadge(item.estado, true)}
+              <span class="badge-pill badge-stone font-mono text-[10px]">${esc(item.origenLabel)} · ${esc(item.id)}</span>
+              <span class="text-[11px] font-semibold text-stone-600">👤 ${esc(item.responsable)}</span>
+              <span class="text-[11px] font-mono ${item.estado === 'ATRASADO' ? 'text-rose-600 font-bold' : 'text-stone-500'}">📅 ${formatDateDisplay(item.fecha)}</span>
+            </div>
+            <button type="button" onclick="${openCall}" class="text-left block w-full group">
+              <div class="text-xs sm:text-sm font-bold text-stone-900 group-hover:text-[#de4800] transition leading-snug">${esc(item.titulo)}</div>
+            </button>
+            ${item.subtitulo ? `<p class="text-[11px] text-stone-500 leading-snug">${esc(item.subtitulo)}</p>` : ''}
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+            <button type="button" onclick="${closeCall}" title="Marcar como cerrada con evidencia" class="px-2.5 py-1.5 rounded-lg bg-emerald-600/15 hover:bg-emerald-600 text-emerald-700 hover:text-white border border-emerald-500/30 text-[11px] font-bold transition">
+              ✓ Cerrar
+            </button>
+            <button type="button" onclick="${openCall}" class="px-2.5 py-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 text-white text-[11px] font-semibold transition">
+              Abrir
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="glass-card p-4 sm:p-5 space-y-3.5">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-stone-200/70">
+          <div>
+            <div class="flex items-center gap-2 flex-wrap mb-1">
+              <span class="w-2 h-2 rounded-full bg-[#de4800] animate-pulse"></span>
+              <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-[#ff7a3d]">Arranque de Semana</span>
+              <span class="badge-pill badge-stone font-mono text-[10px]">${allPending.length} pendientes</span>
+              ${atrasadasCount > 0 ? `<span class="badge-pill badge-red font-bold text-[10px]">${atrasadasCount} atrasadas</span>` : ''}
+            </div>
+            <h2 class="text-base sm:text-lg font-extrabold text-stone-900 tracking-tight">Tareas y Prioridades Pendientes</h2>
+            <p class="text-xs text-stone-500 mt-0.5">Ordenado automáticamente por urgencia: atrasadas, prioridad (Crítica → Media) y fecha más próxima.</p>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap shrink-0">
+            <button type="button" onclick="MaderoConduccion.openPrioridadModal(null)" class="px-3 py-1.5 rounded-xl bg-[#de4800] hover:brightness-110 text-white text-xs font-bold shadow-xs transition">
+              + Nueva Prioridad
+            </button>
+            <button type="button" onclick="MaderoConduccion.openTareaEquipoModal(null)" class="px-3 py-1.5 rounded-xl bg-white border border-stone-300 text-stone-800 text-xs font-semibold hover:bg-stone-50 transition">
+              + Nueva Tarea
+            </button>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-1.5">
+          ${filterBtns}
+        </div>
+
+        <div class="space-y-2">
+          ${rowsHtml}
+        </div>
+      </div>
+    `;
+  }
+
   // ========================================================================
   // A. SECCIÓN 4: MATRIZ DE SEPARACIÓN DE RESPONSABILIDADES Y CRITERIO LÍDER
   // ========================================================================
@@ -329,8 +482,12 @@ window.MaderoConduccion = (function () {
       `;
     }).join('');
 
+    const weeklyStartHtml = buildWeeklyStartPanel(state);
+
     return `
       <div class="space-y-5">
+        ${weeklyStartHtml}
+
         ${decisionesHtml}
 
         <div class="glass-card p-4 sm:p-6 space-y-4">
@@ -1505,6 +1662,7 @@ window.MaderoConduccion = (function () {
     resetAgendaFilters,
     focusAgendaDesvios,
     focusAgendaDireccion,
+    setWeeklyFocusFilter,
     exportAgendaCSV,
     renderEquipoModule,
     openMiembroModal,

@@ -74,8 +74,8 @@
               <span class="opacity-40">•</span>
               <span>Corte: <strong id="hdr-corte" class="text-stone-700">--</strong></span>
               <span class="opacity-40 hidden sm:inline">•</span>
-              <button type="button" onclick="MaderoApp.toggleBentoHero()" id="btn-toggle-bento" class="hidden sm:inline-flex items-center gap-1 text-[11px] text-[#ff7a3d] hover:text-[#f4f1ea] transition font-sans font-semibold">
-                <i class="ri-eye-line text-xs"></i> Ocultar Bento
+              <button type="button" onclick="MaderoApp.toggleBentoHero()" id="btn-toggle-bento" class="inline-flex items-center gap-1 text-[11px] text-[#ff7a3d] hover:text-[#f4f1ea] transition font-sans font-semibold">
+                <i class="ri-eye-off-line text-xs"></i> Mostrar Pulso / Gráficos
               </button>
             </div>
           </div>
@@ -136,8 +136,8 @@
       <!-- BARRA HORIZONTAL DE PILLS VISIONOS (12 MÓDULOS + BOTÓN + NUEVO) -->
       <nav id="modules-12-strip" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-4 mb-2 no-print"></nav>
 
-      <!-- HERO BENTO SPATIAL (MISMA ESTRUCTURA VISUAL DEL REFERENTE, 100% REACTIVO A MADERO) -->
-      <section id="spatial-bento-hero" class="space-y-4 mb-6 no-print">
+      <!-- HERO BENTO SPATIAL (COLAPSADO POR DEFECTO · TOGGLE EN HEADER) -->
+      <section id="spatial-bento-hero" class="space-y-4 mb-6 no-print hidden">
 
         <!-- FILA 1: 3 TARJETAS SUPERIORES (UPGRADE/INFORME + PULSO MEDIA + CÁMARA SHOWROOM) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
