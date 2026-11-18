@@ -44,3 +44,10 @@ Antes de diseñar o escribir código en cualquier paso, activá y consultá el s
   - Escapar siempre texto dinámico con `MaderoUI.esc()` (especialmente apóstrofes como `Monseñor D'Andrea`).
   - Preservar foco y posición del cursor en inputs de búsqueda reactiva (`oninput`).
   - Exportar archivos `.csv` con BOM UTF-8 (`\uFEFF`) para compatibilidad directa con Microsoft Excel en Windows.
+
+## 5. Sincronización Obligatoria con la Nube (GitHub y Vercel)
+- **La nube es la fuente de verdad vigente:** Ángelo trabaja desde más de una PC (notebook y escritorio), por lo que `origin/main` en GitHub y producción en Vercel pueden tener commits más recientes que la copia local.
+- **Antes de reportar el estado del proyecto o modificar archivos:**
+  1. Ejecutar `git fetch --all --prune` y verificar `git status -sb` / `git log HEAD..origin/main --oneline` (no confiar en `git status` sin `fetch` previo).
+  2. Verificar también el último deployment en Vercel (`READY`) y confirmar si coincide con `origin/main`.
+  3. Si la rama local está detrás de `origin/main` y no hay conflictos locales, sincronizar primero con `git pull --ff-only origin main` (o avisar antes de editar).
