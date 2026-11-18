@@ -79,6 +79,38 @@ window.MaderoData = (function () {
       badge: 'badge-emerald',
       dot: 'bg-emerald-500',
       uso: 'El resultado fue verificado y validado.'
+    },
+    PENDIENTE_INFO_REM: {
+      id: 'PENDIENTE_INFO_REM',
+      label: 'Pendiente de información / entrega de REM',
+      shortLabel: 'Pend. entrega REM',
+      badge: 'badge-purple',
+      dot: 'bg-purple-500',
+      uso: 'Madero aguarda una guía, pieza, informe, enlace o respuesta pendiente del equipo de REM.'
+    },
+    EN_ELABORACION_REM: {
+      id: 'EN_ELABORACION_REM',
+      label: 'En elaboración / edición por el equipo de REM',
+      shortLabel: 'En edición REM',
+      badge: 'badge-blue',
+      dot: 'bg-blue-500',
+      uso: 'El equipo de REM está produciendo, editando o configurando el entregable.'
+    },
+    EN_REVISION_REM: {
+      id: 'EN_REVISION_REM',
+      label: 'En revisión por el equipo de REM',
+      shortLabel: 'En revisión REM',
+      badge: 'badge-sky',
+      dot: 'bg-sky-500',
+      uso: 'Material, relevamiento o consulta enviada por Madero que está en revisión por el equipo de REM.'
+    },
+    EN_CORRECCION_REM: {
+      id: 'EN_CORRECCION_REM',
+      label: 'En ajuste / corrección por el equipo de REM',
+      shortLabel: 'En corrección REM',
+      badge: 'badge-orange',
+      dot: 'bg-orange-500',
+      uso: 'El equipo de REM recibió observaciones de Madero y está aplicando los ajustes solicitados.'
     }
   };
 

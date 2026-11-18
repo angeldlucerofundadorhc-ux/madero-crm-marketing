@@ -212,7 +212,25 @@ window.MaderoConduccion = (function () {
               </div>
               <div>
                 <label class="block text-[11px] font-bold text-stone-700 mb-1">Quién envía / Registra</label>
-                <input type="text" id="av-autor" value="Ángelo Lucero" placeholder="Ej. REM GrowthSulting, Ángelo, Carlos..." class="input-glass w-full px-3 py-2">
+                <input type="text" id="av-autor" list="av-autor-list" value="Ángelo Lucero" placeholder="Ej. Equipo de REM, REM GrowthSulting, Ángelo..." class="input-glass w-full px-3 py-2">
+                <datalist id="av-autor-list">
+                  <option value="Ángelo Lucero">
+                  <option value="Equipo de REM">
+                  <option value="REM GrowthSulting">
+                  <option value="REM Pauta">
+                  <option value="REM Diseño">
+                  <option value="Carlos">
+                  <option value="Mario">
+                  <option value="Bet">
+                  <option value="Agustín">
+                </datalist>
+                <div class="flex flex-wrap items-center gap-1 mt-1.5">
+                  <button type="button" onclick="const el=document.getElementById('av-autor'); if(el){el.value='Ángelo Lucero'; el.focus();}" class="px-1.5 py-0.5 rounded bg-stone-200/80 hover:bg-stone-300 text-stone-700 text-[10px] font-semibold transition">Ángelo</button>
+                  <button type="button" onclick="const el=document.getElementById('av-autor'); if(el){el.value='Equipo de REM'; el.focus();}" class="px-1.5 py-0.5 rounded bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/30 text-blue-700 text-[10px] font-semibold transition">Equipo de REM</button>
+                  <button type="button" onclick="const el=document.getElementById('av-autor'); if(el){el.value='REM GrowthSulting'; el.focus();}" class="px-1.5 py-0.5 rounded bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/30 text-blue-700 text-[10px] font-semibold transition">REM GrowthSulting</button>
+                  <button type="button" onclick="const el=document.getElementById('av-autor'); if(el){el.value='REM Pauta'; el.focus();}" class="px-1.5 py-0.5 rounded bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/30 text-blue-700 text-[10px] font-semibold transition">REM Pauta</button>
+                  <button type="button" onclick="const el=document.getElementById('av-autor'); if(el){el.value='REM Diseño'; el.focus();}" class="px-1.5 py-0.5 rounded bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/30 text-blue-700 text-[10px] font-semibold transition">REM Diseño</button>
+                </div>
               </div>
               <div>
                 <label class="block text-[11px] font-bold text-stone-700 mb-1">Estado tras este avance</label>
@@ -1049,7 +1067,18 @@ window.MaderoConduccion = (function () {
             </div>
             <div>
               <label class="block text-[11px] font-bold text-stone-700 mb-1">Persona / Equipo Asignado</label>
-              <input type="text" id="pri-responsable" value="${esc(item.responsable)}" class="input-glass w-full px-3 py-2">
+              <input type="text" id="pri-responsable" list="pri-responsable-list" value="${esc(item.responsable)}" placeholder="Ej. Equipo de REM, Ángelo Lucero..." class="input-glass w-full px-3 py-2">
+              <datalist id="pri-responsable-list">
+                <option value="Equipo de REM">
+                <option value="REM GrowthSulting">
+                <option value="REM (Control: Ángelo)">
+                <option value="REM Tráfico & Diseño (Control: Ángelo)">
+                <option value="REM Pauta">
+                <option value="REM Diseño">
+                <option value="Ángelo Lucero + REM">
+                <option value="Ángelo Lucero">
+                <option value="Agustina + REM (Curación: Ángelo)">
+              </datalist>
             </div>
             <div>
               <label class="block text-[11px] font-bold text-stone-700 mb-1">Plaza / Sucursal</label>
