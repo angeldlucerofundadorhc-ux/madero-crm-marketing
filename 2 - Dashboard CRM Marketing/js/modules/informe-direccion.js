@@ -73,10 +73,21 @@ window.MaderoInformeDireccion = (function () {
       alerts.push({
         nivel: 'MEDIA',
         badge: 'badge-orange',
-        frente: 'Punto de Reposición Merchandising (Secc. 5.11)',
+        frente: 'Presupuesto · Reposición Merchandising (Secc. 5.11)',
         detalle: `${sum.merchBajoMinimoCount} artículo(s) POP/Kits de entrega están en o por debajo del stock mínimo de seguridad.`,
         modulo: 'm11-merch',
-        cta: 'Ver Inventario POP →'
+        cta: 'Ver Presupuesto →'
+      });
+    }
+
+    if (sum.subsContratarCount > 0 || sum.subsPorVencerCount > 0 || sum.subsPendientesAprobCount > 0) {
+      alerts.push({
+        nivel: sum.subsContratarCount > 0 ? 'ALTA' : 'MEDIA',
+        badge: sum.subsContratarCount > 0 ? 'badge-red' : 'badge-amber',
+        frente: 'Presupuesto · Suscripciones de Apps',
+        detalle: `${sum.subsContratarCount} app(s) para contratar, ${sum.subsPorVencerCount} por vencer y ${sum.subsPendientesAprobCount} pendiente(s) de aprobación. Gasto mensual activo: ${formatMoney(sum.subsMensualArs)}.`,
+        modulo: 'm11-merch',
+        cta: 'Ver Suscripciones →'
       });
     }
 
@@ -239,9 +250,9 @@ window.MaderoInformeDireccion = (function () {
                 <span class="text-[10px] text-stone-600 block mt-0.5">Presup: ${formatMoney(sum.eventosPresupEstimadoTotal)}</span>
               </div>
               <div class="p-3 rounded-xl bg-stone-50 border border-stone-200 cursor-pointer" onclick="MaderoApp.navigateModule('m11-merch')">
-                <span class="text-[10px] font-bold uppercase text-stone-500 block">Merchandising POP</span>
+                <span class="text-[10px] font-bold uppercase text-stone-500 block">Presupuesto (POP &amp; Apps)</span>
                 <span class="font-mono text-base font-extrabold text-stone-900">${formatMoney(sum.merchValorTotal)}</span>
-                <span class="text-[10px] text-rose-700 font-semibold block mt-0.5">${sum.merchBajoMinimoCount} ítem(s) en punto reposición</span>
+                <span class="text-[10px] text-rose-700 font-semibold block mt-0.5">${sum.merchBajoMinimoCount} repos. POP · Apps: ${formatMoney(sum.subsMensualArs)}/mes</span>
               </div>
             </div>
             <p class="text-xs text-stone-700 leading-relaxed bg-stone-100/75 p-3 rounded-xl border border-stone-200/70">

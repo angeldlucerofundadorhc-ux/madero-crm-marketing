@@ -12,7 +12,7 @@ window.MaderoApp = (function () {
     if (modId === 'm9-proveedores') return 'proveedores';
     if (modId === 'm3-fotos') return 'fotos';
     if (['m4-contenido', 'm5-redes', 'm6-campanas'].includes(modId)) return 'contenido-pauta';
-    if (['m7-google', 'm8-web', 'm10-eventos', 'm11-merch', 'm12-ventas'].includes(modId)) return 'ecosistema';
+    if (['m7-google', 'm8-web', 'm10-eventos', 'm11-merch', 'm11-apps', 'm12-ventas'].includes(modId)) return 'ecosistema';
     return 'conduccion';
   }
 
@@ -290,6 +290,8 @@ window.MaderoApp = (function () {
       html = window.MaderoEcosistemaTerritorio.renderEventosModule();
     } else if (activeModuleId === 'm11-merch') {
       html = window.MaderoEcosistemaTerritorio.renderMerchModule();
+    } else if (activeModuleId === 'm11-apps') {
+      html = window.MaderoEcosistemaTerritorio.renderAppsModule();
     } else if (activeModuleId === 'm12-ventas') {
       html = window.MaderoEcosistemaTerritorio.renderVentasModule();
     } else {
@@ -414,6 +416,9 @@ window.MaderoApp = (function () {
       case 'm11-merch':
         if (window.MaderoEcosistemaTerritorio?.setMerchSearch) window.MaderoEcosistemaTerritorio.setMerchSearch(q);
         break;
+      case 'm11-apps':
+        if (window.MaderoEcosistemaTerritorio?.setAppsSearch) window.MaderoEcosistemaTerritorio.setAppsSearch(q);
+        break;
       case 'm12-ventas':
         if (window.MaderoEcosistemaTerritorio?.setVentasSearch) window.MaderoEcosistemaTerritorio.setVentasSearch(q);
         break;
@@ -465,7 +470,14 @@ window.MaderoApp = (function () {
         window.MaderoEcosistemaTerritorio?.openEventoModal(null);
         break;
       case 'm11-merch':
-        window.MaderoEcosistemaTerritorio?.openMerchModal(null);
+        if (window.MaderoEcosistemaTerritorio?.openQuickNewPresupuesto) {
+          window.MaderoEcosistemaTerritorio.openQuickNewPresupuesto();
+        } else {
+          window.MaderoEcosistemaTerritorio?.openMerchModal(null);
+        }
+        break;
+      case 'm11-apps':
+        window.MaderoEcosistemaTerritorio?.openSuscripcionModal(null);
         break;
       case 'm12-ventas':
         window.MaderoEcosistemaTerritorio?.openVentaModal(null);

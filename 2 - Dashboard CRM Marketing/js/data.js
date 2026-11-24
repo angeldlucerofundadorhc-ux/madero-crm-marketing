@@ -408,11 +408,11 @@ window.MaderoData = (function () {
       cluster: 'ecosistema',
       paso: 5,
       activoEnPasoActual: true,
-      nombre: 'Merchandising',
-      corto: '11. Merchandising',
-      alcanceDireccion: 'Inventario, destino, costo, reposición, utilización y necesidades futuras.',
+      nombre: 'Presupuesto',
+      corto: '11. Presupuesto',
+      alcanceDireccion: 'Presupuesto de Marketing: suscripciones de apps, inventario POP y reposición de merchandising, movimientos, cotizaciones y pedidos.',
       actorDominante: 'MKT_INTERNO',
-      camposClave: ['Ítem / Material POP', 'Stock físico por sucursal', 'Destino (Entregas clientes, Eventos, Salones)', 'Costo unitario y punto de reposición', 'Necesidades futuras proyectadas']
+      camposClave: ['Suscripciones de Apps (IA, diseño, hosting)', 'Merchandising y stock para reponer por sucursal', 'Movimientos y entregas por fecha / patente', 'Comparativa de proveedores y cotizaciones', 'Bitácora de pedidos de reposición']
     },
     {
       num: 12,
@@ -3648,7 +3648,7 @@ window.MaderoData = (function () {
         id: 'MER-01',
         articulo: 'Kit Entrega Cliente Premium (Caja grabada, llavero cuero/metal Madero y porta-documentos)',
         categoria: 'Presentes de Entrega',
-        sucursal_ubicacion: 'Comodoro · Av. Polonia 546 (Salón Principal)',
+        sucursal_ubicacion: 'Comodoro Rivadavia',
         stock_actual: 18,
         stock_minimo_reposicion: 25,
         costo_unitario: 18500,
@@ -3661,7 +3661,7 @@ window.MaderoData = (function () {
         id: 'MER-02',
         articulo: 'Portapatentes Acrílico / Inyectado Oficial "Madero Automotores"',
         categoria: 'Identificación Vehicular',
-        sucursal_ubicacion: 'Comodoro · CAM (Monseñor D\'Andrea 1967)',
+        sucursal_ubicacion: 'Comodoro Rivadavia',
         stock_actual: 145,
         stock_minimo_reposicion: 80,
         costo_unitario: 4200,
@@ -3674,7 +3674,7 @@ window.MaderoData = (function () {
         id: 'MER-03',
         articulo: 'Placas Cubre-Patentes de Salón para Fotografía y Exhibición ("MADERO")',
         categoria: 'Exhibición y Fotografía',
-        sucursal_ubicacion: 'Neuquén · Madero Neuquén',
+        sucursal_ubicacion: 'Neuquén',
         stock_actual: 4,
         stock_minimo_reposicion: 10,
         costo_unitario: 9800,
@@ -3687,7 +3687,7 @@ window.MaderoData = (function () {
         id: 'MER-04',
         articulo: 'Mates Térmicos Grabados Láser con Bombilla Acero (Logo Madero)',
         categoria: 'Presentes de Entrega / VIP',
-        sucursal_ubicacion: 'Comodoro · Av. Polonia 546 (Salón Principal)',
+        sucursal_ubicacion: 'Comodoro Rivadavia',
         stock_actual: 9,
         stock_minimo_reposicion: 15,
         costo_unitario: 24000,
@@ -3700,7 +3700,7 @@ window.MaderoData = (function () {
         id: 'MER-05',
         articulo: 'Banderas Flybanner 3.5m Doble Costura + Bases Rellenables Exterior',
         categoria: 'Material POP Eventos y Fachada',
-        sucursal_ubicacion: 'Comodoro · Av. Alem 828',
+        sucursal_ubicacion: 'Comodoro Rivadavia',
         stock_actual: 6,
         stock_minimo_reposicion: 4,
         costo_unitario: 68000,
@@ -3713,27 +3713,209 @@ window.MaderoData = (function () {
         id: 'MER-06',
         articulo: 'Chombas y Camperas Softshell Institucionales Equipo Comercial & Alistamiento',
         categoria: 'Indumentaria Corporativa',
-        sucursal_ubicacion: 'Todas las plazas (Transversal)',
+        sucursal_ubicacion: 'Comodoro Rivadavia',
         stock_actual: 12,
         stock_minimo_reposicion: 10,
         costo_unitario: 45000,
-        destino_principal: 'Asesores comerciales ( presencia uniforme en Reels/Videos y atención en salón)',
+        destino_principal: 'Asesores comerciales (presencia uniforme en Reels/Videos y atención en salón)',
         utilizacion_periodo: 'Entregadas a nuevos ingresos de Neuquén y CAM.',
         necesidad_futura: 'Relevar talles de verano para pedido de diciembre.',
         responsable_control: 'Marketing Interno + RRHH'
       },
       {
         id: 'MER-07',
-        articulo: 'Kit Entrega Cliente y Carpetas Institucionales — Plaza Cordillera',
+        articulo: 'Kit Entrega Cliente y Carpetas Institucionales — Despacho Comodoro',
         categoria: 'Presentes de Entrega',
-        sucursal_ubicacion: 'Cordillera · Cordillera Venta',
+        sucursal_ubicacion: 'Comodoro Rivadavia',
         stock_actual: 3,
         stock_minimo_reposicion: 8,
         costo_unitario: 18500,
-        destino_principal: 'Operaciones cerradas en Cordillera Venta',
+        destino_principal: 'Operaciones cerradas y stock de respaldo en Comodoro Rivadavia',
         utilizacion_periodo: '7 entregas realizadas en el bimestre.',
-        necesidad_futura: 'CRÍTICO: Despachar 10 kits desde Comodoro junto con material del evento EVT-03.',
+        necesidad_futura: 'CRÍTICO: Reponer 10 kits en Comodoro Rivadavia.',
         responsable_control: 'Marketing Interno'
+      },
+      {
+        id: 'MER-08',
+        articulo: 'Wine & Glass Box (Vino Trumpeter 750ml + Copa grabada + Caja Kraft c/ logo) — Fábrica de Regalos',
+        categoria: 'Presentes de Entrega / VIP',
+        sucursal_ubicacion: 'Neuquén',
+        stock_actual: 30,
+        stock_minimo_reposicion: 10,
+        costo_unitario: 39260,
+        destino_principal: 'Entregas VIP y clientes destacados en salón Madero Neuquén',
+        utilizacion_periodo: '30 unidades asignadas en Neuquén ($39.260 + IVA c/u · escala 25-49 u.).',
+        necesidad_futura: 'Stock saludable (30 u. · mín. compra 25 u.). Total neto: $ 1.177.800 + IVA.',
+        enlace_url: 'https://www.fabricaderegalos.com.ar/productos/wine-glass-box/',
+        responsable_control: 'Marketing Interno + Referente Neuquén'
+      }
+    ],
+
+    // MÓDULO 11B: SUSCRIPCIONES DE APPS Y HERRAMIENTAS DIGITALES (Presupuesto)
+    presupuesto_suscripciones: [
+      {
+        id: 'SUB-01',
+        app: 'ChatGPT Plus / OpenAI',
+        categoria: 'IA y Productividad',
+        plan_periodicidad: 'Mensual',
+        moneda: 'USD',
+        monto: 20,
+        tipo_cambio: 1200,
+        medio_pago: 'Tarjeta Corporativa',
+        fecha_vencimiento: '2026-12-01',
+        responsable: 'Ángelo Lucero',
+        estado: 'ACTIVA',
+        comprobante_url: '',
+        notas: 'Redacción de copies, estructuración de guiones y apoyo operativo de Marketing.'
+      },
+      {
+        id: 'SUB-02',
+        app: 'Canva Pro',
+        categoria: 'Diseño y Video',
+        plan_periodicidad: 'Mensual',
+        moneda: 'ARS',
+        monto: 9300,
+        precio_mensual_ref: 9300,
+        precio_anual_ref: 74400,
+        tipo_cambio: 1,
+        medio_pago: 'Tarjeta Corporativa',
+        fecha_vencimiento: '2026-11-28',
+        responsable: 'Ángelo Lucero',
+        estado: 'CONTRATAR',
+        comprobante_url: '',
+        notas: 'Plan Mensual: $ 9.300 | Plan Anual: $ 74.400 (equiv. $ 6.200/mes). Diseño diario de placas de stock, 0km, sorteos y cartelería de salón.'
+      },
+      {
+        id: 'SUB-03',
+        app: 'Vercel (Hosting Tableros y Apps Internas)',
+        categoria: 'Web y Hosting',
+        plan_periodicidad: 'Mensual',
+        moneda: 'USD',
+        monto: 0,
+        tipo_cambio: 1200,
+        medio_pago: 'Plan Hobby / Sin costo',
+        fecha_vencimiento: '2026-12-01',
+        responsable: 'Ángelo Lucero',
+        estado: 'ACTIVA',
+        comprobante_url: 'https://madero-crm-marketing.vercel.app',
+        notas: 'Alojamiento del Dashboard CRM Marketing y App de Precios 0km.'
+      },
+      {
+        id: 'SUB-04',
+        app: 'CapCut Pro',
+        categoria: 'Diseño y Video',
+        plan_periodicidad: 'Mensual',
+        moneda: 'USD',
+        monto: 13.99,
+        precio_mensual_ref: 13.99,
+        precio_anual_ref: 129.99,
+        tipo_cambio: 1200,
+        medio_pago: 'Tarjeta Corporativa',
+        fecha_vencimiento: '2026-12-05',
+        responsable: 'Ángelo Lucero',
+        estado: 'CONTRATAR',
+        comprobante_url: '',
+        notas: 'Plan Mensual: USD 13.99 | Plan Anual: USD 129.99 (equiv. USD 10.83/mes). Edición ágil de reels, subtítulos automáticos y formatos verticales para IG/TikTok.'
+      }
+    ],
+
+    // MÓDULO 11C: MOVIMIENTOS Y ENTREGAS POR FECHA / PATENTE
+    merchandising_movimientos: [
+      {
+        id: 'MOV-01',
+        fecha: '2026-11-20',
+        tipo: 'ENTREGA_CLIENTE',
+        merch_id: 'MER-01',
+        articulo: 'Kit Entrega Cliente Premium (Caja grabada, llavero cuero/metal Madero y porta-documentos)',
+        cantidad: 1,
+        patente: 'AG082JF',
+        sucursal: 'Comodoro · Av. Polonia 546 (Salón Principal)',
+        responsable: 'Ángelo Lucero / Ventas Polonia',
+        nota: 'Entrega de unidad 0km/usado destacado con kit completo.'
+      },
+      {
+        id: 'MOV-02',
+        fecha: '2026-11-18',
+        tipo: 'TRASLADO_SUCURSAL',
+        merch_id: 'MER-03',
+        articulo: 'Placas Cubre-Patentes de Salón para Fotografía y Exhibición ("MADERO")',
+        cantidad: 2,
+        patente: '',
+        sucursal: 'Neuquén · Madero Neuquén',
+        responsable: 'Equipo Fotografía / Referente Neuquén',
+        nota: 'Reposición parcial para sesiones fotográficas de salón.'
+      }
+    ],
+
+    // MÓDULO 11D: COMPARATIVA DE PROVEEDORES Y COTIZACIONES
+    merchandising_cotizaciones: [
+      {
+        id: 'COT-01',
+        fecha: '2026-11-18',
+        proveedor: 'Face Publicidad',
+        item_kit: 'Kit Entrega Gama Media (Llavero cuero/metal + Parasol + Microfibra)',
+        cantidad: 50,
+        precio_unitario: 32000,
+        plazo_entrega: '12 días hábiles',
+        estado: 'EN_EVALUACION',
+        enlace_url: '',
+        notas: 'Cotización base vinculada a PRI-O01 (precios + IVA).'
+      },
+      {
+        id: 'COT-02',
+        fecha: '2026-11-18',
+        proveedor: 'Plan X Gráfica',
+        item_kit: 'Portadocumentos + Bolsa friselina + Calco luneta (Gama Baja)',
+        cantidad: 50,
+        precio_unitario: 13500,
+        plazo_entrega: '7 días hábiles',
+        estado: 'SELECCIONADA',
+        enlace_url: '',
+        notas: 'Mejor relación costo/plazo para gama baja.'
+      },
+      {
+        id: 'COT-03',
+        fecha: '2026-11-18',
+        proveedor: 'Fábrica de Regalos / Crystal Rock',
+        item_kit: 'Caja madera Wine & Glass Box + Vino Reserva (Gama Alta)',
+        cantidad: 20,
+        precio_unitario: 85000,
+        plazo_entrega: '15 días hábiles',
+        estado: 'EN_EVALUACION',
+        enlace_url: '',
+        notas: 'Pendiente aprobación de Dirección (PRI-O01).'
+      }
+    ],
+
+    // MÓDULO 11E: BITÁCORA DE PEDIDOS DE REPOSICIÓN
+    merchandising_pedidos: [
+      {
+        id: 'PED-01',
+        fecha_pedido: '2026-11-19',
+        merch_id: 'MER-03',
+        articulo: 'Placas Cubre-Patentes de Salón para Fotografía y Exhibición ("MADERO")',
+        cantidad: 12,
+        sucursal_destino: 'Neuquén · Madero Neuquén',
+        proveedor: 'Plan X Gráfica',
+        monto_estimado: 117600,
+        estado: 'SOLICITADO',
+        fecha_estimada_entrega: '2026-11-28',
+        responsable: 'Ángelo Lucero',
+        nota: 'Envío urgente por encomienda a Neuquén para sostener estándar de fotos.'
+      },
+      {
+        id: 'PED-02',
+        fecha_pedido: '2026-11-20',
+        merch_id: 'MER-01',
+        articulo: 'Kit Entrega Cliente Premium (Caja grabada, llavero cuero/metal Madero y porta-documentos)',
+        cantidad: 80,
+        sucursal_destino: 'Comodoro · Av. Polonia 546 (Salón Principal)',
+        proveedor: 'Face Publicidad',
+        monto_estimado: 1480000,
+        estado: 'APROBADO_DIRECCION',
+        fecha_estimada_entrega: '2026-12-05',
+        responsable: 'Ángelo Lucero + Dirección',
+        nota: 'Cobertura para entregas de noviembre y diciembre.'
       }
     ],
 

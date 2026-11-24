@@ -95,6 +95,91 @@ window.MaderoStore = (function () {
       }
     }
 
+    // Sembrar / actualizar CapCut Pro (SUB-04) una única vez sin pisar otras suscripciones
+    if (Array.isArray(merged.presupuesto_suscripciones)) {
+      const baseSub04 = (base.presupuesto_suscripciones || []).find(s => s.id === 'SUB-04');
+      if (baseSub04) {
+        const hasSub04 = merged.presupuesto_suscripciones.some(s => s.id === 'SUB-04');
+        if (!hasSub04 && !(merged.meta && merged.meta._sub04_seeded)) {
+          merged.presupuesto_suscripciones.push(deepClone(baseSub04));
+          merged.meta = Object.assign({}, merged.meta, { _sub04_seeded: true });
+        } else {
+          merged.presupuesto_suscripciones = merged.presupuesto_suscripciones.map(sub => {
+            if (sub.id === 'SUB-04' && Number(sub.monto) === 9.99 && !sub.precio_anual_ref) {
+              return Object.assign({}, sub, {
+                monto: baseSub04.monto,
+                precio_mensual_ref: baseSub04.precio_mensual_ref,
+                precio_anual_ref: baseSub04.precio_anual_ref,
+                notas: baseSub04.notas
+              });
+            }
+            return sub;
+          });
+        }
+      }
+      if (!(merged.meta && merged.meta._subs_contratar_20261124)) {
+        merged.presupuesto_suscripciones = merged.presupuesto_suscripciones.map(sub => {
+          if (sub.id === 'SUB-02' || sub.id === 'SUB-04') {
+            return Object.assign({}, sub, { estado: 'CONTRATAR' });
+          }
+          return sub;
+        });
+        merged.meta = Object.assign({}, merged.meta, { _subs_contratar_20261124: true });
+      }
+      if (!(merged.meta && merged.meta._sub02_precios_20261124)) {
+        const baseSub02 = (base.presupuesto_suscripciones || []).find(s => s.id === 'SUB-02');
+        if (baseSub02) {
+          merged.presupuesto_suscripciones = merged.presupuesto_suscripciones.map(sub => {
+            if (sub.id === 'SUB-02') {
+              return Object.assign({}, sub, {
+                monto: sub.plan_periodicidad === 'Anual' ? baseSub02.precio_anual_ref : baseSub02.precio_mensual_ref,
+                precio_mensual_ref: baseSub02.precio_mensual_ref,
+                precio_anual_ref: baseSub02.precio_anual_ref,
+                notas: baseSub02.notas
+              });
+            }
+            return sub;
+          });
+        }
+        merged.meta = Object.assign({}, merged.meta, { _sub02_precios_20261124: true });
+      }
+    }
+
+    // Sembrar Wine & Glass Box (MER-08) en Neuquén una única vez sin pisar stock editado
+    if (Array.isArray(merged.merchandising_stock)) {
+      const baseMer08 = (base.merchandising_stock || []).find(m => m.id === 'MER-08');
+      if (baseMer08 && !(merged.meta && merged.meta._mer08_wine_20261124)) {
+        const hasMer08 = merged.merchandising_stock.some(m => m.id === 'MER-08');
+        if (!hasMer08) {
+          merged.merchandising_stock.push(deepClone(baseMer08));
+        }
+        merged.meta = Object.assign({}, merged.meta, { _mer08_wine_20261124: true });
+      }
+      if (!(merged.meta && merged.meta._merch_2sucursales_20261124)) {
+        merged.merchandising_stock = merged.merchandising_stock.map(m => {
+          const suc = String(m.sucursal_ubicacion || '').startsWith('Neuquén') ? 'Neuquén' : 'Comodoro Rivadavia';
+          return Object.assign({}, m, { sucursal_ubicacion: suc });
+        });
+        merged.meta = Object.assign({}, merged.meta, { _merch_2sucursales_20261124: true });
+      }
+      if (!(merged.meta && merged.meta._mer08_precio_39260_20261124)) {
+        const baseMer08 = (base.merchandising_stock || []).find(m => m.id === 'MER-08');
+        if (baseMer08) {
+          merged.merchandising_stock = merged.merchandising_stock.map(m => {
+            if (m.id === 'MER-08') {
+              return Object.assign({}, m, {
+                costo_unitario: baseMer08.costo_unitario,
+                utilizacion_periodo: baseMer08.utilizacion_periodo,
+                necesidad_futura: baseMer08.necesidad_futura
+              });
+            }
+            return m;
+          });
+        }
+        merged.meta = Object.assign({}, merged.meta, { _mer08_precio_39260_20261124: true });
+      }
+    }
+
     // Sincronizar banderas de módulos activos en gobernanza si corresponde
     return merged;
   }
@@ -394,7 +479,7 @@ window.MaderoStore = (function () {
     const eventosCerradosCount = eventosList.filter(e => e.estado === 'CERRADO_EVIDENCIA').length;
     const eventosProximosCount = eventosList.length - eventosCerradosCount;
 
-    // Paso 5 · Módulo 11: Merchandising e Inventario POP
+    // Paso 5 · Módulo 11: Presupuesto (Merchandising POP + Suscripciones de Apps)
     const merchList = s.merchandising_stock || [];
     const merchValorTotal = merchList.reduce((acc, m) => acc + ((Number(m.stock_actual) || 0) * (Number(m.costo_unitario) || 0)), 0);
     const merchBajoMinimo = merchList.filter(m => (Number(m.stock_actual) || 0) <= (Number(m.stock_minimo_reposicion) || 0));
@@ -402,6 +487,42 @@ window.MaderoStore = (function () {
       const faltante = Math.max(10, ((Number(m.stock_minimo_reposicion) || 10) * 2) - (Number(m.stock_actual) || 0));
       return acc + (faltante * (Number(m.costo_unitario) || 0));
     }, 0);
+
+    const merchSucursalMap = {};
+    merchBajoMinimo.forEach(m => {
+      const suc = String(m.sucursal_ubicacion || '').startsWith('Neuquén') ? 'Neuquén' : 'Comodoro Rivadavia';
+      if (!merchSucursalMap[suc]) merchSucursalMap[suc] = { sucursal: suc, count: 0, costoEstimado: 0 };
+      merchSucursalMap[suc].count += 1;
+      const faltante = Math.max(10, ((Number(m.stock_minimo_reposicion) || 10) * 2) - (Number(m.stock_actual) || 0));
+      merchSucursalMap[suc].costoEstimado += faltante * (Number(m.costo_unitario) || 0);
+    });
+    const merchAlertasPorSucursal = Object.values(merchSucursalMap).sort((a, b) => b.count - a.count);
+
+    const subsList = s.presupuesto_suscripciones || [];
+    const calcSubMensualArs = sub => {
+      const monto = Number(sub && sub.monto) || 0;
+      const tc = sub && sub.moneda === 'USD' ? (Number(sub.tipo_cambio) || 1200) : 1;
+      const ars = monto * tc;
+      if (sub && sub.plan_periodicidad === 'Anual') return Math.round(ars / 12);
+      if (sub && sub.plan_periodicidad === 'Único') return 0;
+      return Math.round(ars);
+    };
+    const subsActivas = subsList.filter(sub => sub.estado === 'ACTIVA' || sub.estado === 'POR_VENCER');
+    const subsPorVencer = subsList.filter(sub => sub.estado === 'POR_VENCER');
+    const subsContratar = subsList.filter(sub => sub.estado === 'CONTRATAR');
+    const subsPendientesAprob = subsList.filter(sub => sub.estado === 'PENDIENTE_APROBACION');
+    const subsMensualArs = subsActivas.reduce((acc, sub) => acc + calcSubMensualArs(sub), 0);
+    const subsMensualUsd = subsActivas
+      .filter(sub => sub.moneda === 'USD')
+      .reduce((acc, sub) => {
+        const m = Number(sub.monto) || 0;
+        return acc + (sub.plan_periodicidad === 'Anual' ? m / 12 : sub.plan_periodicidad === 'Único' ? 0 : m);
+      }, 0);
+
+    const merchMovimientos = s.merchandising_movimientos || [];
+    const merchCotizaciones = s.merchandising_cotizaciones || [];
+    const merchPedidos = s.merchandising_pedidos || [];
+    const merchPedidosActivos = merchPedidos.filter(p => p.estado !== 'RECIBIDO' && p.estado !== 'CANCELADO');
 
     // Paso 5 · Módulo 12: Relación con Ventas y Stock Prioritario
     const ventasList = s.ventas_feedback || [];
@@ -529,12 +650,23 @@ window.MaderoStore = (function () {
       eventosCerradosCount,
       eventosProximosCount,
 
-      // Módulo 11: Merchandising (Paso 5)
+      // Módulo 11: Presupuesto (Merchandising POP + Suscripciones de Apps)
       merchTotalItems: merchList.length,
       merchValorTotal,
       merchBajoMinimoCount: merchBajoMinimo.length,
       merchBajoMinimo,
       merchCostoReposicionEstimado,
+      merchAlertasPorSucursal,
+      subsTotalCount: subsList.length,
+      subsActivasCount: subsActivas.length,
+      subsPorVencerCount: subsPorVencer.length,
+      subsContratarCount: subsContratar.length,
+      subsPendientesAprobCount: subsPendientesAprob.length,
+      subsMensualArs,
+      subsMensualUsd,
+      merchMovimientosCount: merchMovimientos.length,
+      merchCotizacionesCount: merchCotizaciones.length,
+      merchPedidosActivosCount: merchPedidosActivos.length,
 
       // Módulo 12: Relación con Ventas (Paso 5)
       ventasTotal: ventasList.length,
@@ -1726,6 +1858,226 @@ window.MaderoStore = (function () {
     exportCSV(`madero_modulo11_merchandising_${dateStr}.csv`, headers, rows);
   }
 
+  // Módulo 11B: Suscripciones de Apps
+  function upsertSuscripcion(payload) {
+    const s = getState();
+    if (!Array.isArray(s.presupuesto_suscripciones)) s.presupuesto_suscripciones = [];
+    const list = s.presupuesto_suscripciones;
+
+    if (payload.id) {
+      const idx = list.findIndex(item => item.id === payload.id);
+      if (idx !== -1) {
+        list[idx] = Object.assign({}, list[idx], payload);
+        persist(true);
+        return list[idx];
+      }
+    }
+
+    const nuevo = Object.assign(
+      {
+        id: nextId('SUB', list),
+        app: '',
+        categoria: 'IA y Productividad',
+        plan_periodicidad: 'Mensual',
+        moneda: 'ARS',
+        monto: 0,
+        tipo_cambio: 1,
+        medio_pago: 'Tarjeta Corporativa',
+        fecha_vencimiento: '',
+        responsable: 'Ángelo Lucero',
+        estado: 'ACTIVA',
+        comprobante_url: '',
+        notas: ''
+      },
+      payload,
+      { id: payload.id || nextId('SUB', list) }
+    );
+    list.unshift(nuevo);
+    persist(true);
+    return nuevo;
+  }
+
+  function deleteSuscripcion(id) {
+    const s = getState();
+    s.presupuesto_suscripciones = (s.presupuesto_suscripciones || []).filter(item => item.id !== id);
+    persist(true);
+  }
+
+  function setSuscripcionPeriodicidad(id, nuevaPeriodicidad) {
+    const item = (getState().presupuesto_suscripciones || []).find(s => s.id === id);
+    if (!item) return;
+    item.plan_periodicidad = nuevaPeriodicidad;
+    if (nuevaPeriodicidad === 'Mensual' && Number(item.precio_mensual_ref) > 0) {
+      item.monto = Number(item.precio_mensual_ref);
+    } else if (nuevaPeriodicidad === 'Anual' && Number(item.precio_anual_ref) > 0) {
+      item.monto = Number(item.precio_anual_ref);
+    }
+    persist(true);
+  }
+
+  function exportSuscripcionesCSV(filteredList) {
+    const list = Array.isArray(filteredList) ? filteredList : (getState().presupuesto_suscripciones || []);
+    const headers = ['ID', 'App / Servicio', 'Categoría', 'Periodicidad', 'Moneda', 'Monto', 'Tipo Cambio', 'Equivalente Mensual ARS', 'Medio de Pago', 'Vencimiento', 'Responsable', 'Estado', 'Notas'];
+    const rows = list.map(sub => {
+      const m = Number(sub.monto) || 0;
+      const tc = sub.moneda === 'USD' ? (Number(sub.tipo_cambio) || 1200) : 1;
+      const ars = Math.round((m * tc) / (sub.plan_periodicidad === 'Anual' ? 12 : 1));
+      return [sub.id, sub.app, sub.categoria, sub.plan_periodicidad, sub.moneda, m, tc, sub.plan_periodicidad === 'Único' ? 0 : ars, sub.medio_pago, sub.fecha_vencimiento, sub.responsable, sub.estado, sub.notas];
+    });
+    const dateStr = (getState().meta.fecha_corte || 'reporte').replace(/[^0-9-]/g, '');
+    exportCSV(`madero_modulo11_suscripciones_apps_${dateStr}.csv`, headers, rows);
+  }
+
+  // Módulo 11C: Movimientos y Entregas por Fecha / Patente
+  function addMerchMovimiento(payload) {
+    const s = getState();
+    if (!Array.isArray(s.merchandising_movimientos)) s.merchandising_movimientos = [];
+    const list = s.merchandising_movimientos;
+    const merchItem = (s.merchandising_stock || []).find(m => m.id === payload.merch_id);
+
+    const cant = Math.max(1, Number(payload.cantidad) || 1);
+    const tipo = payload.tipo || 'ENTREGA_CLIENTE';
+
+    if (payload.ajustar_stock !== false && merchItem) {
+      if (tipo === 'INGRESO_REPOSICION') {
+        merchItem.stock_actual = (Number(merchItem.stock_actual) || 0) + cant;
+      } else if (tipo === 'ENTREGA_CLIENTE' || tipo === 'TRASLADO_SUCURSAL') {
+        merchItem.stock_actual = Math.max(0, (Number(merchItem.stock_actual) || 0) - cant);
+      } else if (tipo === 'AJUSTE_INVENTARIO' && payload.stock_nuevo !== undefined && payload.stock_nuevo !== '') {
+        merchItem.stock_actual = Math.max(0, Number(payload.stock_nuevo) || 0);
+      }
+    }
+
+    const nuevo = {
+      id: nextId('MOV', list),
+      fecha: payload.fecha || new Date().toISOString().slice(0, 10),
+      tipo,
+      merch_id: payload.merch_id || '',
+      articulo: (merchItem && merchItem.articulo) || payload.articulo || '',
+      cantidad: cant,
+      patente: (payload.patente || '').toUpperCase().trim(),
+      sucursal: payload.sucursal || (merchItem && merchItem.sucursal_ubicacion) || '',
+      responsable: payload.responsable || 'Ángelo Lucero',
+      nota: payload.nota || ''
+    };
+    list.unshift(nuevo);
+    list.sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
+    persist(true);
+    return nuevo;
+  }
+
+  function deleteMerchMovimiento(id) {
+    const s = getState();
+    s.merchandising_movimientos = (s.merchandising_movimientos || []).filter(m => m.id !== id);
+    persist(true);
+  }
+
+  function exportMerchMovimientosCSV(filteredList) {
+    const list = Array.isArray(filteredList) ? filteredList : (getState().merchandising_movimientos || []);
+    const headers = ['ID', 'Fecha', 'Tipo', 'ID Artículo', 'Artículo', 'Cantidad', 'Patente / Operación', 'Sucursal', 'Responsable', 'Nota'];
+    const rows = list.map(m => [m.id, m.fecha, m.tipo, m.merch_id, m.articulo, m.cantidad, m.patente, m.sucursal, m.responsable, m.nota]);
+    const dateStr = (getState().meta.fecha_corte || 'reporte').replace(/[^0-9-]/g, '');
+    exportCSV(`madero_modulo11_movimientos_${dateStr}.csv`, headers, rows);
+  }
+
+  // Módulo 11D: Comparativa de Proveedores y Cotizaciones
+  function upsertMerchCotizacion(payload) {
+    const s = getState();
+    if (!Array.isArray(s.merchandising_cotizaciones)) s.merchandising_cotizaciones = [];
+    const list = s.merchandising_cotizaciones;
+    if (payload.id) {
+      const idx = list.findIndex(c => c.id === payload.id);
+      if (idx !== -1) {
+        list[idx] = Object.assign({}, list[idx], payload);
+        persist(true);
+        return list[idx];
+      }
+    }
+    const nuevo = Object.assign(
+      {
+        id: nextId('COT', list),
+        fecha: new Date().toISOString().slice(0, 10),
+        proveedor: '',
+        item_kit: '',
+        cantidad: 1,
+        precio_unitario: 0,
+        plazo_entrega: '',
+        estado: 'EN_EVALUACION',
+        enlace_url: '',
+        notas: ''
+      },
+      payload,
+      { id: payload.id || nextId('COT', list) }
+    );
+    list.unshift(nuevo);
+    persist(true);
+    return nuevo;
+  }
+
+  function deleteMerchCotizacion(id) {
+    const s = getState();
+    s.merchandising_cotizaciones = (s.merchandising_cotizaciones || []).filter(c => c.id !== id);
+    persist(true);
+  }
+
+  function exportMerchCotizacionesCSV(filteredList) {
+    const list = Array.isArray(filteredList) ? filteredList : (getState().merchandising_cotizaciones || []);
+    const headers = ['ID', 'Fecha', 'Proveedor', 'Ítem / Kit', 'Cantidad', 'Precio Unitario ($)', 'Total ($)', 'Plazo Entrega', 'Estado', 'Enlace', 'Notas'];
+    const rows = list.map(c => [c.id, c.fecha, c.proveedor, c.item_kit, c.cantidad, c.precio_unitario, (Number(c.cantidad) || 0) * (Number(c.precio_unitario) || 0), c.plazo_entrega, c.estado, c.enlace_url, c.notas]);
+    const dateStr = (getState().meta.fecha_corte || 'reporte').replace(/[^0-9-]/g, '');
+    exportCSV(`madero_modulo11_cotizaciones_${dateStr}.csv`, headers, rows);
+  }
+
+  // Módulo 11E: Bitácora de Pedidos de Reposición
+  function upsertMerchPedido(payload) {
+    const s = getState();
+    if (!Array.isArray(s.merchandising_pedidos)) s.merchandising_pedidos = [];
+    const list = s.merchandising_pedidos;
+    if (payload.id) {
+      const idx = list.findIndex(p => p.id === payload.id);
+      if (idx !== -1) {
+        list[idx] = Object.assign({}, list[idx], payload);
+        persist(true);
+        return list[idx];
+      }
+    }
+    const nuevo = Object.assign(
+      {
+        id: nextId('PED', list),
+        fecha_pedido: new Date().toISOString().slice(0, 10),
+        merch_id: '',
+        articulo: '',
+        cantidad: 10,
+        sucursal_destino: 'Comodoro · Av. Polonia 546 (Salón Principal)',
+        proveedor: '',
+        monto_estimado: 0,
+        estado: 'SOLICITADO',
+        fecha_estimada_entrega: '',
+        responsable: 'Ángelo Lucero',
+        nota: ''
+      },
+      payload,
+      { id: payload.id || nextId('PED', list) }
+    );
+    list.unshift(nuevo);
+    persist(true);
+    return nuevo;
+  }
+
+  function deleteMerchPedido(id) {
+    const s = getState();
+    s.merchandising_pedidos = (s.merchandising_pedidos || []).filter(p => p.id !== id);
+    persist(true);
+  }
+
+  function setMerchPedidoEstado(id, nuevoEstado) {
+    const item = (getState().merchandising_pedidos || []).find(p => p.id === id);
+    if (item) {
+      item.estado = nuevoEstado;
+      persist(true);
+    }
+  }
+
   // Módulo 12: Relación con Ventas y Stock Prioritario
   function upsertVentaFeedback(payload) {
     const s = getState();
@@ -1842,7 +2194,7 @@ window.MaderoStore = (function () {
     ];
     const rows = [
       ['1. Estado General del Área', `Semáforo: ${s.meta.semaforo_area} | Prioridades: ${sum.totalPrioridades} (${sum.priCerradasCount} cerradas, ${sum.priDesviosCount} desvíos)`, notas.bloque_1_resumen_general || s.meta.resumen_ejecutivo_lider],
-      ['2. Marketing Interno', `Ocupación: ${sum.horasAsignadas}/${sum.capacidadTotalHs} hs (${sum.ocupacionPct}%) | Fotos Lucy DMS: ${sum.conFotoLucyTotal}/${sum.universoControladoTotal} (${sum.coberturaGeneralLucyPct}%) | Eventos: ${sum.eventosTotal} | Merch bajo mínimo: ${sum.merchBajoMinimoCount}`, notas.bloque_2_marketing_interno || ''],
+      ['2. Marketing Interno', `Ocupación: ${sum.horasAsignadas}/${sum.capacidadTotalHs} hs (${sum.ocupacionPct}%) | Fotos Lucy DMS: ${sum.conFotoLucyTotal}/${sum.universoControladoTotal} (${sum.coberturaGeneralLucyPct}%) | Eventos: ${sum.eventosTotal} | Presupuesto: POP $${sum.merchValorTotal} (${sum.merchBajoMinimoCount} repos.) + Apps $${sum.subsMensualArs}/mes (${sum.subsActivasCount} activas)`, notas.bloque_2_marketing_interno || ''],
       ['3. REM y Otros Proveedores', `Compromisos: ${sum.provTotal} (${sum.provAtrasadosCount} atrasados, ${sum.provObservadosCount} observados, ${sum.provPendMinutaCount} minutas pend.)`, notas.bloque_3_proveedores_rem || ''],
       ['4. Canales y Campañas', `Redes: ${sum.redesFrecRealTotal}/${sum.redesFrecPlanTotal} pub. sem. | Pauta: $${sum.campPresupuestoEjecutadoTotal} ejec. (${sum.campLeadsTotal} leads, CPL $${sum.campCplPromedio}) | Google: ${sum.googleAccesosPendientesCount} accesos pend. | Web: ${sum.webValidadosCount}/${sum.webTotal} en prod.`, notas.bloque_4_canales_campanas || ''],
       ['5. Control de Calidad', `Piezas observadas: ${sum.contObservadosCount} | Fotos calidad observada: ${sum.fotosCalidadObservadaCount} | Inconsistencias stock: ${sum.fotosInconsistenciasCanalesCount}`, notas.bloque_5_calidad || ''],
@@ -1970,6 +2322,19 @@ window.MaderoStore = (function () {
     deleteMerchItem,
     adjustMerchStock,
     exportMerchCSV,
+    upsertSuscripcion,
+    deleteSuscripcion,
+    setSuscripcionPeriodicidad,
+    exportSuscripcionesCSV,
+    addMerchMovimiento,
+    deleteMerchMovimiento,
+    exportMerchMovimientosCSV,
+    upsertMerchCotizacion,
+    deleteMerchCotizacion,
+    exportMerchCotizacionesCSV,
+    upsertMerchPedido,
+    deleteMerchPedido,
+    setMerchPedidoEstado,
     upsertVentaFeedback,
     deleteVentaFeedback,
     setVentaEstado,
