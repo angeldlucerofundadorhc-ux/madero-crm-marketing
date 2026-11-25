@@ -1867,7 +1867,7 @@ window.MaderoEcosistemaTerritorio = (function () {
       moneda: 'USD',
       monto: 20,
       tipo_cambio: 1200,
-      medio_pago: 'Tarjeta Corporativa',
+      medio_pago: 'Tarjeta Corporativa ARQ · 1172',
       fecha_vencimiento: new Date().toISOString().slice(0, 10),
       responsable: 'Ángelo Lucero',
       estado: 'ACTIVA',
@@ -1932,7 +1932,14 @@ window.MaderoEcosistemaTerritorio = (function () {
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label class="block text-[11px] font-bold text-stone-700 mb-1">Medio de Pago</label>
-              <input type="text" id="sub-pago" value="${esc(item.medio_pago)}" class="input-glass w-full px-3 py-2">
+              <input type="text" id="sub-pago" list="sub-pago-list" value="${esc(item.medio_pago)}" class="input-glass w-full px-3 py-2">
+              <datalist id="sub-pago-list">
+                <option value="Tarjeta Corporativa ARQ · 1172">
+                <option value="Tarjeta Corporativa">
+                <option value="Mercado Pago">
+                <option value="Transferencia Bancaria">
+                <option value="Plan Hobby / Sin costo">
+              </datalist>
             </div>
             <div>
               <label class="block text-[11px] font-bold text-stone-700 mb-1">Próx. Vencimiento</label>

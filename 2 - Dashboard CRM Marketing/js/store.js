@@ -143,6 +143,15 @@ window.MaderoStore = (function () {
         }
         merged.meta = Object.assign({}, merged.meta, { _sub02_precios_20261124: true });
       }
+      if (!(merged.meta && merged.meta._subs_tarjeta_arq_1172_20261125)) {
+        merged.presupuesto_suscripciones = merged.presupuesto_suscripciones.map(sub => {
+          if (sub.medio_pago === 'Tarjeta Corporativa') {
+            return Object.assign({}, sub, { medio_pago: 'Tarjeta Corporativa ARQ · 1172' });
+          }
+          return sub;
+        });
+        merged.meta = Object.assign({}, merged.meta, { _subs_tarjeta_arq_1172_20261125: true });
+      }
     }
 
     // Sembrar Wine & Glass Box (MER-08) en Neuquén una única vez sin pisar stock editado
@@ -1882,7 +1891,7 @@ window.MaderoStore = (function () {
         moneda: 'ARS',
         monto: 0,
         tipo_cambio: 1,
-        medio_pago: 'Tarjeta Corporativa',
+        medio_pago: 'Tarjeta Corporativa ARQ · 1172',
         fecha_vencimiento: '',
         responsable: 'Ángelo Lucero',
         estado: 'ACTIVA',
