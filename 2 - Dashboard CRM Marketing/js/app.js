@@ -201,7 +201,7 @@ window.MaderoApp = (function () {
 
     const gobActive = activeModuleId === 'gob-frentes';
     let html = `
-      <button type="button" onclick="MaderoApp.navigateModule('gob-frentes')" class="spatial-pill px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 shrink-0 ${gobActive ? 'spatial-pill-active' : ''}">
+      <button type="button" onclick="MaderoApp.navigateModule('gob-frentes')" class="spatial-pill px-3 py-1.5 text-[11px] sm:text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 shrink-0 ${gobActive ? 'spatial-pill-active' : ''}">
         <span class="w-1.5 h-1.5 rounded-full ${gobActive ? 'bg-[#f4f1ea]' : 'bg-[#de4800]'}"></span>
         <span>7 Frentes</span>
       </button>
@@ -209,11 +209,11 @@ window.MaderoApp = (function () {
     `;
 
     window.MaderoData.MODULOS_SISTEMA.forEach(m => {
-      const isAct = activeModuleId === m.id;
+      const isAct = activeModuleId === m.id || (m.id === 'm11-merch' && activeModuleId === 'm11-apps');
       const dotClass = isAct ? 'bg-[#f4f1ea]' : (m.activoEnPasoActual ? 'bg-[#de4800]' : 'bg-stone-400');
       const stepTag = m.activoEnPasoActual ? '' : `<span class="text-[9px] font-mono opacity-75">P${m.paso}</span>`;
       html += `
-        <button type="button" onclick="MaderoApp.navigateModule('${m.id}')" class="spatial-pill px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 shrink-0 ${isAct ? 'spatial-pill-active' : ''}">
+        <button type="button" onclick="MaderoApp.navigateModule('${m.id}')" class="spatial-pill px-3 py-1.5 text-[11px] sm:text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 shrink-0 ${isAct ? 'spatial-pill-active' : ''}">
           <span class="w-1.5 h-1.5 rounded-full ${dotClass}"></span>
           <span>${window.MaderoUI.esc(m.corto)}</span>
           ${stepTag}
@@ -222,7 +222,7 @@ window.MaderoApp = (function () {
     });
 
     html += `
-      <button type="button" onclick="MaderoApp.triggerQuickNew()" class="spatial-pill-new px-4 py-1.5 text-xs font-bold whitespace-nowrap flex items-center gap-1 shrink-0 ml-auto">
+      <button type="button" onclick="MaderoApp.triggerQuickNew()" class="spatial-pill-new px-3.5 py-1.5 text-[11px] sm:text-xs font-bold whitespace-nowrap flex items-center gap-1 shrink-0 ml-auto">
         <i class="ri-add-line text-sm"></i>
         <span>Nuevo</span>
       </button>
