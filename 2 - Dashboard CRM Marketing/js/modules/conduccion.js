@@ -161,19 +161,52 @@ window.MaderoConduccion = (function () {
     const urlEl = document.getElementById('av-archivo-url');
     if (nameEl) nameEl.value = file.name;
 
-    if (file.size <= 350 * 1024 && typeof FileReader !== 'undefined') {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (urlEl && typeof reader.result === 'string') {
-          urlEl.value = reader.result;
-          window.MaderoUI.showToast(`Archivo "${file.name}" adjuntado para guardar`);
-        }
-      };
-      reader.readAsDataURL(file);
-    } else {
+    if (file.size > 3 * 1024 * 1024) {
       if (urlEl && /^data:/i.test(urlEl.value)) urlEl.value = '';
-      window.MaderoUI.showToast(`Nombre "${file.name}" cargado (>350 KB: pegá el link de Drive/Docs si querés abrirlo online)`, 'amber');
+      window.MaderoUI.showToast(`"${file.name}" supera 3 MB: subilo a Drive y pegá el link arriba`, 'amber');
+      return;
     }
+
+    if (typeof FileReader === 'undefined') return;
+    const reader = new FileReader();
+    reader.onload = async () => {
+      if (typeof reader.result !== 'string') return;
+      const canUploadCloud = typeof fetch === 'function' && window.location && window.location.protocol !== 'file:';
+
+      if (canUploadCloud) {
+        try {
+          window.MaderoUI.showToast(`Subiendo "${file.name}" a la nube...`);
+          const resp = await fetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              filename: file.name,
+              contentType: file.type || 'application/octet-stream',
+              base64: reader.result
+            })
+          });
+          if (resp.ok) {
+            const json = await resp.json();
+            if (json && json.ok && json.url) {
+              if (urlEl) urlEl.value = json.url;
+              window.MaderoUI.showToast(`Archivo "${file.name}" subido a Supabase`);
+              return;
+            }
+          }
+        } catch (_) {
+          // Fallback local si el endpoint no responde
+        }
+      }
+
+      if (file.size <= 350 * 1024) {
+        if (urlEl) urlEl.value = reader.result;
+        window.MaderoUI.showToast(`Archivo "${file.name}" adjuntado localmente`);
+      } else {
+        if (urlEl && /^data:/i.test(urlEl.value)) urlEl.value = '';
+        window.MaderoUI.showToast(`"${file.name}" supera 350 KB sin nube activa: pegá el link de Drive/Docs`, 'amber');
+      }
+    };
+    reader.readAsDataURL(file);
   }
 
   function openAvanceModal(kind, id) {
@@ -258,7 +291,7 @@ window.MaderoConduccion = (function () {
               <label class="inline-flex items-center gap-2 text-[11px] text-stone-700 cursor-pointer">
                 <span class="px-2.5 py-1 rounded-lg bg-white border border-stone-300 text-stone-800 font-semibold hover:bg-stone-50 transition">📁 Adjuntar archivo desde PC</span>
                 <input type="file" id="av-file-input" onchange="MaderoConduccion.handleAvanceFileSelect(this)" class="hidden">
-                <span class="text-[10px] text-stone-500">Hasta 350 KB directo (o pegá el link arriba)</span>
+                <span class="text-[10px] text-stone-500">Hasta 3 MB directo a la nube (o pegá el link arriba)</span>
               </label>
 
               ${kind === 'AGENDA' ? `

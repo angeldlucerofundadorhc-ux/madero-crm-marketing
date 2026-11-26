@@ -100,6 +100,24 @@ window.MaderoApp = (function () {
     setTxt('hdr-corte', window.MaderoUI.formatDateDisplay(meta.fecha_corte));
     setTxt('hdr-lider', meta.lider);
 
+    const cloudBadge = document.getElementById('cloud-sync-badge');
+    if (cloudBadge && window.MaderoStore.getCloudStatus) {
+      const cs = window.MaderoStore.getCloudStatus();
+      if (cs.status === 'synced') {
+        cloudBadge.textContent = '☁️ Nube OK';
+        cloudBadge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+      } else if (cs.status === 'syncing') {
+        cloudBadge.textContent = '☁️ Sincronizando...';
+        cloudBadge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30';
+      } else if (cs.status === 'error') {
+        cloudBadge.textContent = '☁️ Error sync';
+        cloudBadge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-500/15 text-rose-300 border border-rose-500/30';
+      } else {
+        cloudBadge.textContent = '☁️ Local';
+        cloudBadge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/10 text-stone-600 border border-white/15';
+      }
+    }
+
     // Botones de Nivel 1 vs Nivel 2
     const btnOp = document.getElementById('btn-nivel-operativo');
     const btnGer = document.getElementById('btn-nivel-gerencial');
@@ -371,6 +389,9 @@ window.MaderoApp = (function () {
       renderAll();
     });
     renderAll();
+    if (window.MaderoStore.syncFromCloud) {
+      window.MaderoStore.syncFromCloud();
+    }
   });
 
   function handleGlobalSearch(query) {

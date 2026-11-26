@@ -5,8 +5,15 @@
 
 window.MaderoStore = (function () {
   const STORAGE_KEY = 'madero_crm_mkt_v1';
+  const DIRTY_KEY = 'madero_crm_mkt_dirty';
   let state = null;
   const listeners = [];
+  let cloudSaveTimer = null;
+  const cloudState = {
+    status: 'idle', // 'idle' | 'syncing' | 'synced' | 'offline' | 'error'
+    lastSyncAt: null,
+    error: null
+  };
 
   function deepClone(obj) {
     return JSON.parse(JSON.stringify(obj));
@@ -193,14 +200,23 @@ window.MaderoStore = (function () {
     return merged;
   }
 
+  function persistLocalOnly() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (err) {
+      console.error('Error guardando estado en localStorage:', err);
+    }
+  }
+
   function init() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         state = ensureDefaults(JSON.parse(raw));
+        persistLocalOnly();
       } else {
         state = deepClone(window.MaderoData.INITIAL_STATE);
-        persist(false);
+        persistLocalOnly();
       }
     } catch (err) {
       console.warn('LocalStorage fallback activo:', err);
@@ -209,17 +225,123 @@ window.MaderoStore = (function () {
     return state;
   }
 
+  function getCloudStatus() {
+    return Object.assign({}, cloudState);
+  }
+
+  function canUseCloud() {
+    return typeof fetch === 'function' &&
+      typeof window !== 'undefined' &&
+      window.location &&
+      window.location.protocol !== 'file:';
+  }
+
+  function notifyListeners() {
+    listeners.forEach(fn => {
+      try { fn(state); } catch (e) { console.error('Subscriber error:', e); }
+    });
+  }
+
+  async function pushToCloud() {
+    if (!canUseCloud() || !state) return false;
+    cloudState.status = 'syncing';
+    cloudState.error = null;
+    notifyListeners();
+    try {
+      const resp = await fetch('/api/state', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: state })
+      });
+      if (!resp.ok) {
+        const errJson = await resp.json().catch(() => ({}));
+        cloudState.status = resp.status === 503 ? 'offline' : 'error';
+        cloudState.error = errJson.error || `HTTP ${resp.status}`;
+        notifyListeners();
+        return false;
+      }
+      const json = await resp.json();
+      try { localStorage.removeItem(DIRTY_KEY); } catch (_) {}
+      cloudState.status = 'synced';
+      cloudState.lastSyncAt = json.updated_at || new Date().toISOString();
+      cloudState.error = null;
+      notifyListeners();
+      return true;
+    } catch (err) {
+      cloudState.status = 'offline';
+      cloudState.error = err && err.message ? err.message : 'Sin conexión';
+      notifyListeners();
+      return false;
+    }
+  }
+
+  function scheduleCloudSave() {
+    if (!canUseCloud()) return;
+    if (cloudSaveTimer) clearTimeout(cloudSaveTimer);
+    cloudSaveTimer = setTimeout(() => {
+      cloudSaveTimer = null;
+      pushToCloud();
+    }, 600);
+  }
+
+  async function syncFromCloud() {
+    if (!canUseCloud()) {
+      cloudState.status = 'offline';
+      notifyListeners();
+      return false;
+    }
+    cloudState.status = 'syncing';
+    cloudState.error = null;
+    notifyListeners();
+
+    try {
+      const resp = await fetch('/api/state', { cache: 'no-store' });
+      if (!resp.ok) {
+        cloudState.status = resp.status === 503 ? 'offline' : 'error';
+        notifyListeners();
+        return false;
+      }
+      const json = await resp.json();
+      if (!json || !json.configured) {
+        cloudState.status = 'offline';
+        notifyListeners();
+        return false;
+      }
+
+      if (json.exists && json.data) {
+        let isDirty = false;
+        try { isDirty = localStorage.getItem(DIRTY_KEY) === '1'; } catch (_) {}
+        const cloudTs = Date.parse(json.updated_at || json.data.updated_at || 0) || 0;
+        const localTs = Date.parse((state && state.updated_at) || 0) || 0;
+
+        if (!isDirty || cloudTs >= localTs) {
+          state = ensureDefaults(json.data);
+          persistLocalOnly();
+          try { localStorage.removeItem(DIRTY_KEY); } catch (_) {}
+          cloudState.status = 'synced';
+          cloudState.lastSyncAt = json.updated_at || new Date().toISOString();
+          notifyListeners();
+          return true;
+        }
+        return await pushToCloud();
+      }
+
+      return await pushToCloud();
+    } catch (err) {
+      cloudState.status = 'offline';
+      cloudState.error = err && err.message ? err.message : 'Sin conexión';
+      notifyListeners();
+      return false;
+    }
+  }
+
   function persist(notify = true) {
     state.updated_at = new Date().toISOString();
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (err) {
-      console.error('Error guardando estado en localStorage:', err);
-    }
+    persistLocalOnly();
     if (notify) {
-      listeners.forEach(fn => {
-        try { fn(state); } catch (e) { console.error('Subscriber error:', e); }
-      });
+      try { localStorage.setItem(DIRTY_KEY, '1'); } catch (_) {}
+      scheduleCloudSave();
+      notifyListeners();
     }
   }
 
@@ -2355,7 +2477,10 @@ window.MaderoStore = (function () {
     exportCSV,
     exportJSONBackup,
     importJSONBackup,
-    resetToBaseline
+    resetToBaseline,
+    syncFromCloud,
+    pushToCloud,
+    getCloudStatus
   };
 })();
 
