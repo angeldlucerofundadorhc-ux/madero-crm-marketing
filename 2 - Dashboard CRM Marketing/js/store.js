@@ -90,6 +90,20 @@ window.MaderoStore = (function () {
         Array.isArray(t.avances_archivos) ? t : Object.assign({}, t, { avances_archivos: [] })
       );
     }
+    if (Array.isArray(merged.equipo_miembros)) {
+      merged.equipo_miembros = merged.equipo_miembros.map(m => Object.assign({
+        sueldo_actual: 0,
+        sueldo_moneda: 'ARS',
+        modalidad_pago: 'Mensual',
+        fecha_ultimo_pago: '',
+        notas_pago: '',
+        historial_aumentos: [],
+        viaticos: []
+      }, m, {
+        historial_aumentos: Array.isArray(m.historial_aumentos) ? m.historial_aumentos : [],
+        viaticos: Array.isArray(m.viaticos) ? m.viaticos : []
+      }));
+    }
 
     // Migrar capacidad semanal heredada (180h sintéticas -> 47.5h reales Lun-Vie 9:30 a 19:00)
     if (Array.isArray(merged.equipo_miembros)) {
@@ -889,7 +903,15 @@ window.MaderoStore = (function () {
         return list[idx];
       }
     }
-    const nuevo = Object.assign({}, payload, {
+    const nuevo = Object.assign({
+      sueldo_actual: 0,
+      sueldo_moneda: 'ARS',
+      modalidad_pago: 'Mensual',
+      fecha_ultimo_pago: '',
+      notas_pago: '',
+      historial_aumentos: [],
+      viaticos: []
+    }, payload, {
       id: nextId('MEM', list)
     });
     list.push(nuevo);
@@ -901,6 +923,77 @@ window.MaderoStore = (function () {
     const s = getState();
     s.equipo_miembros = s.equipo_miembros.filter(m => m.id !== id);
     persist(true);
+  }
+
+  function addMiembroAumento(miembroId, payload) {
+    const m = (getState().equipo_miembros || []).find(i => i.id === miembroId);
+    if (!m) return null;
+    m.historial_aumentos = Array.isArray(m.historial_aumentos) ? m.historial_aumentos : [];
+
+    const anterior = Number(m.sueldo_actual) || 0;
+    const nuevoMonto = Math.max(0, Number(payload && payload.monto_nuevo) || 0);
+    const pct = anterior > 0 ? Math.round(((nuevoMonto - anterior) / anterior) * 1000) / 10 : null;
+
+    const reg = {
+      id: `AUM-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      fecha: (payload && payload.fecha) || new Date().toISOString().slice(0, 10),
+      monto_anterior: anterior,
+      monto_nuevo: nuevoMonto,
+      porcentaje: pct,
+      motivo: (payload && payload.motivo) || ''
+    };
+    m.historial_aumentos.unshift(reg);
+    m.historial_aumentos.sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
+    m.sueldo_actual = nuevoMonto;
+    persist(true);
+    return reg;
+  }
+
+  function deleteMiembroAumento(miembroId, aumentoId) {
+    const m = (getState().equipo_miembros || []).find(i => i.id === miembroId);
+    if (!m || !Array.isArray(m.historial_aumentos)) return false;
+    m.historial_aumentos = m.historial_aumentos.filter(a => a.id !== aumentoId);
+    persist(true);
+    return true;
+  }
+
+  function addMiembroViatico(miembroId, payload) {
+    const m = (getState().equipo_miembros || []).find(i => i.id === miembroId);
+    if (!m) return null;
+    m.viaticos = Array.isArray(m.viaticos) ? m.viaticos : [];
+
+    const reg = {
+      id: `VIA-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      fecha: (payload && payload.fecha) || new Date().toISOString().slice(0, 10),
+      concepto: (payload && payload.concepto) || '',
+      monto: Math.max(0, Number(payload && payload.monto) || 0),
+      moneda: (payload && payload.moneda) || m.sueldo_moneda || 'ARS',
+      estado: (payload && payload.estado) || 'PENDIENTE',
+      comprobante_nombre: (payload && payload.comprobante_nombre) || '',
+      comprobante_url: (payload && payload.comprobante_url) || ''
+    };
+    m.viaticos.unshift(reg);
+    m.viaticos.sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
+    persist(true);
+    return reg;
+  }
+
+  function setMiembroViaticoEstado(miembroId, viaticoId, nuevoEstado) {
+    const m = (getState().equipo_miembros || []).find(i => i.id === miembroId);
+    if (!m || !Array.isArray(m.viaticos)) return false;
+    const v = m.viaticos.find(x => x.id === viaticoId);
+    if (!v) return false;
+    v.estado = nuevoEstado;
+    persist(true);
+    return true;
+  }
+
+  function deleteMiembroViatico(miembroId, viaticoId) {
+    const m = (getState().equipo_miembros || []).find(i => i.id === miembroId);
+    if (!m || !Array.isArray(m.viaticos)) return false;
+    m.viaticos = m.viaticos.filter(v => v.id !== viaticoId);
+    persist(true);
+    return true;
   }
 
   // Módulo 2B: Tareas del Equipo Interno
@@ -2403,6 +2496,11 @@ window.MaderoStore = (function () {
     setPrioridadEstado,
     upsertMiembro,
     deleteMiembro,
+    addMiembroAumento,
+    deleteMiembroAumento,
+    addMiembroViatico,
+    setMiembroViaticoEstado,
+    deleteMiembroViatico,
     upsertTareaEquipo,
     deleteTareaEquipo,
     setTareaEquipoEstado,

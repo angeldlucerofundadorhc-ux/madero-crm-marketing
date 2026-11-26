@@ -1318,13 +1318,51 @@ window.MaderoConduccion = (function () {
               </div>
             </div>
 
+            ${(() => {
+              const sueldo = Number(m.sueldo_actual) || 0;
+              const moneda = m.sueldo_moneda === 'USD' ? 'USD' : '$';
+              const fmt = n => `${moneda} ${Number(n || 0).toLocaleString('es-AR')}`;
+              const aumentos = Array.isArray(m.historial_aumentos) ? m.historial_aumentos : [];
+              const viaticos = Array.isArray(m.viaticos) ? m.viaticos : [];
+              const totalViaticos = viaticos.reduce((acc, v) => acc + (Number(v.monto) || 0), 0);
+              const pendViaticos = viaticos.filter(v => v.estado === 'PENDIENTE').length;
+              const ultAum = aumentos[0];
+              if (!sueldo && viaticos.length === 0 && aumentos.length === 0) return '';
+              return `
+                <div class="text-[11px] bg-white/10 border border-stone-200/50 p-2 rounded-xl space-y-1">
+                  ${sueldo > 0 ? `
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-stone-600">💵 ${esc(m.modalidad_pago || 'Mensual')}</span>
+                      <span class="font-mono font-bold text-stone-900">${fmt(sueldo)}</span>
+                    </div>
+                  ` : ''}
+                  ${ultAum ? `
+                    <div class="text-[10px] text-emerald-700 font-semibold">
+                      📈 Últ. aumento ${formatDateDisplay(ultAum.fecha)}${ultAum.porcentaje !== null && ultAum.porcentaje !== undefined ? ` (+${ultAum.porcentaje}%)` : ''}
+                    </div>
+                  ` : ''}
+                  ${viaticos.length > 0 ? `
+                    <div class="flex items-center justify-between gap-2 text-[10px] text-stone-600 pt-0.5 border-t border-stone-200/40">
+                      <span>🚗 Viáticos (${viaticos.length}${pendViaticos ? ` · ${pendViaticos} pend.` : ''})</span>
+                      <span class="font-mono font-semibold text-stone-800">${fmt(totalViaticos)}</span>
+                    </div>
+                  ` : ''}
+                </div>
+              `;
+            })()}
+
             ${absHs > 0 ? `<div class="text-[10px] text-rose-700 font-bold">⚠ Absorbió ${absHs}h por desvíos de terceros</div>` : ''}
           </div>
 
-          <div class="pt-2 border-t border-stone-200/60 flex items-center justify-between gap-2">
-            <button type="button" onclick="MaderoConduccion.openMiembroModal('${esc(m.id)}')" class="text-xs font-semibold text-stone-600 hover:text-stone-900">
-              ✎ Editar
-            </button>
+          <div class="pt-2 border-t border-stone-200/60 flex items-center justify-between gap-2 flex-wrap">
+            <div class="flex items-center gap-2.5">
+              <button type="button" onclick="MaderoConduccion.openMiembroModal('${esc(m.id)}')" class="text-xs font-semibold text-stone-600 hover:text-stone-900">
+                ✎ Editar
+              </button>
+              <button type="button" onclick="MaderoConduccion.openMiembroCompensacionModal('${esc(m.id)}')" class="text-xs font-semibold text-[#ff9c6e] hover:underline">
+                💵 Sueldos y Viáticos
+              </button>
+            </div>
             <button type="button" onclick="MaderoConduccion.setEquipoFilter('miembro', '${isSelected ? 'ALL' : esc(m.id)}')" class="px-2.5 py-1 rounded-lg ${isSelected ? 'bg-[#de4800] text-white' : 'bg-stone-200/75 text-stone-800 hover:bg-stone-300/70'} text-[11px] font-bold transition">
               ${isSelected ? '✓ Viendo tareas' : `${pendingCount} activa(s) · ${mTasks.length} total`}
             </button>
@@ -1586,13 +1624,23 @@ window.MaderoConduccion = (function () {
       estado_continuidad: 'EN_PROCESO',
       detalle_continuidad: '',
       estandar_calidad: '',
-      observaciones: ''
+      observaciones: '',
+      sueldo_actual: 0,
+      sueldo_moneda: 'ARS',
+      modalidad_pago: 'Mensual',
+      fecha_ultimo_pago: '',
+      notas_pago: '',
+      historial_aumentos: [],
+      viaticos: []
     };
+
+    const aumCount = Array.isArray(item.historial_aumentos) ? item.historial_aumentos.length : 0;
+    const viaCount = Array.isArray(item.viaticos) ? item.viaticos.length : 0;
 
     window.MaderoUI.openModal({
       title: existing ? `Editar Rol / Integrante (${item.id})` : 'Agregar Integrante o Célula Funcional',
-      subtitle: 'Módulo 2 · Capacidad semanal, cobertura territorial y esquema de reemplazo.',
-      maxWidth: 'max-w-xl',
+      subtitle: 'Módulo 2 · Capacidad semanal, esquema de reemplazo, sueldo/pago y viáticos.',
+      maxWidth: 'max-w-2xl',
       bodyHtml: `
         <div class="space-y-3">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1641,6 +1689,44 @@ window.MaderoConduccion = (function () {
               <input type="text" id="mem-obs" value="${esc(item.observaciones)}" placeholder="Foco actual o cuello de botella..." class="input-glass w-full px-3 py-2">
             </div>
           </div>
+
+          <div class="p-3.5 rounded-2xl bg-stone-100/75 border border-stone-200/75 space-y-2.5">
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+              <span class="text-xs font-extrabold text-stone-900">💵 Sueldo / Pago Base y Viáticos</span>
+              ${existing ? `
+                <button type="button" onclick="MaderoConduccion.openMiembroCompensacionModal('${esc(item.id)}')" class="px-2.5 py-1 rounded-xl bg-[#de4800] hover:brightness-110 text-white text-[11px] font-bold transition">
+                  📈 Aumentos (${aumCount}) y 🚗 Viáticos (${viaCount}) →
+                </button>
+              ` : '<span class="text-[10px] text-stone-500">Guardá la ficha para cargar aumentos y viáticos.</span>'}
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
+              <div>
+                <label class="block text-[10px] font-bold text-stone-700 mb-1">Sueldo / Pago Actual</label>
+                <input type="number" id="mem-sueldo" value="${esc(item.sueldo_actual ?? 0)}" min="0" step="100" class="input-glass w-full px-2.5 py-1.5 font-mono font-bold">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-stone-700 mb-1">Moneda</label>
+                <select id="mem-moneda" class="input-glass w-full px-2.5 py-1.5">
+                  <option value="ARS" ${(item.sueldo_moneda || 'ARS') === 'ARS' ? 'selected' : ''}>ARS ($)</option>
+                  <option value="USD" ${item.sueldo_moneda === 'USD' ? 'selected' : ''}>USD</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-stone-700 mb-1">Modalidad</label>
+                <select id="mem-modalidad" class="input-glass w-full px-2.5 py-1.5">
+                  ${['Mensual', 'Quincenal', 'Por pieza / Freelance', 'Honorarios'].map(mod => `<option value="${mod}" ${(item.modalidad_pago || 'Mensual') === mod ? 'selected' : ''}>${mod}</option>`).join('')}
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-stone-700 mb-1">Último Pago</label>
+                <input type="date" id="mem-ultimo-pago" value="${esc(item.fecha_ultimo_pago || '')}" class="input-glass w-full px-2.5 py-1.5 font-mono">
+              </div>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-stone-700 mb-1">Notas de Pago (CBU / Alias / Acuerdo)</label>
+              <input type="text" id="mem-notas-pago" value="${esc(item.notas_pago || '')}" placeholder="Ej. Pago del 1 al 5, incluye viáticos de traslado..." class="input-glass w-full px-2.5 py-1.5">
+            </div>
+          </div>
         </div>
       `,
       footerHtml: `
@@ -1667,10 +1753,261 @@ window.MaderoConduccion = (function () {
       estado_continuidad: document.getElementById('mem-cont-estado').value,
       detalle_continuidad: document.getElementById('mem-cont-det').value.trim(),
       estandar_calidad: document.getElementById('mem-estandar').value.trim(),
-      observaciones: document.getElementById('mem-obs').value.trim()
+      observaciones: document.getElementById('mem-obs').value.trim(),
+      sueldo_actual: Math.max(0, Number(document.getElementById('mem-sueldo')?.value) || 0),
+      sueldo_moneda: document.getElementById('mem-moneda')?.value || 'ARS',
+      modalidad_pago: document.getElementById('mem-modalidad')?.value || 'Mensual',
+      fecha_ultimo_pago: document.getElementById('mem-ultimo-pago')?.value || '',
+      notas_pago: (document.getElementById('mem-notas-pago')?.value || '').trim()
     });
     window.MaderoUI.closeModal();
     window.MaderoUI.showToast('Integrante / rol guardado');
+  }
+
+  function formatCompMoney(amount, currency) {
+    const prefix = currency === 'USD' ? 'USD' : '$';
+    return `${prefix} ${Number(amount || 0).toLocaleString('es-AR')}`;
+  }
+
+  function openMiembroCompensacionModal(id) {
+    const m = (window.MaderoStore.getState().equipo_miembros || []).find(i => i.id === id);
+    if (!m) {
+      window.MaderoUI.showToast('Integrante no encontrado', 'red');
+      return;
+    }
+
+    const moneda = m.sueldo_moneda === 'USD' ? 'USD' : 'ARS';
+    const sueldoActual = Number(m.sueldo_actual) || 0;
+    const aumentos = Array.isArray(m.historial_aumentos) ? m.historial_aumentos : [];
+    const viaticos = Array.isArray(m.viaticos) ? m.viaticos : [];
+    const totalViaticos = viaticos.reduce((acc, v) => acc + (Number(v.monto) || 0), 0);
+    const totalPendiente = viaticos.filter(v => v.estado === 'PENDIENTE').reduce((acc, v) => acc + (Number(v.monto) || 0), 0);
+    const todayIso = new Date().toISOString().slice(0, 10);
+
+    const aumentosHtml = aumentos.length === 0
+      ? '<p class="text-[11px] text-stone-500">Sin aumentos registrados todavía.</p>'
+      : aumentos.map(a => `
+        <div class="p-2.5 rounded-xl bg-white/10 border border-stone-200/50 flex items-center justify-between gap-2">
+          <div class="space-y-0.5 min-w-0">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="badge-pill badge-orange font-mono text-[10px]">📅 ${formatDateDisplay(a.fecha)}</span>
+              <span class="font-mono text-xs font-bold text-stone-900">${formatCompMoney(a.monto_anterior, moneda)} → ${formatCompMoney(a.monto_nuevo, moneda)}</span>
+              ${a.porcentaje !== null && a.porcentaje !== undefined ? `<span class="badge-pill badge-emerald text-[10px]">+${a.porcentaje}%</span>` : ''}
+            </div>
+            ${a.motivo ? `<p class="text-[11px] text-stone-600">${esc(a.motivo)}</p>` : ''}
+          </div>
+          <button type="button" onclick="MaderoConduccion.deleteAumentoFromModal('${esc(m.id)}', '${esc(a.id)}')" title="Eliminar registro" class="px-2 py-0.5 rounded bg-stone-100 hover:bg-rose-100 text-stone-500 hover:text-rose-700 text-xs font-bold shrink-0">×</button>
+        </div>
+      `).join('');
+
+    const estadoBadgeViatico = st => {
+      if (st === 'PAGADO') return '<span class="badge-pill badge-emerald text-[10px]">Pagado</span>';
+      if (st === 'RENDIDO') return '<span class="badge-pill badge-blue text-[10px]">Rendido</span>';
+      return '<span class="badge-pill badge-amber text-[10px]">Pendiente</span>';
+    };
+
+    const viaticosHtml = viaticos.length === 0
+      ? '<p class="text-[11px] text-stone-500">Sin viáticos cargados todavía.</p>'
+      : viaticos.map(v => {
+        const hasUrl = v.comprobante_url && /^(https?:\/\/|data:)/i.test(v.comprobante_url);
+        const nextEst = v.estado === 'PENDIENTE' ? 'RENDIDO' : v.estado === 'RENDIDO' ? 'PAGADO' : 'PENDIENTE';
+        return `
+          <div class="p-2.5 rounded-xl bg-white/10 border border-stone-200/50 flex items-start justify-between gap-2">
+            <div class="space-y-1 min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="badge-pill badge-stone font-mono text-[10px]">📅 ${formatDateDisplay(v.fecha)}</span>
+                <span class="font-mono text-xs font-extrabold text-stone-900">${formatCompMoney(v.monto, v.moneda || moneda)}</span>
+                <button type="button" onclick="MaderoConduccion.quickChangeViaticoEstado('${esc(m.id)}', '${esc(v.id)}', '${nextEst}')" title="Clic para cambiar estado" class="cursor-pointer">
+                  ${estadoBadgeViatico(v.estado)}
+                </button>
+              </div>
+              <div class="text-xs font-semibold text-stone-800">${esc(v.concepto)}</div>
+              ${hasUrl ? `
+                <a href="${esc(v.comprobante_url)}" target="_blank" rel="noopener noreferrer" ${/^data:/i.test(v.comprobante_url) ? `download="${esc(v.comprobante_nombre || 'comprobante')}"` : ''} class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#ff9c6e] hover:underline">
+                  📄 ${esc(v.comprobante_nombre || 'Ver comprobante')} ↗
+                </a>
+              ` : ''}
+            </div>
+            <button type="button" onclick="MaderoConduccion.deleteViaticoFromModal('${esc(m.id)}', '${esc(v.id)}')" title="Eliminar viático" class="px-2 py-0.5 rounded bg-stone-100 hover:bg-rose-100 text-stone-500 hover:text-rose-700 text-xs font-bold shrink-0">×</button>
+          </div>
+        `;
+      }).join('');
+
+    window.MaderoUI.openModal({
+      title: `Sueldos, Aumentos y Viáticos · ${m.nombre}`,
+      subtitle: `${m.id} · ${m.rol || 'Equipo Interno'}`,
+      maxWidth: 'max-w-3xl',
+      bodyHtml: `
+        <div class="space-y-4">
+          <!-- Resumen -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div class="p-3 rounded-xl bg-stone-100/75 border border-stone-200/75">
+              <span class="text-[10px] font-bold uppercase text-stone-500 block">Sueldo / Pago Actual</span>
+              <span class="font-mono text-lg font-extrabold text-stone-900">${formatCompMoney(sueldoActual, moneda)}</span>
+              <span class="text-[10px] text-stone-500 block">${esc(m.modalidad_pago || 'Mensual')}</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-100/75 border border-stone-200/75">
+              <span class="text-[10px] font-bold uppercase text-stone-500 block">Aumentos Registrados</span>
+              <span class="font-mono text-lg font-extrabold text-stone-900">${aumentos.length}</span>
+              <span class="text-[10px] text-stone-500 block">${aumentos[0] ? `Último: ${formatDateDisplay(aumentos[0].fecha)}` : 'Sin historial aún'}</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-100/75 border border-stone-200/75">
+              <span class="text-[10px] font-bold uppercase text-stone-500 block">Total Viáticos (${viaticos.length})</span>
+              <span class="font-mono text-lg font-extrabold text-stone-900">${formatCompMoney(totalViaticos, moneda)}</span>
+              <span class="text-[10px] text-amber-700 font-semibold block">Pendiente: ${formatCompMoney(totalPendiente, moneda)}</span>
+            </div>
+          </div>
+
+          <!-- Bloque A: Aumentos de Sueldo -->
+          <div class="p-3.5 rounded-2xl bg-stone-100/75 border border-stone-200/75 space-y-3">
+            <div class="text-xs font-extrabold text-stone-900">📈 Registrar Aumento de Sueldo / Pago</div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <div>
+                <label class="block text-[10px] font-bold text-stone-700 mb-1">Fecha del Aumento *</label>
+                <input type="date" id="aum-fecha" value="${esc(todayIso)}" class="input-glass w-full px-2.5 py-1.5 font-mono">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-stone-700 mb-1">Nuevo Sueldo / Pago (${moneda}) *</label>
+                <input type="number" id="aum-monto" value="${esc(sueldoActual)}" min="0" step="100" class="input-glass w-full px-2.5 py-1.5 font-mono font-bold">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-stone-700 mb-1">Motivo / Acuerdo</label>
+                <input type="text" id="aum-motivo" placeholder="Ej. Ajuste inflación / desempeño..." class="input-glass w-full px-2.5 py-1.5">
+              </div>
+            </div>
+            <div class="flex justify-end">
+              <button type="button" onclick="MaderoConduccion.saveAumentoFromModal('${esc(m.id)}')" class="px-3.5 py-1.5 rounded-xl bg-[#de4800] hover:brightness-110 text-white text-xs font-bold transition">
+                + Registrar Aumento y Actualizar Sueldo
+              </button>
+            </div>
+            <div class="space-y-1.5 pt-2 border-t border-stone-200/60">
+              ${aumentosHtml}
+            </div>
+          </div>
+
+          <!-- Bloque B: Viáticos -->
+          <div class="p-3.5 rounded-2xl bg-stone-100/75 border border-stone-200/75 space-y-3">
+            <div class="text-xs font-extrabold text-stone-900">🚗 Registrar Viático</div>
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
+              <div>
+                <label class="block text-[10px] font-bold text-stone-700 mb-1">Fecha *</label>
+                <input type="date" id="via-fecha" value="${esc(todayIso)}" class="input-glass w-full px-2.5 py-1.5 font-mono">
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-[10px] font-bold text-stone-700 mb-1">Concepto / Motivo *</label>
+                <input type="text" id="via-concepto" placeholder="Ej. Combustible traslado Neuquén, peajes, almuerzo..." class="input-glass w-full px-2.5 py-1.5">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-stone-700 mb-1">Monto (${moneda}) *</label>
+                <input type="number" id="via-monto" value="" min="0" step="100" placeholder="15000" class="input-glass w-full px-2.5 py-1.5 font-mono font-bold">
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 items-end">
+              <div>
+                <label class="block text-[10px] font-bold text-stone-700 mb-1">Estado</label>
+                <select id="via-estado" class="input-glass w-full px-2.5 py-1.5">
+                  <option value="PENDIENTE">Pendiente de Reintegro</option>
+                  <option value="RENDIDO">Rendido / Aprobado</option>
+                  <option value="PAGADO">Pagado / Reintegrado</option>
+                </select>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-[10px] font-bold text-stone-700 mb-1">Comprobante (Link o subir PDF/Foto hasta 3 MB)</label>
+                <input type="hidden" id="via-comp-nombre" value="">
+                <div class="flex items-center gap-2">
+                  <input type="text" id="via-comp-url" value="" placeholder="https://... o adjuntá comprobante" class="input-glass flex-1 px-2.5 py-1.5">
+                  <label class="inline-flex items-center cursor-pointer shrink-0">
+                    <span class="px-2.5 py-1.5 rounded-xl bg-white border border-stone-300 text-stone-800 text-[11px] font-semibold hover:bg-stone-50">📄 Adjuntar</span>
+                    <input type="file" accept=".pdf,application/pdf,image/*" onchange="MaderoConduccion.handleViaticoFileSelect(this)" class="hidden">
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="flex justify-end">
+              <button type="button" onclick="MaderoConduccion.saveViaticoFromModal('${esc(m.id)}')" class="px-3.5 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold transition">
+                + Agregar Viático
+              </button>
+            </div>
+            <div class="space-y-1.5 pt-2 border-t border-stone-200/60">
+              ${viaticosHtml}
+            </div>
+          </div>
+        </div>
+      `,
+      footerHtml: `
+        <button type="button" onclick="MaderoConduccion.openMiembroModal('${esc(m.id)}')" class="px-3 py-2 rounded-xl bg-white border border-stone-300 text-stone-800 text-xs font-semibold mr-auto">← Volver a Ficha del Integrante</button>
+        <button type="button" onclick="MaderoUI.closeModal()" class="px-4 py-2 rounded-xl bg-stone-900 text-white text-xs font-semibold">Cerrar</button>
+      `
+    });
+  }
+
+  function saveAumentoFromModal(miembroId) {
+    const fecha = (document.getElementById('aum-fecha')?.value || '').trim();
+    const montoNuevo = Number(document.getElementById('aum-monto')?.value);
+    const motivo = (document.getElementById('aum-motivo')?.value || '').trim();
+    if (!fecha || isNaN(montoNuevo) || montoNuevo <= 0) {
+      window.MaderoUI.showToast('Ingresá fecha y el nuevo monto válido', 'red');
+      return;
+    }
+    window.MaderoStore.addMiembroAumento(miembroId, { fecha, monto_nuevo: montoNuevo, motivo });
+    openMiembroCompensacionModal(miembroId);
+    window.MaderoUI.showToast('Aumento registrado y sueldo actualizado');
+  }
+
+  function deleteAumentoFromModal(miembroId, aumentoId) {
+    if (!confirm('¿Eliminar este registro de aumento?')) return;
+    window.MaderoStore.deleteMiembroAumento(miembroId, aumentoId);
+    openMiembroCompensacionModal(miembroId);
+    window.MaderoUI.showToast('Registro de aumento eliminado', 'amber');
+  }
+
+  function handleViaticoFileSelect(inputEl) {
+    const file = inputEl && inputEl.files && inputEl.files[0];
+    if (!file) return;
+    const nameEl = document.getElementById('via-comp-nombre');
+    const urlEl = document.getElementById('via-comp-url');
+    if (nameEl) nameEl.value = file.name;
+    window.MaderoUI.uploadAttachmentFile(file, res => {
+      if (urlEl && res.ok && res.url) {
+        urlEl.value = res.url;
+      }
+    });
+  }
+
+  function saveViaticoFromModal(miembroId) {
+    const fecha = (document.getElementById('via-fecha')?.value || '').trim();
+    const concepto = (document.getElementById('via-concepto')?.value || '').trim();
+    const monto = Number(document.getElementById('via-monto')?.value);
+    const estado = document.getElementById('via-estado')?.value || 'PENDIENTE';
+    const comprobante_nombre = (document.getElementById('via-comp-nombre')?.value || '').trim();
+    const comprobante_url = (document.getElementById('via-comp-url')?.value || '').trim();
+    if (!concepto || isNaN(monto) || monto <= 0) {
+      window.MaderoUI.showToast('Ingresá concepto y monto del viático', 'red');
+      return;
+    }
+    window.MaderoStore.addMiembroViatico(miembroId, {
+      fecha,
+      concepto,
+      monto,
+      estado,
+      comprobante_nombre,
+      comprobante_url
+    });
+    openMiembroCompensacionModal(miembroId);
+    window.MaderoUI.showToast('Viático registrado');
+  }
+
+  function quickChangeViaticoEstado(miembroId, viaticoId, nuevoEstado) {
+    window.MaderoStore.setMiembroViaticoEstado(miembroId, viaticoId, nuevoEstado);
+    openMiembroCompensacionModal(miembroId);
+    window.MaderoUI.showToast(`Viático marcado como ${nuevoEstado}`);
+  }
+
+  function deleteViaticoFromModal(miembroId, viaticoId) {
+    if (!confirm('¿Eliminar este viático?')) return;
+    window.MaderoStore.deleteMiembroViatico(miembroId, viaticoId);
+    openMiembroCompensacionModal(miembroId);
+    window.MaderoUI.showToast('Viático eliminado', 'amber');
   }
 
   function handleDeleteMiembro(id) {
@@ -2123,6 +2460,13 @@ window.MaderoConduccion = (function () {
     openMiembroModal,
     saveMiembroFromModal,
     handleDeleteMiembro,
+    openMiembroCompensacionModal,
+    saveAumentoFromModal,
+    deleteAumentoFromModal,
+    handleViaticoFileSelect,
+    saveViaticoFromModal,
+    quickChangeViaticoEstado,
+    deleteViaticoFromModal,
     openTareaEquipoModal,
     saveTareaFromModal,
     handleDeleteTareaEquipo,
