@@ -36,6 +36,16 @@ async function readJsonBody(req) {
   });
 }
 
+function normalizeSupabaseUrl(raw) {
+  const s = String(raw || '').trim();
+  if (!s) return '';
+  try {
+    return new URL(s).origin;
+  } catch (_) {
+    return s.replace(/\/+$/, '');
+  }
+}
+
 module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     res.statusCode = 204;
@@ -47,7 +57,7 @@ module.exports = async function handler(req, res) {
     return sendJson(res, 405, { ok: false, error: 'Método no permitido' });
   }
 
-  const supabaseUrl = String(process.env.SUPABASE_URL || '').trim().replace(/\/+$/, '');
+  const supabaseUrl = normalizeSupabaseUrl(process.env.SUPABASE_URL);
   const serviceKey = String(process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
 
   if (!supabaseUrl || !serviceKey) {
