@@ -594,7 +594,17 @@ window.MaderoData = (function () {
         requiere_decision_direccion: false,
         detalle_decision_direccion: '',
         evidencia_label: 'Pedido Mario 12/11/2026',
-        evidencia_url: '',
+        evidencia_url: 'https://dashboard-alistamiento-pi.vercel.app/',
+        avances_archivos: [
+          {
+            id: 'AV-M02-1',
+            fecha: '2026-11-17',
+            autor: 'Ángelo Lucero',
+            nota: 'Definiendo con Santy como es mas efectivo realizar la actualizacion de las fotos en neuquen del stock, sin intervenir en sus horarios laborales. https://dashboard-alistamiento-pi.vercel.app/',
+            archivo_nombre: 'Dashboard Alistamiento (Guía / Referencia)',
+            archivo_url: 'https://dashboard-alistamiento-pi.vercel.app/'
+          }
+        ],
         criterio_lider: 'Asegura continuidad y estándar mínimo de 8 tomas.'
       },
       {
@@ -616,6 +626,16 @@ window.MaderoData = (function () {
         detalle_decision_direccion: '',
         evidencia_label: 'Filmación 13/11/2026',
         evidencia_url: '',
+        avances_archivos: [
+          {
+            id: 'AV-M03-1',
+            fecha: '2026-11-16',
+            autor: 'Ángelo Lucero - Mario',
+            nota: 'Se conecto el drive fotos al iphone de neuquen para tener una carga mas rapida de los archivos. -Angelo: revisar los crudos y enviar a REM',
+            archivo_nombre: '',
+            archivo_url: ''
+          }
+        ],
         criterio_lider: 'Seguimiento de adaptación de Agustina en producción de reels.'
       },
       {
@@ -662,6 +682,14 @@ window.MaderoData = (function () {
         evidencia_url: 'https://docs.google.com/document/d/16lWKuc2ikG6OPxQIHCjZl9flkvFWuxSGUPPXVl00mxbI/edit?tab=t.0',
         avances_archivos: [
           {
+            id: 'AV-C01-3',
+            fecha: '2026-11-17',
+            autor: 'Ángelo Lucero',
+            nota: 'Enviado a Mauro para que avancen sobre estos cambios.',
+            archivo_nombre: '',
+            archivo_url: ''
+          },
+          {
             id: 'AV-C01-2',
             fecha: '2026-11-16',
             autor: 'REM GrowthSulting',
@@ -694,11 +722,21 @@ window.MaderoData = (function () {
         horas_estimadas: 1.5,
         fecha_compromiso: '2026-11-06',
         dependencia: 'Definir toma exterior, referencias viales y cierre comercial.',
-        proximo_paso: 'Bajar idea/guion breve y coordinar grabación en salón.',
+        proximo_paso: 'Filmacion de crudos para hacer la primer prueba',
         requiere_decision_direccion: false,
         detalle_decision_direccion: '',
         evidencia_label: 'Pedido Carlos 06/11/2026',
         evidencia_url: '',
+        avances_archivos: [
+          {
+            id: 'AV-C02-1',
+            fecha: '2026-11-13',
+            autor: 'Antonella',
+            nota: 'Filmacion de crudos para hacer la primer prueba',
+            archivo_nombre: '',
+            archivo_url: ''
+          }
+        ],
         criterio_lider: 'Pieza útil para fijar en historias destacadas, WhatsApp y Google.'
       },
 
@@ -738,11 +776,21 @@ window.MaderoData = (function () {
         horas_estimadas: 8,
         fecha_compromiso: '2026-11-16',
         dependencia: 'Última revisión conjunta con Bet el 16-11-2026.',
-        proximo_paso: '16-11-2026: Última revisión con Bet y pase a producción.',
+        proximo_paso: 'Pausada la publicacion con precios, se avanzo con las placas sin precio para entregarle a Tomy',
         requiere_decision_direccion: false,
         detalle_decision_direccion: '',
         evidencia_label: 'Rev. 14/11 · Prod 16/11',
         evidencia_url: '',
+        avances_archivos: [
+          {
+            id: 'AV-B02-1',
+            fecha: '2026-11-16',
+            autor: 'Mario - Carlos',
+            nota: 'Pausada la publicacion con precios, se avanzo con las placas sin precio para entregarle a Tomy',
+            archivo_nombre: '',
+            archivo_url: ''
+          }
+        ],
         criterio_lider: 'Prioridad máxima de arranque de semana para salir hoy a producción.'
       },
 
@@ -761,11 +809,21 @@ window.MaderoData = (function () {
         horas_estimadas: 1.5,
         fecha_compromiso: '2026-11-16',
         dependencia: 'Respuesta del equipo de Lucy sobre estado de actualización.',
-        proximo_paso: '16-11-2026: Consultar a los de Lucy en qué quedó.',
+        proximo_paso: 'Solicitud a Mario de nuevo contacto para ver si tenemos respuesta.',
         requiere_decision_direccion: false,
         detalle_decision_direccion: '',
-        evidencia_label: 'Seguimiento Lucy 16/11/2026',
+        evidencia_label: 'Seguimiento Lucy 17/11/2026',
         evidencia_url: '',
+        avances_archivos: [
+          {
+            id: 'AV-A01-1',
+            fecha: '2026-11-17',
+            autor: 'Ángelo Lucero',
+            nota: 'Solicitud a Mario de nuevo contacto para ver si tenemos respuesta.',
+            archivo_nombre: '',
+            archivo_url: ''
+          }
+        ],
         criterio_lider: 'Destrabar hoy con Lucy para cerrar carta institucional.'
       },
 
