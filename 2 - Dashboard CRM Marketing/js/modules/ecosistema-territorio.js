@@ -1510,7 +1510,13 @@ window.MaderoEcosistemaTerritorio = (function () {
           </td>
           <td class="py-3.5 px-3 min-w-[220px]">
             <div class="font-bold text-stone-900 text-xs">${esc(c.proveedor)}</div>
+            ${c.proveedor_email ? `<a href="mailto:${esc(c.proveedor_email)}" class="text-[10px] text-[#ff9c6e] hover:underline block mt-0.5">✉️ ${esc(c.proveedor_email)}</a>` : ''}
             <div class="text-[11px] text-stone-700 mt-0.5">${esc(c.item_kit)}</div>
+            ${c.enlace_url && /^(https?:\/\/|data:)/i.test(c.enlace_url) ? `
+              <a href="${esc(c.enlace_url)}" target="_blank" rel="noopener noreferrer" ${/^data:/i.test(c.enlace_url) ? `download="${esc(c.archivo_nombre || 'presupuesto.pdf')}"` : ''} class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md bg-[#de4800]/15 hover:bg-[#de4800] text-[#ff9c6e] hover:text-white border border-[#de4800]/35 text-[10px] font-semibold transition">
+                📄 ${esc(c.archivo_nombre || 'Ver PDF / Presupuesto')} ↗
+              </a>
+            ` : ''}
             ${c.notas ? `<div class="text-[10px] text-stone-500 mt-1">${esc(c.notas)}</div>` : ''}
           </td>
           <td class="py-3.5 px-3 whitespace-nowrap font-mono text-center font-bold">${c.cantidad} u.</td>
@@ -2120,6 +2126,27 @@ window.MaderoEcosistemaTerritorio = (function () {
   }
 
   // Modales: Proveedores y Cotizaciones
+  function handleCotizacionPdfSelect(inputEl) {
+    const file = inputEl && inputEl.files && inputEl.files[0];
+    if (!file) return;
+
+    const nameEl = document.getElementById('cot-archivo-nombre');
+    const urlEl = document.getElementById('cot-url');
+    const badgeEl = document.getElementById('cot-pdf-status');
+    if (nameEl) nameEl.value = file.name;
+    if (badgeEl) badgeEl.textContent = `Subiendo ${file.name}...`;
+
+    window.MaderoUI.uploadAttachmentFile(file, res => {
+      if (res.ok && res.url) {
+        if (urlEl) urlEl.value = res.url;
+        if (badgeEl) badgeEl.textContent = `✓ ${file.name}`;
+      } else {
+        if (urlEl && /^data:/i.test(urlEl.value)) urlEl.value = '';
+        if (badgeEl) badgeEl.textContent = 'No se pudo adjuntar';
+      }
+    });
+  }
+
   function openCotizacionModal(id) {
     const list = window.MaderoStore.getState().merchandising_cotizaciones || [];
     const existing = id ? list.find(c => c.id === id) : null;
@@ -2127,12 +2154,14 @@ window.MaderoEcosistemaTerritorio = (function () {
       id: '',
       fecha: new Date().toISOString().slice(0, 10),
       proveedor: '',
+      proveedor_email: '',
       item_kit: '',
       cantidad: 50,
       precio_unitario: 15000,
       plazo_entrega: '10 días hábiles',
       estado: 'EN_EVALUACION',
       enlace_url: '',
+      archivo_nombre: '',
       notas: ''
     };
     window.MaderoUI.openModal({
@@ -2142,10 +2171,15 @@ window.MaderoEcosistemaTerritorio = (function () {
       bodyHtml: `
         <form class="space-y-3.5">
           <input type="hidden" id="cot-id" value="${esc(item.id)}">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <input type="hidden" id="cot-archivo-nombre" value="${esc(item.archivo_nombre || '')}">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label class="block text-[11px] font-bold text-stone-700 mb-1">Proveedor *</label>
               <input type="text" id="cot-prov" value="${esc(item.proveedor)}" placeholder="Ej. Face Publicidad, Plan X..." class="input-glass w-full px-3 py-2" required>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-stone-700 mb-1">E-mail del Proveedor</label>
+              <input type="email" id="cot-email" value="${esc(item.proveedor_email || '')}" placeholder="ventas@proveedor.com" class="input-glass w-full px-3 py-2">
             </div>
             <div>
               <label class="block text-[11px] font-bold text-stone-700 mb-1">Fecha Cotización</label>
@@ -2182,7 +2216,14 @@ window.MaderoEcosistemaTerritorio = (function () {
             </div>
             <div>
               <label class="block text-[11px] font-bold text-stone-700 mb-1">Enlace / PDF Cotización</label>
-              <input type="text" id="cot-url" value="${esc(item.enlace_url)}" placeholder="https://..." class="input-glass w-full px-3 py-2">
+              <input type="text" id="cot-url" value="${esc(item.enlace_url)}" placeholder="https://... o subí PDF abajo" class="input-glass w-full px-3 py-2">
+              <div class="flex items-center justify-between gap-2 mt-1.5 flex-wrap">
+                <label class="inline-flex items-center gap-1.5 cursor-pointer text-[11px]">
+                  <span class="px-2.5 py-1 rounded-lg bg-[#de4800]/15 hover:bg-[#de4800] text-[#ff9c6e] hover:text-white border border-[#de4800]/35 font-semibold transition">📄 Subir PDF (hasta 3 MB)</span>
+                  <input type="file" accept=".pdf,application/pdf,image/*" onchange="MaderoEcosistemaTerritorio.handleCotizacionPdfSelect(this)" class="hidden">
+                </label>
+                <span id="cot-pdf-status" class="text-[10px] text-stone-500 truncate max-w-[160px]">${esc(item.archivo_nombre || '')}</span>
+              </div>
             </div>
           </div>
           <div>
@@ -2209,12 +2250,14 @@ window.MaderoEcosistemaTerritorio = (function () {
       id: document.getElementById('cot-id').value.trim() || undefined,
       fecha: document.getElementById('cot-fecha').value,
       proveedor,
+      proveedor_email: (document.getElementById('cot-email')?.value || '').trim(),
       item_kit,
       cantidad: Number(document.getElementById('cot-cant').value) || 1,
       precio_unitario: Number(document.getElementById('cot-unit').value) || 0,
       plazo_entrega: document.getElementById('cot-plazo').value.trim(),
       estado: document.getElementById('cot-estado').value,
       enlace_url: document.getElementById('cot-url').value.trim(),
+      archivo_nombre: (document.getElementById('cot-archivo-nombre')?.value || '').trim(),
       notas: document.getElementById('cot-notas').value.trim()
     });
     activePresupuestoTab = 'cotizaciones';
@@ -2725,6 +2768,7 @@ window.MaderoEcosistemaTerritorio = (function () {
     saveMovimientoFromModal,
     handleDeleteMovimiento,
     openCotizacionModal,
+    handleCotizacionPdfSelect,
     saveCotizacionFromModal,
     handleDeleteCotizacion,
     openPedidoModal,

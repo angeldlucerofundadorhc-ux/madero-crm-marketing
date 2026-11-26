@@ -285,6 +285,61 @@ window.MaderoUI = (function () {
     `;
   }
 
+  /**
+   * Sube un archivo adjunto (hasta 3 MB) al bucket de Supabase Storage vía /api/upload,
+   * o hace fallback a DataURL local si pesa <= 350 KB y no hay backend activo.
+   */
+  function uploadAttachmentFile(file, onResult) {
+    if (!file || typeof onResult !== 'function') return;
+
+    if (file.size > 3 * 1024 * 1024) {
+      showToast(`"${file.name}" supera 3 MB: subilo a Drive y pegá el link arriba`, 'amber');
+      onResult({ ok: false, name: file.name, url: '', reason: 'too_large' });
+      return;
+    }
+
+    if (typeof FileReader === 'undefined') return;
+    const reader = new FileReader();
+    reader.onload = async () => {
+      if (typeof reader.result !== 'string') return;
+      const canUploadCloud = typeof fetch === 'function' && window.location && window.location.protocol !== 'file:';
+
+      if (canUploadCloud) {
+        try {
+          showToast(`Subiendo "${file.name}" a la nube...`);
+          const resp = await fetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              filename: file.name,
+              contentType: file.type || 'application/octet-stream',
+              base64: reader.result
+            })
+          });
+          if (resp.ok) {
+            const json = await resp.json();
+            if (json && json.ok && json.url) {
+              showToast(`"${file.name}" subido a Supabase`);
+              onResult({ ok: true, name: file.name, url: json.url, cloud: true });
+              return;
+            }
+          }
+        } catch (_) {
+          // Fallback local si el endpoint no responde
+        }
+      }
+
+      if (file.size <= 350 * 1024) {
+        showToast(`"${file.name}" adjuntado localmente`);
+        onResult({ ok: true, name: file.name, url: reader.result, cloud: false });
+      } else {
+        showToast(`"${file.name}" supera 350 KB sin nube activa: pegá el link de Drive/Docs`, 'amber');
+        onResult({ ok: false, name: file.name, url: '', reason: 'offline_too_large' });
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
   return {
     esc,
     estadoBadge,
@@ -297,6 +352,7 @@ window.MaderoUI = (function () {
     openModal,
     closeModal,
     showToast,
+    uploadAttachmentFile,
     openEstadosGuideModal,
     openDataCenterModal,
     renderUpcomingModuleBlueprint

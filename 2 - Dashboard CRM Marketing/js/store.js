@@ -2129,12 +2129,14 @@ window.MaderoStore = (function () {
         id: nextId('COT', list),
         fecha: new Date().toISOString().slice(0, 10),
         proveedor: '',
+        proveedor_email: '',
         item_kit: '',
         cantidad: 1,
         precio_unitario: 0,
         plazo_entrega: '',
         estado: 'EN_EVALUACION',
         enlace_url: '',
+        archivo_nombre: '',
         notas: ''
       },
       payload,
@@ -2153,8 +2155,8 @@ window.MaderoStore = (function () {
 
   function exportMerchCotizacionesCSV(filteredList) {
     const list = Array.isArray(filteredList) ? filteredList : (getState().merchandising_cotizaciones || []);
-    const headers = ['ID', 'Fecha', 'Proveedor', 'Ítem / Kit', 'Cantidad', 'Precio Unitario ($)', 'Total ($)', 'Plazo Entrega', 'Estado', 'Enlace', 'Notas'];
-    const rows = list.map(c => [c.id, c.fecha, c.proveedor, c.item_kit, c.cantidad, c.precio_unitario, (Number(c.cantidad) || 0) * (Number(c.precio_unitario) || 0), c.plazo_entrega, c.estado, c.enlace_url, c.notas]);
+    const headers = ['ID', 'Fecha', 'Proveedor', 'E-mail Proveedor', 'Ítem / Kit', 'Cantidad', 'Precio Unitario ($)', 'Total ($)', 'Plazo Entrega', 'Estado', 'Enlace / PDF', 'Notas'];
+    const rows = list.map(c => [c.id, c.fecha, c.proveedor, c.proveedor_email || '', c.item_kit, c.cantidad, c.precio_unitario, (Number(c.cantidad) || 0) * (Number(c.precio_unitario) || 0), c.plazo_entrega, c.estado, c.enlace_url, c.notas]);
     const dateStr = (getState().meta.fecha_corte || 'reporte').replace(/[^0-9-]/g, '');
     exportCSV(`madero_modulo11_cotizaciones_${dateStr}.csv`, headers, rows);
   }

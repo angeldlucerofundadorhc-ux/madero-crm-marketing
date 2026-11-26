@@ -161,52 +161,15 @@ window.MaderoConduccion = (function () {
     const urlEl = document.getElementById('av-archivo-url');
     if (nameEl) nameEl.value = file.name;
 
-    if (file.size > 3 * 1024 * 1024) {
-      if (urlEl && /^data:/i.test(urlEl.value)) urlEl.value = '';
-      window.MaderoUI.showToast(`"${file.name}" supera 3 MB: subilo a Drive y pegá el link arriba`, 'amber');
-      return;
-    }
-
-    if (typeof FileReader === 'undefined') return;
-    const reader = new FileReader();
-    reader.onload = async () => {
-      if (typeof reader.result !== 'string') return;
-      const canUploadCloud = typeof fetch === 'function' && window.location && window.location.protocol !== 'file:';
-
-      if (canUploadCloud) {
-        try {
-          window.MaderoUI.showToast(`Subiendo "${file.name}" a la nube...`);
-          const resp = await fetch('/api/upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              filename: file.name,
-              contentType: file.type || 'application/octet-stream',
-              base64: reader.result
-            })
-          });
-          if (resp.ok) {
-            const json = await resp.json();
-            if (json && json.ok && json.url) {
-              if (urlEl) urlEl.value = json.url;
-              window.MaderoUI.showToast(`Archivo "${file.name}" subido a Supabase`);
-              return;
-            }
-          }
-        } catch (_) {
-          // Fallback local si el endpoint no responde
+    window.MaderoUI.uploadAttachmentFile(file, res => {
+      if (urlEl) {
+        if (res.ok && res.url) {
+          urlEl.value = res.url;
+        } else if (!res.ok && /^data:/i.test(urlEl.value)) {
+          urlEl.value = '';
         }
       }
-
-      if (file.size <= 350 * 1024) {
-        if (urlEl) urlEl.value = reader.result;
-        window.MaderoUI.showToast(`Archivo "${file.name}" adjuntado localmente`);
-      } else {
-        if (urlEl && /^data:/i.test(urlEl.value)) urlEl.value = '';
-        window.MaderoUI.showToast(`"${file.name}" supera 350 KB sin nube activa: pegá el link de Drive/Docs`, 'amber');
-      }
-    };
-    reader.readAsDataURL(file);
+    });
   }
 
   function openAvanceModal(kind, id) {
