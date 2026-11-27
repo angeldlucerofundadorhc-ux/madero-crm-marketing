@@ -4075,7 +4075,63 @@ window.MaderoData = (function () {
         'Cumpliendo la regla de "No sustitución silenciosa", cada vez que Marketing Interno debió rehacer placas o carruseles por errores tipográficos o de ficha técnica de REM (ej. CNT-02 / PRV-02), el trabajo se ejecutó para no frenar a Ventas pero quedó contabilizado en horas e imputado al legajo de auditoría del proveedor.',
       bloque_8_prioridades_decisiones:
         'Prioridades de la próxima semana: (1) Reducir en un 40% las unidades sin foto en CAM D\'Andrea y Neuquén; (2) Poner en producción con L. Christian la sincronización automática de RESERVADO/VENDIDO en la web (WEB-01); (3) Auditar el resultado del nuevo filtro de leads en Neuquén. Se elevan a Dirección las decisiones contractuales y presupuestarias detalladas al pie.'
-    }
+    },
+
+    // PERFIL DEDICADO AGENDA ANTO (Antonella · Creadora de Contenido Comodoro)
+    anto_bitacora: [
+      {
+        id: 'ANT-01',
+        fecha: '2026-11-26',
+        categoria: 'Historias diarias IG',
+        plaza: 'Comodoro · Av. Polonia 546 (Salón Principal)',
+        titulo: 'Historias diarias Instagram · Stock destacado y consultas del día',
+        detalle: 'Secuencia de historias diarias en IG mostrando unidades en salón Polonia, destacados del día y derivación de consultas.',
+        horas: 1.5,
+        estado: 'COMPLETADO',
+        link_nombre: '',
+        link_url: '',
+        tarea_vinculada: 'INT-01'
+      },
+      {
+        id: 'ANT-02',
+        fecha: '2026-11-25',
+        categoria: 'Video / Gestión TikTok',
+        plaza: 'Comodoro · Av. Alem 828',
+        titulo: 'Video TikTok ingresos de la semana en Sucursal Alem',
+        detalle: 'Grabación en salón Alem y edición vertical en CapCut con subtítulos y llamado comercial.',
+        horas: 2,
+        estado: 'COMPLETADO',
+        link_nombre: '',
+        link_url: '',
+        tarea_vinculada: 'INT-01'
+      },
+      {
+        id: 'ANT-03',
+        fecha: '2026-11-21',
+        categoria: 'Filmación de crudos',
+        plaza: 'Comodoro · Av. Polonia 546 (Salón Principal)',
+        titulo: 'Crudos de entregas y unidad destacada para Reel / Ángelo',
+        detalle: 'Filmación de tomas cortas en salón y entregas recientes; material subido a Drive para edición de Ángelo / REM.',
+        horas: 2.5,
+        estado: 'ENVIADO_REVISION',
+        link_nombre: '',
+        link_url: '',
+        tarea_vinculada: ''
+      },
+      {
+        id: 'ANT-04',
+        fecha: '2026-11-13',
+        categoria: 'Filmación de crudos',
+        plaza: 'Comodoro · Av. Polonia 546 (Salón Principal)',
+        titulo: 'Crudos prueba video ubicación de sucursal (Pedido Carlos)',
+        detalle: 'Filmación de crudos exteriores e interiores para hacer la primera prueba del video de ubicación de sucursal.',
+        horas: 1.5,
+        estado: 'COMPLETADO',
+        link_nombre: '',
+        link_url: '',
+        tarea_vinculada: 'PRI-C02'
+      }
+    ]
   };
 
   return {

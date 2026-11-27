@@ -26,6 +26,11 @@ window.MaderoConduccion = (function () {
     onlyAbsorbido: false
   };
 
+  const filtersAnto = {
+    search: '',
+    categoria: 'ALL'
+  };
+
   let weeklyFocusFilter = 'ALL'; // 'ALL' | 'CRITICAS' | 'ATRASADAS' | 'SEG:Mario' | ...
   let weeklyGroupMode = 'SEGMENTO'; // 'SEGMENTO' | 'URGENCIA'
 
@@ -866,10 +871,52 @@ window.MaderoConduccion = (function () {
     }).join('');
 
     const weeklyStartHtml = buildWeeklyStartPanel(state);
+    const antoList = state.anto_bitacora || [];
+    const antoPreviewHtml = `
+      <div class="glass-card p-4 sm:p-5 space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="badge-pill badge-orange font-mono text-[10px]">Perfil Anto · Solo Agenda</span>
+              <span class="text-xs font-extrabold text-stone-900">📸 Bitácora cargada por Antonella (${antoList.length})</span>
+            </div>
+            <p class="text-[11px] text-stone-500 mt-0.5">Lo que Anto registra desde su perfil exclusivo de Agenda (se sincroniza en vivo con Supabase).</p>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button type="button" onclick="MaderoApp.copyAntoLink()" class="px-2.5 py-1.5 rounded-xl bg-white border border-stone-300 text-stone-800 text-[11px] font-semibold hover:bg-stone-50">
+              🔗 Copiar link para Anto
+            </button>
+            <button type="button" onclick="MaderoApp.setProfile('anto')" class="px-3 py-1.5 rounded-xl bg-[#de4800] hover:brightness-110 text-white text-[11px] font-bold">
+              Abrir Perfil Anto →
+            </button>
+          </div>
+        </div>
+        ${antoList.length === 0 ? '<p class="text-xs text-stone-500">Todavía no hay registros cargados por Anto.</p>' : `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+            ${antoList.slice(0, 4).map(a => `
+              <div class="p-3 rounded-xl bg-white/10 border border-stone-200/60 space-y-1">
+                <div class="flex items-center justify-between gap-2 flex-wrap">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="badge-pill badge-orange font-mono text-[10px]">📅 ${formatDateDisplay(a.fecha)}</span>
+                    <span class="badge-pill badge-stone text-[10px]">${esc(a.categoria)}</span>
+                    ${a.horas ? `<span class="badge-pill badge-amber font-mono text-[10px]">⏱ ${esc(a.horas)}h</span>` : ''}
+                  </div>
+                  <span class="text-[10px] font-semibold ${a.estado === 'COMPLETADO' ? 'text-emerald-700' : 'text-sky-700'}">${a.estado === 'COMPLETADO' ? '✓ Hecho' : 'En revisión'}</span>
+                </div>
+                <div class="text-xs font-bold text-stone-900">${esc(a.titulo)}</div>
+                ${a.detalle ? `<p class="text-[11px] text-stone-600 leading-snug">${esc(a.detalle)}</p>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        `}
+      </div>
+    `;
 
     return `
       <div class="space-y-5">
         ${weeklyStartHtml}
+
+        ${antoPreviewHtml}
 
         ${decisionesHtml}
 
@@ -2434,6 +2481,385 @@ window.MaderoConduccion = (function () {
     `;
   }
 
+  // ========================================================================
+  // D. PERFIL DEDICADO ANTO (SOLO AGENDA · CARGA DIARIA DE TRABAJO)
+  // ========================================================================
+  const ANTO_CATEGORIAS = [
+    'Historias diarias IG',
+    'Video / Gestión TikTok',
+    'Filmación de crudos',
+    'Edición en CapCut / Canva',
+    'Carga Drive / envío a Ángelo o REM',
+    'Otro'
+  ];
+
+  function setAntoFilter(cat) {
+    filtersAnto.categoria = cat || 'ALL';
+    window.MaderoApp.renderActiveView();
+  }
+
+  function setAntoSearch(val) {
+    filtersAnto.search = val || '';
+    window.MaderoApp.renderActiveView();
+  }
+
+  function renderAntoAgendaModule() {
+    const state = window.MaderoStore.getState();
+    const allLogs = state.anto_bitacora || [];
+    const q = filtersAnto.search.trim().toLowerCase();
+
+    const filteredLogs = allLogs.filter(item => {
+      if (filtersAnto.categoria !== 'ALL' && item.categoria !== filtersAnto.categoria) return false;
+      if (q) {
+        const hay = [item.id, item.categoria, item.plaza, item.titulo, item.detalle, item.tarea_vinculada].join(' ').toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+
+    const totalHs = allLogs.reduce((acc, i) => acc + (Number(i.horas) || 0), 0);
+    const completadosCount = allLogs.filter(i => i.estado === 'COMPLETADO').length;
+
+    const tareasAntoAgenda = (state.agenda_prioridades || []).filter(p =>
+      p.estado !== 'CERRADO_EVIDENCIA' &&
+      (/anto|antonella/i.test(p.responsable || '') || /anto|antonella/i.test(p.proximo_paso || '') || /anto|antonella/i.test(p.descripcion || '') || p.id === 'PRI-C02')
+    );
+    const tareasAntoEquipo = (state.equipo_tareas || []).filter(t =>
+      t.estado !== 'CERRADO_EVIDENCIA' &&
+      (t.miembro_id === 'MEM-02' || /anto|antonella/i.test(t.tarea || ''))
+    );
+    const asignadasCount = tareasAntoAgenda.length + tareasAntoEquipo.length;
+
+    const assignedCardsHtml = asignadasCount === 0
+      ? '<p class="text-xs text-stone-500">No tenés tareas pendientes asignadas en este momento.</p>'
+      : [
+        ...tareasAntoEquipo.map(t => `
+          <div class="p-3 sm:px-4 rounded-xl bg-white/60 border border-stone-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-1 min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="badge-pill badge-blue text-[10px]">Equipo · ${esc(t.id)}</span>
+                ${estadoBadge(t.estado, true)}
+                <span class="text-[11px] font-mono text-stone-500">📅 ${formatDateDisplay(t.fecha_entrega)}</span>
+              </div>
+              <div class="text-xs sm:text-sm font-bold text-stone-900">${esc(t.tarea)}</div>
+              ${t.nota_calidad ? `<p class="text-[11px] text-stone-500">${esc(t.nota_calidad)}</p>` : ''}
+              ${renderAvancesTimelineHtml(t.avances_archivos || [], 'EQUIPO', t.id, { compact: true, maxItems: 2 })}
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+              <button type="button" onclick="MaderoConduccion.openAvanceModal('EQUIPO', '${esc(t.id)}')" class="px-2.5 py-1.5 rounded-lg bg-[#de4800]/15 hover:bg-[#de4800] text-[#ff9c6e] hover:text-white border border-[#de4800]/35 text-[11px] font-bold transition">
+                📎 + Avance / Archivo
+              </button>
+              <button type="button" onclick="MaderoConduccion.quickChangeEstadoTarea('${esc(t.id)}', 'CERRADO_EVIDENCIA')" class="px-2.5 py-1.5 rounded-lg bg-emerald-600/15 hover:bg-emerald-600 text-emerald-700 hover:text-white border border-emerald-500/30 text-[11px] font-bold transition">
+                ✓ Listo
+              </button>
+            </div>
+          </div>
+        `),
+        ...tareasAntoAgenda.map(p => `
+          <div class="p-3 sm:px-4 rounded-xl bg-white/60 border border-stone-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-1 min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="badge-pill badge-orange text-[10px]">Agenda · ${esc(p.id)}</span>
+                ${estadoBadge(p.estado, true)}
+                <span class="text-[11px] font-mono text-stone-500">📅 ${formatDateDisplay(p.fecha_compromiso)}</span>
+              </div>
+              <div class="text-xs sm:text-sm font-bold text-stone-900">${esc(p.objetivo)}</div>
+              ${p.proximo_paso ? `<p class="text-[11px] text-stone-500">${esc(p.proximo_paso)}</p>` : ''}
+              ${renderAvancesTimelineHtml(p.avances_archivos || [], 'AGENDA', p.id, { compact: true, maxItems: 2 })}
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+              <button type="button" onclick="MaderoConduccion.openAvanceModal('AGENDA', '${esc(p.id)}')" class="px-2.5 py-1.5 rounded-lg bg-[#de4800]/15 hover:bg-[#de4800] text-[#ff9c6e] hover:text-white border border-[#de4800]/35 text-[11px] font-bold transition">
+                📎 + Avance / Archivo
+              </button>
+              <button type="button" onclick="MaderoConduccion.quickChangeEstadoPrioridad('${esc(p.id)}', 'ENTREGADO_REVISION')" class="px-2.5 py-1.5 rounded-lg bg-sky-600/15 hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-500/30 text-[11px] font-bold transition">
+                Enviar a Revisión
+              </button>
+            </div>
+          </div>
+        `)
+      ].join('');
+
+    const catPills = [
+      { id: 'ALL', label: `Todas (${allLogs.length})` },
+      ...ANTO_CATEGORIAS.map(c => ({ id: c, label: `${c} (${allLogs.filter(i => i.categoria === c).length})` }))
+    ].map(btn => {
+      const act = filtersAnto.categoria === btn.id;
+      return `<button type="button" onclick="MaderoConduccion.setAntoFilter('${esc(btn.id)}')" class="px-2.5 py-1 rounded-full text-[11px] font-semibold transition ${act ? 'bg-[#de4800] text-white' : 'bg-white/10 text-stone-600 hover:text-stone-900 border border-stone-200/50'}">${esc(btn.label)}</button>`;
+    }).join('');
+
+    const logsHtml = filteredLogs.length === 0
+      ? '<div class="py-10 text-center text-xs text-stone-500">Todavía no hay cargas en este filtro. Tocá <strong>"+ Cargar lo que hice"</strong> para registrar tu trabajo.</div>'
+      : filteredLogs.map(item => {
+        const hasLink = item.link_url && /^(https?:\/\/|data:)/i.test(item.link_url);
+        const estBadge = item.estado === 'COMPLETADO'
+          ? '<span class="badge-pill badge-emerald text-[10px]">✓ Completado</span>'
+          : item.estado === 'ENVIADO_REVISION'
+            ? '<span class="badge-pill badge-sky text-[10px]">Enviado a Revisión</span>'
+            : '<span class="badge-pill badge-blue text-[10px]">En Proceso</span>';
+
+        return `
+          <div class="p-3.5 rounded-xl bg-white/60 border border-stone-200/70 hover:border-[#de4800]/45 transition flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+            <div class="space-y-1.5 min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="badge-pill badge-orange font-mono text-[10px]">📅 ${formatDateDisplay(item.fecha)}</span>
+                ${estBadge}
+                <span class="badge-pill badge-stone text-[10px]">${esc(item.categoria)}</span>
+                ${item.horas ? `<span class="badge-pill badge-amber font-mono text-[10px]">⏱ ${esc(item.horas)}h</span>` : ''}
+                ${item.tarea_vinculada ? `<span class="font-mono text-[10px] font-bold text-[#ff9c6e]">🔗 ${esc(item.tarea_vinculada)}</span>` : ''}
+                <span class="text-[10px] text-stone-500">📍 ${esc(item.plaza)}</span>
+              </div>
+              <div class="text-xs sm:text-sm font-bold text-stone-900">${esc(item.titulo)}</div>
+              ${item.detalle ? `<p class="text-[11px] text-stone-600 leading-relaxed">${esc(item.detalle)}</p>` : ''}
+              ${hasLink ? `
+                <div class="pt-0.5">
+                  <a href="${esc(item.link_url)}" target="_blank" rel="noopener noreferrer" ${/^data:/i.test(item.link_url) ? `download="${esc(item.link_nombre || 'archivo')}"` : ''} class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#de4800]/15 hover:bg-[#de4800] text-[#ff9c6e] hover:text-white border border-[#de4800]/35 text-[10px] font-semibold transition">
+                    📄 ${esc(item.link_nombre || 'Ver archivo / link')} ↗
+                  </a>
+                </div>
+              ` : ''}
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+              <button type="button" onclick="MaderoConduccion.openAntoRegistroModal('${esc(item.id)}')" class="px-2.5 py-1 rounded-lg bg-stone-900 text-white text-[11px] font-semibold hover:bg-stone-800">
+                Editar
+              </button>
+              <button type="button" onclick="MaderoConduccion.handleDeleteAntoRegistro('${esc(item.id)}')" class="px-2 py-1 rounded-lg bg-stone-100 hover:bg-rose-100 text-stone-500 hover:text-rose-700 text-[11px] font-bold">
+                ×
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+    return `
+      <div class="space-y-5">
+        <div class="glass-card p-4 sm:p-6 space-y-4">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-4 border-b border-stone-200/70">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap mb-1">
+                <span class="badge-pill badge-orange font-mono">Perfil Agenda · Anto</span>
+                <span class="badge-pill badge-blue">Comodoro Rivadavia · IG &amp; TikTok</span>
+              </div>
+              <h2 class="text-base sm:text-lg font-extrabold text-stone-900 tracking-tight">Agenda de Anto: Registro de Trabajo y Avances</h2>
+              <p class="text-xs text-stone-500 mt-0.5">Cargá acá lo que hiciste en el día (historias, TikTok, filmación de crudos, ediciones o envíos a Drive). Todo se guarda en la nube.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" onclick="MaderoStore.exportAntoBitacoraCSV()" class="px-3 py-1.5 rounded-xl bg-white border border-stone-300 text-stone-800 text-xs font-semibold hover:bg-stone-50">
+                ⬇ CSV Anto
+              </button>
+              <button type="button" onclick="MaderoConduccion.openAntoRegistroModal(null)" class="px-4 py-2 rounded-xl bg-[#de4800] hover:brightness-110 text-white text-xs font-bold shadow-xs transition">
+                + Cargar lo que hice
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="p-3.5 rounded-2xl bg-white/75 border border-stone-200/80">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-stone-500 block">Registros Cargados</span>
+              <span class="font-mono text-xl font-extrabold text-stone-900">${allLogs.length}</span>
+              <span class="text-[11px] text-stone-500 block mt-0.5">Actividades en bitácora</span>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-white/75 border border-stone-200/80">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-stone-500 block">Horas Registradas</span>
+              <span class="font-mono text-xl font-extrabold text-stone-900">${totalHs.toFixed(1)}h</span>
+              <span class="text-[11px] text-stone-500 block mt-0.5">Suma de cargas</span>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-white/75 border border-stone-200/80">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-stone-500 block">Completados</span>
+              <span class="font-mono text-xl font-extrabold text-emerald-700">${completadosCount}</span>
+              <span class="text-[11px] text-stone-500 block mt-0.5">Entregados / publicados</span>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-white/75 border border-stone-200/80">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-stone-500 block">Tareas Asignadas</span>
+              <span class="font-mono text-xl font-extrabold text-[#ff9c6e]">${asignadasCount}</span>
+              <span class="text-[11px] text-stone-500 block mt-0.5">Pendientes de seguimiento</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card p-4 sm:p-6 space-y-3">
+          <div>
+            <h3 class="text-sm sm:text-base font-extrabold text-stone-900">📌 Tus Tareas y Pedidos Asignados</h3>
+            <p class="text-xs text-stone-500">Podés cargar avances o archivos directo en estas tareas asignadas.</p>
+          </div>
+          <div class="space-y-2.5">
+            ${assignedCardsHtml}
+          </div>
+        </div>
+
+        <div class="glass-card p-4 sm:p-6 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div>
+              <h3 class="text-sm sm:text-base font-extrabold text-stone-900">📝 Bitácora: Lo que hice</h3>
+              <p class="text-xs text-stone-500">Historial diario de historias, videos, crudos y ediciones.</p>
+            </div>
+            <input type="text" id="anto-search-input" value="${esc(filtersAnto.search)}" oninput="MaderoConduccion.setAntoSearch(this.value)" placeholder="Buscar por título, patente, sucursal..." class="input-glass px-3.5 py-2 w-full sm:w-72">
+          </div>
+
+          <div class="flex flex-wrap items-center gap-1.5">
+            ${catPills}
+          </div>
+
+          <div class="space-y-2.5">
+            ${logsHtml}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function handleAntoFileSelect(inputEl) {
+    const file = inputEl && inputEl.files && inputEl.files[0];
+    if (!file) return;
+    const nameEl = document.getElementById('ant-link-nombre');
+    const urlEl = document.getElementById('ant-link-url');
+    if (nameEl && !nameEl.value.trim()) nameEl.value = file.name;
+    window.MaderoUI.uploadAttachmentFile(file, res => {
+      if (urlEl && res.ok && res.url) {
+        urlEl.value = res.url;
+      }
+    });
+  }
+
+  function openAntoRegistroModal(id) {
+    const state = window.MaderoStore.getState();
+    const list = state.anto_bitacora || [];
+    const existing = id ? list.find(i => i.id === id) : null;
+    const item = existing || {
+      id: '',
+      fecha: new Date().toISOString().slice(0, 10),
+      categoria: ANTO_CATEGORIAS[0],
+      plaza: 'Comodoro · Av. Polonia 546 (Salón Principal)',
+      titulo: '',
+      detalle: '',
+      horas: 1.5,
+      estado: 'COMPLETADO',
+      link_nombre: '',
+      link_url: '',
+      tarea_vinculada: ''
+    };
+
+    const plazaOpts = window.MaderoData.PLAZAS.map(p =>
+      `<option value="${esc(p)}" ${item.plaza === p ? 'selected' : ''}>${esc(p)}</option>`
+    ).join('');
+
+    const tareasOpts = [
+      '<option value="">Sin vincular a tarea específica</option>',
+      ...(state.equipo_tareas || []).filter(t => t.estado !== 'CERRADO_EVIDENCIA').map(t =>
+        `<option value="${esc(t.id)}" ${item.tarea_vinculada === t.id ? 'selected' : ''}>${esc(t.id)} · ${esc(t.tarea).slice(0, 55)}</option>`
+      ),
+      ...(state.agenda_prioridades || []).filter(p => p.estado !== 'CERRADO_EVIDENCIA').map(p =>
+        `<option value="${esc(p.id)}" ${item.tarea_vinculada === p.id ? 'selected' : ''}>${esc(p.id)} · ${esc(p.objetivo).slice(0, 55)}</option>`
+      )
+    ].join('');
+
+    window.MaderoUI.openModal({
+      title: existing ? `Editar Registro ${item.id}` : 'Cargar lo que hice hoy · Anto',
+      subtitle: 'Se guarda automáticamente en la Agenda compartida en Supabase.',
+      maxWidth: 'max-w-2xl',
+      bodyHtml: `
+        <div class="space-y-3.5">
+          <input type="hidden" id="ant-id" value="${esc(item.id)}">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-stone-700 mb-1">Fecha *</label>
+              <input type="date" id="ant-fecha" value="${esc(item.fecha)}" class="input-glass w-full px-3 py-2 font-mono">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-stone-700 mb-1">Tipo de Trabajo</label>
+              <select id="ant-categoria" class="input-glass w-full px-3 py-2">
+                ${ANTO_CATEGORIAS.map(c => `<option value="${esc(c)}" ${item.categoria === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-stone-700 mb-1">Horas dedicadas</label>
+              <input type="number" step="0.5" min="0.5" max="16" id="ant-horas" value="${esc(item.horas)}" class="input-glass w-full px-3 py-2 font-mono">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-stone-700 mb-1">¿Qué hiciste? (Título corto) *</label>
+            <input type="text" id="ant-titulo" value="${esc(item.titulo)}" placeholder="Ej. Historias IG ingresos del día + reel Hilux en Polonia" class="input-glass w-full px-3 py-2 font-semibold">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-stone-700 mb-1">Detalle / Unidades / Observaciones</label>
+            <textarea id="ant-detalle" rows="2" placeholder="Patentes filmadas, qué se subió al Drive, pendientes..." class="input-glass w-full px-3 py-2">${esc(item.detalle)}</textarea>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-stone-700 mb-1">Sucursal / Plaza</label>
+              <select id="ant-plaza" class="input-glass w-full px-3 py-2">${plazaOpts}</select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-stone-700 mb-1">Estado</label>
+              <select id="ant-estado" class="input-glass w-full px-3 py-2">
+                <option value="COMPLETADO" ${item.estado === 'COMPLETADO' ? 'selected' : ''}>✓ Completado / Publicado</option>
+                <option value="ENVIADO_REVISION" ${item.estado === 'ENVIADO_REVISION' ? 'selected' : ''}>Enviado a Revisión (Ángelo/REM)</option>
+                <option value="EN_PROCESO" ${item.estado === 'EN_PROCESO' ? 'selected' : ''}>En Proceso</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-stone-700 mb-1">Vincular a tarea (opcional)</label>
+              <select id="ant-tarea" class="input-glass w-full px-3 py-2">${tareasOpts}</select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-stone-700 mb-1">Nombre del archivo o referencia</label>
+              <input type="text" id="ant-link-nombre" value="${esc(item.link_nombre || '')}" placeholder="Ej. Carpeta Drive Crudos 27/11" class="input-glass w-full px-3 py-2">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-stone-700 mb-1">Link (Drive / IG / TikTok) o Archivo</label>
+              <input type="text" id="ant-link-url" value="${esc(item.link_url || '')}" placeholder="https://..." class="input-glass w-full px-3 py-2">
+            </div>
+          </div>
+
+          <div>
+            <label class="inline-flex items-center gap-2 text-[11px] cursor-pointer">
+              <span class="px-2.5 py-1 rounded-lg bg-white border border-stone-300 text-stone-800 font-semibold hover:bg-stone-50">📄 Adjuntar archivo desde PC / Celu (hasta 3 MB)</span>
+              <input type="file" onchange="MaderoConduccion.handleAntoFileSelect(this)" class="hidden">
+            </label>
+          </div>
+        </div>
+      `,
+      footerHtml: `
+        <button type="button" onclick="MaderoUI.closeModal()" class="px-3.5 py-2 rounded-xl bg-stone-100 text-stone-700 text-xs font-semibold">Cancelar</button>
+        <button type="button" onclick="MaderoConduccion.saveAntoRegistroFromModal()" class="px-4 py-2 rounded-xl bg-[#de4800] hover:brightness-110 text-white text-xs font-bold">Guardar en Agenda</button>
+      `
+    });
+  }
+
+  function saveAntoRegistroFromModal() {
+    const titulo = (document.getElementById('ant-titulo')?.value || '').trim();
+    if (!titulo) {
+      window.MaderoUI.showToast('Contanos brevemente qué hiciste', 'red');
+      return;
+    }
+    window.MaderoStore.upsertAntoRegistro({
+      id: (document.getElementById('ant-id')?.value || '').trim() || undefined,
+      fecha: document.getElementById('ant-fecha')?.value || new Date().toISOString().slice(0, 10),
+      categoria: document.getElementById('ant-categoria')?.value || ANTO_CATEGORIAS[0],
+      horas: Number(document.getElementById('ant-horas')?.value) || 1,
+      titulo,
+      detalle: (document.getElementById('ant-detalle')?.value || '').trim(),
+      plaza: document.getElementById('ant-plaza')?.value || '',
+      estado: document.getElementById('ant-estado')?.value || 'COMPLETADO',
+      tarea_vinculada: document.getElementById('ant-tarea')?.value || '',
+      link_nombre: (document.getElementById('ant-link-nombre')?.value || '').trim(),
+      link_url: (document.getElementById('ant-link-url')?.value || '').trim()
+    });
+    window.MaderoUI.closeModal();
+    window.MaderoUI.showToast('Trabajo de Anto guardado en la nube');
+  }
+
+  function handleDeleteAntoRegistro(id) {
+    if (!confirm(`¿Eliminar el registro ${id}?`)) return;
+    window.MaderoStore.deleteAntoRegistro(id);
+    window.MaderoUI.showToast(`Registro ${id} eliminado`, 'amber');
+  }
+
   return {
     renderGobernanzaSection,
     openEditGobernanzaModal,
@@ -2478,7 +2904,14 @@ window.MaderoConduccion = (function () {
     focusEquipoCapacidad,
     focusEquipoAbsorbido,
     exportEquipoCSV,
-    renderResumenGerencialPreview
+    renderResumenGerencialPreview,
+    renderAntoAgendaModule,
+    setAntoFilter,
+    setAntoSearch,
+    openAntoRegistroModal,
+    handleAntoFileSelect,
+    saveAntoRegistroFromModal,
+    handleDeleteAntoRegistro
   };
 })();
 

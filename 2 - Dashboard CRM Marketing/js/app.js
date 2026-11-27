@@ -6,6 +6,40 @@
 window.MaderoApp = (function () {
   let activeNivel = 'operativo'; // 'operativo' | 'gerencial'
   let activeModuleId = 'm1-agenda'; // 'm1-agenda' | 'm2-equipo' | 'gob-frentes' | 'm3-fotos' ... 'm12-ventas'
+  let activeProfile = 'angelo'; // 'angelo' | 'anto'
+  let profileLockedToAnto = false;
+
+  function getActiveProfile() {
+    return activeProfile;
+  }
+
+  function setProfile(profile) {
+    if (profileLockedToAnto && profile !== 'anto') return;
+    activeProfile = profile === 'anto' ? 'anto' : 'angelo';
+    try { localStorage.setItem('madero_crm_active_profile', activeProfile); } catch (_) {}
+    if (activeProfile === 'anto') {
+      activeNivel = 'operativo';
+      activeModuleId = 'm1-agenda';
+    }
+    renderAll();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function copyAntoLink() {
+    const base = (window.location && window.location.origin && window.location.origin !== 'null')
+      ? window.location.origin
+      : 'https://madero-crm-marketing.vercel.app';
+    const url = `${base}/?perfil=anto`;
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      navigator.clipboard.writeText(url).then(() => {
+        window.MaderoUI?.showToast('Link directo de Anto copiado al portapapeles');
+      }).catch(() => {
+        prompt('Copiá este link para pasarle a Anto:', url);
+      });
+    } else {
+      prompt('Copiá este link para pasarle a Anto:', url);
+    }
+  }
 
   function getClusterForModule(modId) {
     if (modId === 'gob-frentes' || modId === 'm1-agenda' || modId === 'm2-equipo') return 'conduccion';
@@ -98,7 +132,44 @@ window.MaderoApp = (function () {
 
     setTxt('hdr-semana', meta.semana_activa);
     setTxt('hdr-corte', window.MaderoUI.formatDateDisplay(meta.fecha_corte));
-    setTxt('hdr-lider', meta.lider);
+    const isAnto = activeProfile === 'anto';
+    setTxt('hdr-lider', isAnto ? 'Antonella' : meta.lider);
+    setTxt('hdr-avatar-initials', isAnto ? 'AN' : 'AL');
+
+    const toggleHidden = (el, hide) => {
+      if (!el) return;
+      if (hide) el.classList.add('hidden');
+      else el.classList.remove('hidden');
+    };
+
+    toggleHidden(document.getElementById('nivel-switcher'), isAnto);
+    toggleHidden(document.getElementById('btn-toggle-bento'), isAnto);
+    toggleHidden(document.getElementById('hdr-btn-print'), isAnto);
+    toggleHidden(document.getElementById('hdr-btn-settings'), isAnto);
+    toggleHidden(document.getElementById('hdr-btn-settings-mob'), isAnto);
+    toggleHidden(document.getElementById('global-search-wrap'), isAnto);
+    toggleHidden(document.getElementById('profile-switcher'), isAnto && profileLockedToAnto);
+
+    if (isAnto) {
+      const hero = document.getElementById('spatial-bento-hero');
+      if (hero) hero.classList.add('hidden');
+    }
+    document.querySelectorAll('.vision-dock').forEach(dock => {
+      if (isAnto) dock.classList.add('hidden');
+      else dock.classList.remove('hidden');
+    });
+
+    const btnAngelo = document.getElementById('btn-perfil-angelo');
+    const btnAnto = document.getElementById('btn-perfil-anto');
+    if (btnAngelo && btnAnto) {
+      if (isAnto) {
+        btnAnto.className = 'px-2.5 py-1.5 rounded-full text-[11px] font-bold transition tab-btn-active';
+        btnAngelo.className = 'px-2.5 py-1.5 rounded-full text-[11px] font-bold text-stone-600 hover:text-stone-900 transition';
+      } else {
+        btnAngelo.className = 'px-2.5 py-1.5 rounded-full text-[11px] font-bold transition tab-btn-active';
+        btnAnto.className = 'px-2.5 py-1.5 rounded-full text-[11px] font-bold text-stone-600 hover:text-stone-900 transition';
+      }
+    }
 
     const cloudBadge = document.getElementById('cloud-sync-badge');
     if (cloudBadge && window.MaderoStore.getCloudStatus) {
@@ -211,7 +282,7 @@ window.MaderoApp = (function () {
     const strip = document.getElementById('modules-12-strip');
     if (!strip) return;
 
-    if (activeNivel === 'gerencial') {
+    if (activeProfile === 'anto' || activeNivel === 'gerencial') {
       strip.classList.add('hidden');
       return;
     }
@@ -280,7 +351,9 @@ window.MaderoApp = (function () {
     const selEnd = restoreId && typeof activeEl.selectionEnd === 'number' ? activeEl.selectionEnd : null;
 
     let html = '';
-    if (activeNivel === 'gerencial') {
+    if (activeProfile === 'anto') {
+      html = window.MaderoConduccion.renderAntoAgendaModule();
+    } else if (activeNivel === 'gerencial') {
       html = window.MaderoInformeDireccion
         ? window.MaderoInformeDireccion.renderExecutiveReport()
         : window.MaderoConduccion.renderResumenGerencialPreview();
@@ -384,6 +457,23 @@ window.MaderoApp = (function () {
 
   // Inicialización
   window.addEventListener('DOMContentLoaded', () => {
+    try {
+      const params = new URLSearchParams(window.location.search || '');
+      if (params.get('perfil') === 'anto' || window.location.hash === '#anto') {
+        activeProfile = 'anto';
+        profileLockedToAnto = true;
+        activeNivel = 'operativo';
+        activeModuleId = 'm1-agenda';
+      } else {
+        const savedProf = localStorage.getItem('madero_crm_active_profile');
+        if (savedProf === 'anto') {
+          activeProfile = 'anto';
+          activeNivel = 'operativo';
+          activeModuleId = 'm1-agenda';
+        }
+      }
+    } catch (_) {}
+
     window.MaderoStore.init();
     window.MaderoStore.subscribe(() => {
       renderAll();
@@ -552,7 +642,10 @@ window.MaderoApp = (function () {
     handleGlobalSearch,
     triggerQuickNew,
     toggleBentoHero,
-    toggleThemeMode
+    toggleThemeMode,
+    getActiveProfile,
+    setProfile,
+    copyAntoLink
   };
 })();
 

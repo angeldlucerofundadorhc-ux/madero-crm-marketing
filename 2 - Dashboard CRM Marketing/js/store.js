@@ -104,6 +104,9 @@ window.MaderoStore = (function () {
         viaticos: Array.isArray(m.viaticos) ? m.viaticos : []
       }));
     }
+    if (!Array.isArray(merged.anto_bitacora)) {
+      merged.anto_bitacora = deepClone(base.anto_bitacora || []);
+    }
 
     // Migrar capacidad semanal heredada (180h sintéticas -> 47.5h reales Lun-Vie 9:30 a 19:00)
     if (Array.isArray(merged.equipo_miembros)) {
@@ -994,6 +997,59 @@ window.MaderoStore = (function () {
     m.viaticos = m.viaticos.filter(v => v.id !== viaticoId);
     persist(true);
     return true;
+  }
+
+  // Perfil Anto (Agenda dedicada de Antonella)
+  function upsertAntoRegistro(payload) {
+    const s = getState();
+    if (!Array.isArray(s.anto_bitacora)) s.anto_bitacora = [];
+    const list = s.anto_bitacora;
+
+    if (payload.id) {
+      const idx = list.findIndex(i => i.id === payload.id);
+      if (idx !== -1) {
+        list[idx] = Object.assign({}, list[idx], payload);
+        list.sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
+        persist(true);
+        return list[idx];
+      }
+    }
+
+    const nuevo = Object.assign(
+      {
+        id: nextId('ANT', list),
+        fecha: new Date().toISOString().slice(0, 10),
+        categoria: 'Historias diarias IG',
+        plaza: 'Comodoro · Av. Polonia 546 (Salón Principal)',
+        titulo: '',
+        detalle: '',
+        horas: 1,
+        estado: 'COMPLETADO',
+        link_nombre: '',
+        link_url: '',
+        tarea_vinculada: ''
+      },
+      payload,
+      { id: payload.id || nextId('ANT', list) }
+    );
+    list.unshift(nuevo);
+    list.sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
+    persist(true);
+    return nuevo;
+  }
+
+  function deleteAntoRegistro(id) {
+    const s = getState();
+    s.anto_bitacora = (s.anto_bitacora || []).filter(i => i.id !== id);
+    persist(true);
+  }
+
+  function exportAntoBitacoraCSV(filteredList) {
+    const list = Array.isArray(filteredList) ? filteredList : (getState().anto_bitacora || []);
+    const headers = ['ID', 'Fecha', 'Categoría', 'Plaza / Sucursal', 'Qué hizo (Título)', 'Detalle', 'Horas', 'Estado', 'Tarea Vinculada', 'Archivo / Link'];
+    const rows = list.map(i => [i.id, i.fecha, i.categoria, i.plaza, i.titulo, i.detalle, i.horas, i.estado, i.tarea_vinculada || '', i.link_url || i.link_nombre || '']);
+    const dateStr = (getState().meta.fecha_corte || 'reporte').replace(/[^0-9-]/g, '');
+    exportCSV(`madero_agenda_anto_${dateStr}.csv`, headers, rows);
   }
 
   // Módulo 2B: Tareas del Equipo Interno
@@ -2501,6 +2557,9 @@ window.MaderoStore = (function () {
     addMiembroViatico,
     setMiembroViaticoEstado,
     deleteMiembroViatico,
+    upsertAntoRegistro,
+    deleteAntoRegistro,
+    exportAntoBitacoraCSV,
     upsertTareaEquipo,
     deleteTareaEquipo,
     setTareaEquipoEstado,

@@ -83,18 +83,18 @@
 
           <!-- Acciones compactas en mobile -->
           <div class="flex xl:hidden items-center gap-1.5 shrink-0">
-            <button type="button" onclick="MaderoApp.toggleThemeMode()" title="Alternar Tema Spatial / Claro" class="w-9 h-9 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-stone-700 hover:bg-white/20 transition">
+            <button id="hdr-btn-theme-mob" type="button" onclick="MaderoApp.toggleThemeMode()" title="Alternar Tema Spatial / Claro" class="w-9 h-9 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-stone-700 hover:bg-white/20 transition">
               <i id="theme-toggle-icon-mob" class="ri-moon-clear-line text-sm"></i>
             </button>
-            <button type="button" onclick="MaderoUI.openDataCenterModal()" title="Corte y Respaldo" class="w-9 h-9 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-stone-700 hover:bg-white/20 transition">
+            <button id="hdr-btn-settings-mob" type="button" onclick="MaderoUI.openDataCenterModal()" title="Corte y Respaldo" class="w-9 h-9 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-stone-700 hover:bg-white/20 transition">
               <i class="ri-settings-3-line text-sm"></i>
             </button>
           </div>
         </div>
 
-        <!-- Buscador Global + Nivel Switcher + Acciones -->
+        <!-- Buscador Global + Perfil + Nivel Switcher + Acciones -->
         <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3 flex-1 xl:justify-end">
-          <div class="relative w-full sm:w-72 lg:w-80">
+          <div id="global-search-wrap" class="relative w-full sm:w-64 lg:w-72">
             <i class="ri-search-line absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-sm pointer-events-none"></i>
             <input
               id="global-spatial-search"
@@ -105,8 +105,18 @@
             >
           </div>
 
+          <!-- Switcher de Perfil (Ángelo / Anto) -->
+          <div id="profile-switcher" class="inline-flex p-1 rounded-full bg-white/10 border border-white/15 self-start sm:self-auto shrink-0" title="Cambiar perfil de vista">
+            <button id="btn-perfil-angelo" type="button" onclick="MaderoApp.setProfile('angelo')" class="px-2.5 py-1.5 rounded-full text-[11px] font-bold transition tab-btn-active">
+              Ángelo
+            </button>
+            <button id="btn-perfil-anto" type="button" onclick="MaderoApp.setProfile('anto')" class="px-2.5 py-1.5 rounded-full text-[11px] font-bold text-stone-600 hover:text-stone-900 transition">
+              Anto
+            </button>
+          </div>
+
           <!-- Switcher Nivel 1 / Nivel 2 -->
-          <div class="inline-flex p-1 rounded-full bg-white/10 border border-white/15 self-start sm:self-auto shrink-0">
+          <div id="nivel-switcher" class="inline-flex p-1 rounded-full bg-white/10 border border-white/15 self-start sm:self-auto shrink-0">
             <button id="btn-nivel-operativo" type="button" onclick="MaderoApp.setNivel('operativo')" class="px-3 py-1.5 rounded-full text-[11px] font-bold transition tab-btn-active">
               Nivel 1 · Operativo
             </button>
@@ -117,17 +127,17 @@
 
           <!-- Controles circulares estilo VisionOS -->
           <div class="hidden xl:flex items-center gap-2 shrink-0">
-            <button type="button" onclick="MaderoApp.toggleThemeMode()" title="Alternar Tema Spatial Dark / Claro" class="w-9 h-9 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-stone-700 hover:bg-white/20 transition">
+            <button id="hdr-btn-theme" type="button" onclick="MaderoApp.toggleThemeMode()" title="Alternar Tema Spatial Dark / Claro" class="w-9 h-9 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-stone-700 hover:bg-white/20 transition">
               <i id="theme-toggle-icon" class="ri-moon-clear-line text-base"></i>
             </button>
-            <button type="button" onclick="MaderoApp.setNivel('gerencial'); setTimeout(() => window.print(), 180)" title="Imprimir Informe A4 Dirección" class="w-9 h-9 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-stone-700 hover:bg-white/20 transition">
+            <button id="hdr-btn-print" type="button" onclick="MaderoApp.setNivel('gerencial'); setTimeout(() => window.print(), 180)" title="Imprimir Informe A4 Dirección" class="w-9 h-9 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-stone-700 hover:bg-white/20 transition">
               <i class="ri-printer-line text-base"></i>
             </button>
-            <button type="button" onclick="MaderoUI.openDataCenterModal()" title="Corte Semanal, JSON y CSV" class="w-9 h-9 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-stone-700 hover:bg-white/20 transition">
+            <button id="hdr-btn-settings" type="button" onclick="MaderoUI.openDataCenterModal()" title="Corte Semanal, JSON y CSV" class="w-9 h-9 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-stone-700 hover:bg-white/20 transition">
               <i class="ri-settings-3-line text-base"></i>
             </button>
-            <button type="button" onclick="MaderoUI.openEstadosGuideModal()" title="Perfil Dirección / Guía de Estados" class="relative w-9 h-9 rounded-full bg-gradient-to-br from-[#f0540a] to-[#b83b00] text-[#f4f1ea] font-bold text-xs flex items-center justify-center border border-[#f4f1ea]/35 shadow-md">
-              AL
+            <button id="hdr-avatar-btn" type="button" onclick="MaderoUI.openEstadosGuideModal()" title="Perfil Dirección / Guía de Estados" class="relative w-9 h-9 rounded-full bg-gradient-to-br from-[#f0540a] to-[#b83b00] text-[#f4f1ea] font-bold text-xs flex items-center justify-center border border-[#f4f1ea]/35 shadow-md">
+              <span id="hdr-avatar-initials">AL</span>
               <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#0e0e0e]"></span>
             </button>
           </div>
